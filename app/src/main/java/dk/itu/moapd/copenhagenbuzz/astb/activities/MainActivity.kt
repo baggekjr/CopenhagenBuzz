@@ -1,14 +1,15 @@
 package dk.itu.moapd.copenhagenbuzz.astb.activities
 
+
+import android.icu.text.SimpleDateFormat
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import dk.itu.moapd.copenhagenbuzz.astb.databinding.ActivityMainBinding
 import android.util.Log
-import android.widget.EditText
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.datepicker.MaterialDatePicker
+import dk.itu.moapd.copenhagenbuzz.astb.databinding.ActivityMainBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
-import dk.itu.moapd.copenhagenbuzz.astb.R
+import java.util.Date
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,7 +21,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // An instance of the ‘Event ‘ class.
-    private val event: Event = Event("", "","","","")
+    private val event: Event = Event("", "", "", "", "")
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
         setContentView(binding.root)
 
 
@@ -36,17 +38,53 @@ class MainActivity : AppCompatActivity() {
             // Only execute the following code when the user fills all ‘EditText ‘.
             handleButtonOnClick()
         }
+
+        //Listener for user interaction in the "Add event date" textfield
+        binding.contentMain.editTextEventDate.setOnClickListener {
+            handleDateOnClick()
+        }
+
+    }
+
+    private fun handleDateOnClick() {
+        val dateRangePicker =
+            MaterialDatePicker.Builder.dateRangePicker().setTitleText("Select dates").build()
+        dateRangePicker.show(supportFragmentManager, "DatePicker")
+
+        dateRangePicker.addOnPositiveButtonClickListener { datePicked ->
+            val startDate = datePicked.first
+            val endDate = datePicked.second
+
+            binding.contentMain.editTextEventDate.setText(
+                convertLongToDate(startDate) + "  " + convertLongToDate(
+                    endDate
+                )
+            )
+
+
+        }
+    }
+
+    private fun convertLongToDate(time: Long): String {
+        val date = Date(time)
+        val format = SimpleDateFormat(
+            "dd-MM-yyyy"
+        )
+
+        return format.format(date)
     }
 
     private fun handleButtonOnClick() {
-        if (binding.contentMain.editTextEventName.text.toString().isNotEmpty() &&
-            binding.contentMain.editTextEventLocation.text.toString().isNotEmpty() &&
-            binding.contentMain.editTextEventDate.text.toString().isNotEmpty() &&
-            binding.contentMain.editTextEventType.text.toString().isNotEmpty() &&
-            binding.contentMain.editTextEventDescription.text.toString().isNotEmpty()
+        if (binding.contentMain.editTextEventName.text.toString()
+                .isNotEmpty() && binding.contentMain.editTextEventLocation.text.toString()
+                .isNotEmpty() && binding.contentMain.editTextEventDate.text.toString()
+                .isNotEmpty() && binding.contentMain.editTextEventType.text.toString()
+                .isNotEmpty() && binding.contentMain.editTextEventDescription.text.toString()
+                .isNotEmpty()
         ) {
             // Update the object attributes.
-            Event(binding.contentMain.editTextEventName.text.toString().trim(),
+            Event(
+                binding.contentMain.editTextEventName.text.toString().trim(),
                 binding.contentMain.editTextEventLocation.text.toString().trim(),
                 binding.contentMain.editTextEventDate.text.toString().trim(),
                 binding.contentMain.editTextEventType.text.toString().trim(),
