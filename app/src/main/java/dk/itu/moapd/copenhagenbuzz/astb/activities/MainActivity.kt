@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
             handleButtonOnClick()
         }
 
-        //Listener for user interaction in the "Add event date" textfield
+        // Listener for user interaction in the "Add event date" textfield
         binding.contentMain.editTextEventDate.setOnClickListener {
             handleDateOnClick()
         }
@@ -56,12 +56,8 @@ class MainActivity : AppCompatActivity() {
             val endDate = datePicked.second
 
             binding.contentMain.editTextEventDate.setText(
-                convertLongToDate(startDate) + "  " + convertLongToDate(
-                    endDate
-                )
+                convertLongToDate(startDate) + " - " + convertLongToDate(endDate)
             )
-
-
         }
     }
 
@@ -70,7 +66,6 @@ class MainActivity : AppCompatActivity() {
         val format = SimpleDateFormat(
             "dd-MM-yyyy"
         )
-
         return format.format(date)
     }
 
