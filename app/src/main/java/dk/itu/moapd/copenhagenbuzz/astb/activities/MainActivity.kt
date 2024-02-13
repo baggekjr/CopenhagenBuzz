@@ -4,11 +4,13 @@ package dk.itu.moapd.copenhagenbuzz.astb.activities
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.WindowCompat
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
+import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.ActivityMainBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import java.util.Date
@@ -21,6 +23,7 @@ import java.util.Date
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private var isLoggedIn: Boolean = false
 
 
     // A set of private constants used in this class .
@@ -52,7 +55,28 @@ class MainActivity : AppCompatActivity() {
             handleDateOnClick()
         }
 
+        binding.contentMain.childAppBar.setOnClickListener{
+            onPrepareOptionsMenu(binding.contentMain.childAppBar.menu)
+        }
+
     }
+
+
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        isLoggedIn = intent.getBooleanExtra("IsLoggedIn", false)
+        if(isLoggedIn) {
+            binding.contentMain.childAppBar.menu.findItem(R.id.nav_to_login).setIcon(R.drawable.baseline_hail_24)
+        } else {
+            binding.contentMain.childAppBar.menu.findItem(R.id.nav_to_logout).setIcon(R.drawable.baseline_account_circle_24)
+        }
+        return true
+
+    }
+
+
+
+
 
     /**
      * Handles the date picker to pop up and the dates selected to get written out
@@ -133,5 +157,7 @@ class MainActivity : AppCompatActivity() {
     private fun showMessage() {
         Log.d(TAG, event.toString())
     }
+
+
 
 }
