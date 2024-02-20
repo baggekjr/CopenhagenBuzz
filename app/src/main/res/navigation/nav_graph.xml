@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/fragment_timeline">
+
+    <fragment
+        android:id="@+id/fragment_timeline"
+        android:name="dk.itu.moapd.copenhagenbuzz.astb.fragments.EventFragment"
+        android:label="@string/timeline"
+        tools:layout="@layout/fragment_event" >
+        <action
+            android:id="@+id/action_favorites"
+            app:destination="@+id/fragment_favorites" />
+        <action
+            android:id="@id/fragment_maps"
+            app:destination="@+id/fragment_maps" />
+        <action
+            android:id="@id/fragment_timeline"
+            app:destination="@id/fragment_timeline" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_favorites"
+        android:name="dk.itu.moapd.copenhagenbuzz.astb.fragments.FavoritesFragment"
+        android:label="@string/favorites"
+        tools:layout="@layout/fragment_favorites" >
+        <action
+            android:id="@+id/action_maps"
+            app:destination="@+id/fragment_maps" />
+        <action
+            android:id="@id/fragment_timeline"
+            app:destination="@id/fragment_timeline" />
+        <action
+            android:id="@+id/action_favorites"
+            app:destination="@+id/fragment_favorites" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_maps"
+        android:name="dk.itu.moapd.copenhagenbuzz.astb.fragments.MapsFragment"
+        android:label="@string/Maps"
+        tools:layout="@layout/fragment_maps" >
+        <action
+            android:id="@+id/action_timeline"
+            app:destination="@+id/fragment_timeline" />
+        <action
+            android:id="@+id/action_favorites"
+            app:destination="@+id/fragment_favorites" />
+        <action
+            android:id="@id/fragment_maps"
+            app:destination="@+id/fragment_maps" />
+    </fragment>
+
+</navigation>
