@@ -28,7 +28,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun navigateToMain(isLoggedIn : Boolean) {
         val intent = Intent(this, MainActivity::class.java).apply {
-            putExtra("isLoggedIn", isLoggedIn)
+            putExtra("IsLoggedIn", isLoggedIn)
         }
         startActivity(intent)
         finish()

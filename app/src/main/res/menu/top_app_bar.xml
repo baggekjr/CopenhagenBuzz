@@ -8,12 +8,7 @@
         android:title="@string/profile"
         app:showAsAction="ifRoom"
         />
-    <item
-        android:id="@+id/nav_to_logout"
-        android:icon="@drawable/baseline_hail_24"
-        android:title="@string/profile"
-        app:showAsAction="ifRoom"
-        />
+
 
 
 

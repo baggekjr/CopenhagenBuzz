@@ -1,6 +1,7 @@
 package dk.itu.moapd.copenhagenbuzz.astb.activities
 
 
+import android.content.Intent
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.util.Log
@@ -43,6 +44,7 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(binding.root)
 
+        onPrepareOptionsMenu(binding.contentMain.childAppBar.menu)
 
         // Listener for user interaction in the ‘Add Event‘ button.
         binding.contentMain.addEventButton.setOnClickListener {
@@ -54,27 +56,38 @@ class MainActivity : AppCompatActivity() {
         binding.contentMain.editTextEventDate.setOnClickListener {
             handleDateOnClick()
         }
-
-        binding.contentMain.childAppBar.setOnClickListener{
-            onPrepareOptionsMenu(binding.contentMain.childAppBar.menu)
+        // Listener for user interaction with top app bar to either login or out
+        binding.contentMain.childAppBar.setOnMenuItemClickListener{
+            handleGoToLogin()
+            true
         }
 
     }
 
-
+    /**
+     * Changes the icon depending on if you're logged in or are using CopenhagenBuzz as a guest
+     * @param menu The top app bar
+     */
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         isLoggedIn = intent.getBooleanExtra("IsLoggedIn", false)
         if(isLoggedIn) {
             binding.contentMain.childAppBar.menu.findItem(R.id.nav_to_login).setIcon(R.drawable.baseline_hail_24)
         } else {
-            binding.contentMain.childAppBar.menu.findItem(R.id.nav_to_logout).setIcon(R.drawable.baseline_account_circle_24)
+            binding.contentMain.childAppBar.menu.findItem(R.id.nav_to_login).setIcon(R.drawable.baseline_account_circle_24)
         }
         return true
 
     }
 
-
+    /**
+     * Handles the top menu button to go to the login-page
+     */
+    private fun handleGoToLogin() {
+        val intent = Intent(this, LoginActivity::class.java).putExtra("IsLoggedIn",isLoggedIn)
+        startActivity(intent)
+        finish()
+    }
 
 
 
