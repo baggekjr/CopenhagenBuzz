@@ -72,7 +72,6 @@ class EventFragment : Fragment() {
      *
      */
 
-
     private fun handleDateOnClick() {
         // TODO: Fix it so you dont have to press twice for it to open.
         val dateRangePicker =
