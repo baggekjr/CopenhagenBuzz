@@ -53,7 +53,7 @@ class EventFragment : Fragment() {
 
         // Listener for user interaction in the "Add event date" textfield
         binding.editTextEventDate.setOnClickListener {
-            //handleDateOnClick()
+            handleDateOnClick()
         }
     }.root
 

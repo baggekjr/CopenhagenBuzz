@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/fragment_timeline">
+    app:startDestination="@id/fragment_event">
 
     <fragment
-        android:id="@+id/fragment_timeline"
+        android:id="@+id/fragment_event"
         android:name="dk.itu.moapd.copenhagenbuzz.astb.fragments.EventFragment"
-        android:label="@string/timeline"
+        android:label="@string/event"
         tools:layout="@layout/fragment_event" >
         <action
             android:id="@+id/action_favorites"
@@ -19,6 +19,22 @@
         <action
             android:id="@id/fragment_timeline"
             app:destination="@id/fragment_timeline" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_timeline"
+        android:name="dk.itu.moapd.copenhagenbuzz.astb.fragments.TimelineFragment"
+        android:label="@string/timeline"
+        tools:layout="@layout/fragment_timeline" >
+        <action
+            android:id="@+id/action_favorites"
+            app:destination="@+id/fragment_favorites" />
+        <action
+            android:id="@id/fragment_maps"
+            app:destination="@+id/fragment_maps" />
+        <action
+            android:id="@id/fragment_event"
+            app:destination="@id/fragment_event" />
     </fragment>
 
     <fragment
@@ -33,8 +49,8 @@
             android:id="@id/fragment_timeline"
             app:destination="@id/fragment_timeline" />
         <action
-            android:id="@+id/action_favorites"
-            app:destination="@+id/fragment_favorites" />
+            android:id="@id/fragment_event"
+            app:destination="@id/fragment_event" />
     </fragment>
 
     <fragment
@@ -49,8 +65,8 @@
             android:id="@+id/action_favorites"
             app:destination="@+id/fragment_favorites" />
         <action
-            android:id="@id/fragment_maps"
-            app:destination="@+id/fragment_maps" />
+            android:id="@id/fragment_event"
+            app:destination="@id/fragment_event" />
     </fragment>
 
 </navigation>

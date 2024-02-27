@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.WindowCompat
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
 import dk.itu.moapd.copenhagenbuzz.astb.R
@@ -27,10 +28,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var isLoggedIn: Boolean = false
 
-    val navHostFragment = supportFragmentManager .findFragmentById(
-        R.id.fragment_container_view ) as NavHostFragment
-    val navController = navHostFragment.navController
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -41,6 +38,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         onPrepareOptionsMenu(binding.contentMain.childAppBar.menu)
+
+        val navHostFragment = supportFragmentManager.findFragmentById(
+            R.id.fragment_container_view ) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        binding.contentMain.bottomNavigation.setupWithNavController(navController)
 
 
         // Listener for user interaction with top app bar to either login or out

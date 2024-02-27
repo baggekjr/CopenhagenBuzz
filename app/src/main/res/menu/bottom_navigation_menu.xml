@@ -1,4 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <item
+        android:id="@+id/fragment_timeline"
+        android:icon="@drawable/baseline_home_24"
+        android:title="@string/timeline"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/fragment_event"
+        android:icon="@drawable/baseline_event_24"
+        android:title="@string/event"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/fragment_favorites"
+        android:icon="@drawable/baseline_favorite_24"
+        android:title="@string/favorites"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/fragment_maps"
+        android:icon="@drawable/baseline_map_24"
+        android:title="@string/Maps"
+        app:showAsAction="ifRoom"/>
 
 </menu>
