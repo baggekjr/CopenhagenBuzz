@@ -1,23 +1,3 @@
-package dk.itu.moapd.copenhagenbuzz.astb.activities
-
-
-import android.content.Intent
-import android.icu.text.SimpleDateFormat
-import android.os.Bundle
-import android.util.Log
-import android.view.Menu
-import androidx.appcompat.app.AppCompatActivity
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.WindowCompat
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.snackbar.Snackbar
-import dk.itu.moapd.copenhagenbuzz.astb.R
-import dk.itu.moapd.copenhagenbuzz.astb.databinding.ActivityMainBinding
-import dk.itu.moapd.copenhagenbuzz.astb.models.Event
-import java.util.Date
-
 
 /**
  * MIT License
@@ -43,26 +23,63 @@ import java.util.Date
  * SOFTWARE.
  */
 
+package dk.itu.moapd.copenhagenbuzz.astb.activities
+
+
+import android.content.Intent
+import android.os.Bundle
+import android.view.Menu
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
+import dk.itu.moapd.copenhagenbuzz.astb.R
+import dk.itu.moapd.copenhagenbuzz.astb.databinding.ActivityMainBinding
+
+
+
+/**
+ * Activity class to manage the main activity of CopenhagenBuzz
+ */
+
 class MainActivity : AppCompatActivity() {
 
+    /**
+     * View binding that creates a direct reference to make coding easier
+     */
     private lateinit var binding: ActivityMainBinding
     private var isLoggedIn: Boolean = false
 
+    /**
+     * Main function to create the MainActivity at the start. Calls relevant functions to
+     * provide functionality and initializes.
+     *
+     * @param savedInstanceState form of data that makes sure to contain the most recent data after
+     * being previously run
+     */
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
 
+        // Calls method to create the correct icon determining if you are logged in or not
         onPrepareOptionsMenu(binding.contentMain.childAppBar.menu)
 
+        /* Initializing navHosFragment which is responsible for displaying destinations
+        via Navigation Graph
+         */
         val navHostFragment = supportFragmentManager.findFragmentById(
             R.id.fragment_container_view ) as NavHostFragment
+
+        /* Initializing navController, which manages the current position and facilitates
+        swapping between destinations as users use CopenhagenBuzz
+         */
         val navController = navHostFragment.navController
 
+        // Adds the bottomNavigation to easily navigate through the application
         binding.contentMain.bottomNavigation.setupWithNavController(navController)
 
 
@@ -77,9 +94,9 @@ class MainActivity : AppCompatActivity() {
     /**
      * Changes the icon depending on if you're logged in or are using CopenhagenBuzz as a guest
      * @param menu The top app bar
-     * @return TODO
+     *
+     * @return return if the user is logged in or not
      */
-
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         isLoggedIn = intent.getBooleanExtra("IsLoggedIn", false)
         if(isLoggedIn) {
