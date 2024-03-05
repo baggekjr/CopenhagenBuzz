@@ -44,9 +44,10 @@ class TimelineFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         // Set up data binding and lifecycle owner.
         binding.apply {
-            dataViewModel = ViewModelProvider()
+            dataViewModel =
             eventAdapter = viewLifecycleOwner
         }
+
     }
     override fun onDestroyView() {
         super.onDestroyView()
