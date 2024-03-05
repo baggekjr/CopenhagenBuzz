@@ -5,8 +5,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentTimelineBinding
+import dk.itu.moapd.copenhagenbuzz.astb.models.DataViewModel
+import dk.itu.moapd.copenhagenbuzz.astb.models.EventAdapter
+
 
 
 
@@ -18,6 +24,8 @@ import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentTimelineBinding
 class TimelineFragment : Fragment() {
 
     private var _binding: FragmentTimelineBinding? = null
+    private lateinit var dataViewModel: DataViewModel
+    private lateinit var eventAdapter: EventAdapter
 
     private val binding
         get() = requireNotNull(_binding) {
@@ -31,6 +39,15 @@ class TimelineFragment : Fragment() {
         _binding = it
     }.root
 
+    override fun onViewCreated(view: View,
+                               savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        // Set up data binding and lifecycle owner.
+        binding.apply {
+            dataViewModel = ViewModelProvider()
+            eventAdapter = viewLifecycleOwner
+        }
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

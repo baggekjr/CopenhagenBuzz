@@ -87,6 +87,7 @@
                 />
 
             <TextView
+                android:id="@+id/event_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -95,6 +96,7 @@
                 android:textAppearance="?attr/textAppearanceBodyMedium"
                 android:textColor="?android:attr/textColorSecondary" />
             <TextView
+                android:id="@+id/event_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -103,6 +105,7 @@
                 android:textColor="?android:attr/textColorSecondary" />
 
             <TextView
+                android:id="@+id/event_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"

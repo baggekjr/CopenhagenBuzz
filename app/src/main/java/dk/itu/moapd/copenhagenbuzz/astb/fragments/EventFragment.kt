@@ -31,7 +31,7 @@ class EventFragment : Fragment() {
     }
 
     // An instance of the ‘Event ‘ class.
-    private val event: Event = Event("", "", "", "", "")
+    private val event: Event = Event("", "", "", "", "", "")
 
     private val binding
         get() = requireNotNull(_binding) {
@@ -123,13 +123,14 @@ class EventFragment : Fragment() {
                 .isNotEmpty()
         ) {
             // Update the object attributes.
+            val eventIcon = "picture"
             val eventName = binding.editTextEventName.text.toString().trim()
             val eventLocation = binding.editTextEventLocation.text.toString().trim()
             val eventDate = binding.editTextEventDate.text.toString().trim()
             val eventType = binding.editTextEventType.text.toString().trim()
             val eventDescription = binding.editTextEventDescription.text.toString().trim()
 
-            Event(eventName, eventLocation, eventDate, eventType, eventDescription)
+            Event(eventIcon, eventName, eventLocation, eventDate, eventType, eventDescription)
 
             // Show snackbar with the event
             Snackbar.make(binding.root, eventName+" " +eventLocation+" "+eventDate+" "+eventType+" "+eventDescription, Snackbar.LENGTH_SHORT).show()
