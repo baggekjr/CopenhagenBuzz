@@ -6,14 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentTimelineBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.DataViewModel
-import dk.itu.moapd.copenhagenbuzz.astb.models.Event
-import dk.itu.moapd.copenhagenbuzz.astb.models.EventAdapter
+import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
 
 
 

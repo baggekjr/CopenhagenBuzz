@@ -1,14 +1,13 @@
-package dk.itu.moapd.copenhagenbuzz.astb.models
+package dk.itu.moapd.copenhagenbuzz.astb.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.BaseAdapter
-import androidx.lifecycle.LiveData
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.EventRowItemBinding
+import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 
 class EventAdapter(private val context: Context, private val events: List<Event>) :
     ArrayAdapter<Event>(context, R.layout.event_row_item, events) {
