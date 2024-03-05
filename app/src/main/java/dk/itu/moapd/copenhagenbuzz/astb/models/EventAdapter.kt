@@ -4,23 +4,14 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.BaseAdapter
 import androidx.lifecycle.LiveData
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.EventRowItemBinding
 
-class EventAdapter(private val context: Context, private val events: LiveData<List<Event>>) : BaseAdapter() {
-    override fun getCount(): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun getItem(position: Int): Event {
-        TODO("Not yet implemented")
-    }
-
-    override fun getItemId(position: Int): Long {
-        TODO("Not yet implemented")
-    }
+class EventAdapter(private val context: Context, private val events: List<Event>) :
+    ArrayAdapter<Event>(context, R.layout.event_row_item, events) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view = convertView ?: LayoutInflater.from(context).inflate(

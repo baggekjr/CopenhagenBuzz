@@ -57,6 +57,7 @@ class MainActivity : AppCompatActivity() {
     /**
      * Changes the icon depending on if you're logged in or are using CopenhagenBuzz as a guest
      * @param menu The top app bar
+     * @return TODO
      */
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {

@@ -11,6 +11,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentTimelineBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.DataViewModel
+import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.models.EventAdapter
 
 
@@ -26,6 +27,7 @@ class TimelineFragment : Fragment() {
     private var _binding: FragmentTimelineBinding? = null
     private lateinit var dataViewModel: DataViewModel
     private lateinit var eventAdapter: EventAdapter
+    private lateinit var list: List<Event>
 
     private val binding
         get() = requireNotNull(_binding) {
@@ -44,8 +46,8 @@ class TimelineFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         // Set up data binding and lifecycle owner.
         binding.apply {
-            dataViewModel =
-            eventAdapter = viewLifecycleOwner
+            eventAdapter = EventAdapter(requireContext(), list)
+            listView.adapter = eventAdapter
         }
 
     }
