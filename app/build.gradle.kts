@@ -39,7 +39,6 @@ android {
 }
 
 dependencies {
-
     implementation("com.github.javafaker:javafaker:1.0.2")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")

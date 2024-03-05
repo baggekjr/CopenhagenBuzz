@@ -31,7 +31,7 @@ class EventFragment : Fragment() {
     }
 
     // An instance of the ‘Event ‘ class.
-    private val event: Event = Event("", "", "", "", "", "")
+    private val event: Event = Event( "","", "", "", "", "")
 
     private val binding
         get() = requireNotNull(_binding) {

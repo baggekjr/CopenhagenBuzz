@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -25,9 +26,8 @@ import dk.itu.moapd.copenhagenbuzz.astb.models.EventAdapter
 class TimelineFragment : Fragment() {
 
     private var _binding: FragmentTimelineBinding? = null
-    private lateinit var dataViewModel: DataViewModel
+    private val dataViewModel: DataViewModel by viewModels()
     private lateinit var eventAdapter: EventAdapter
-    private lateinit var list: List<Event>
 
     private val binding
         get() = requireNotNull(_binding) {
@@ -44,10 +44,16 @@ class TimelineFragment : Fragment() {
     override fun onViewCreated(view: View,
                                savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
         // Set up data binding and lifecycle owner.
         binding.apply {
-            eventAdapter = EventAdapter(requireContext(), list)
-            listView.adapter = eventAdapter
+            dataViewModel.events.observe(viewLifecycleOwner) {
+                eventAdapter = EventAdapter(requireContext(), it)
+                listView.adapter = eventAdapter
+            }
+
+
         }
 
     }
