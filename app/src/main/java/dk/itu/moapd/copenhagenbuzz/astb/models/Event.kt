@@ -2,9 +2,6 @@ package dk.itu.moapd.copenhagenbuzz.astb.models
 
 import android.graphics.drawable.Icon
 
-/**
- * License??
- */
 
 /**
  * Data class that takes the information on the Event the user has filled in retrieved from MainActivity
