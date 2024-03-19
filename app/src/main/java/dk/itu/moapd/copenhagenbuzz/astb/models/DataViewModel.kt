@@ -13,9 +13,25 @@ class DataViewModel : ViewModel() {
     private val _events: MutableLiveData<List<Event>> by lazy {
         MutableLiveData<List<Event>>()
     }
+    private val _favorites: MutableLiveData<List<Event>> by lazy {
+        MutableLiveData<List<Event>>()
+    }
 
     val events: LiveData<List<Event>>
         get() = _events
+
+    val favorites: LiveData<List<Event>>
+        get() = _favorites
+
+
+    init {
+
+    }
+
+    private fun generateRandomFavorites(events: List<Event>): List<Event> {
+        val shuffledIndices = (events.indices).shuffled().take(25).sorted()
+        return shuffledIndices.mapNotNull { index -> events.getOrNull(index) }
+    }
 
     init {
         makeEvents()
