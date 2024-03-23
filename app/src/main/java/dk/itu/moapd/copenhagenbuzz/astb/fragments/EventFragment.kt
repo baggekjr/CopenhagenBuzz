@@ -17,6 +17,7 @@ import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentTimelineBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.DataViewModel
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import java.util.Date
+import java.util.Locale
 
 
 /**
@@ -64,6 +65,8 @@ class EventFragment : Fragment() {
             editTextEventDate.setOnClickListener {
                 handleDateOnClick()
             }
+
+            setupDatePicker()
         }
     }
 
@@ -72,6 +75,15 @@ class EventFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun setupDatePicker() {
+        with(binding.editTextEventDate) {
+            keyListener = null
+            setOnFocusChangeListener { _, infocus ->
+                if (infocus) handleDateOnClick()
+            }
+        }
     }
 
     /**
@@ -84,18 +96,24 @@ class EventFragment : Fragment() {
      */
 
     private fun handleDateOnClick() {
-        // TODO: Fix it so you dont have to press twice for it to open.
-        val dateRangePicker =
-            MaterialDatePicker.Builder.dateRangePicker().setTitleText("Select dates").build()
-        dateRangePicker.show(parentFragmentManager, "DatePicker")
+        with(binding.editTextEventDate){
+            val dateRangePicker =
+                MaterialDatePicker.Builder.dateRangePicker().setTitleText("Select dates").build()
+            dateRangePicker.show(parentFragmentManager, "DatePicker")
 
-        dateRangePicker.addOnPositiveButtonClickListener { datePicked ->
-            val startDate = datePicked.first
-            val endDate = datePicked.second
+            dateRangePicker.addOnPositiveButtonClickListener { datePicked ->
+                val startDate = Date(datePicked.first)
+                val endDate = Date(datePicked.second)
 
-            binding.editTextEventDate.setText(
-                convertLongToDate(startDate) + " - " + convertLongToDate(endDate)
-            )
+                //set event date
+
+                val formatDate = SimpleDateFormat("E, MMM dd yyyy", Locale.US)
+
+                setText(
+                    // Don't do this - use a string resource
+                    formatDate.format(startDate) + " - " + formatDate.format(endDate)
+                )
+            }
         }
     }
 
