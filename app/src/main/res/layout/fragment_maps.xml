@@ -6,11 +6,8 @@
     tools:context=".fragments.MapsFragment">
 
     <TextView
-        style="?textAppearanceHeadlineSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/placeholder_text"
         android:text="@string/Maps"
-        android:layout_gravity="center"
         />
 
 </FrameLayout>
