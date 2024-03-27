@@ -1,10 +1,9 @@
-package dk.itu.moapd.copenhagenbuzz.astb.viewmodels
+package dk.itu.moapd.copenhagenbuzz.astb.models
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.github.javafaker.Faker
-import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
