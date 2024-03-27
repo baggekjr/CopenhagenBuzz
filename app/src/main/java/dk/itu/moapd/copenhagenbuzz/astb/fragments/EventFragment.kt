@@ -10,11 +10,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
-import dk.itu.moapd.copenhagenbuzz.astb.R
-import dk.itu.moapd.copenhagenbuzz.astb.activities.MainActivity
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentEventBinding
-import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentTimelineBinding
-import dk.itu.moapd.copenhagenbuzz.astb.models.DataViewModel
+import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import java.util.Date
 import java.util.Locale
