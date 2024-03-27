@@ -7,11 +7,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentEventBinding
-import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import java.util.Date
 import java.util.Locale
@@ -24,7 +22,6 @@ import java.util.Locale
  */
 class EventFragment : Fragment() {
     private var _binding: FragmentEventBinding? = null
-    private val dataViewModel: DataViewModel by viewModels()
 
     // A set of private constants used in this class .
     companion object {

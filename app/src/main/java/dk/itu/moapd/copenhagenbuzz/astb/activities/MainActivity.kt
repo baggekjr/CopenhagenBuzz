@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Calls method to create the correct icon determining if you are logged in or not
-        onPrepareOptionsMenu(binding.contentMain.childAppBar.menu)
+        onPrepareOptionsMenu(binding.childAppBar.menu)
 
         /* Initializing navHosFragment which is responsible for displaying destinations
         via Navigation Graph
@@ -80,11 +80,11 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
 
         // Adds the bottomNavigation to easily navigate through the application
-        binding.contentMain.bottomNavigation.setupWithNavController(navController)
+        binding.bottomNavigation.setupWithNavController(navController)
 
 
         // Listener for user interaction with top app bar to either login or out
-        binding.contentMain.childAppBar.setOnMenuItemClickListener{
+        binding.childAppBar.setOnMenuItemClickListener{
             handleGoToLogin()
             true
         }
@@ -100,9 +100,9 @@ class MainActivity : AppCompatActivity() {
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         isLoggedIn = intent.getBooleanExtra("IsLoggedIn", false)
         if(isLoggedIn) {
-            binding.contentMain.childAppBar.menu.findItem(R.id.nav_to_login).setIcon(R.drawable.baseline_hail_24)
+            binding.childAppBar.menu.findItem(R.id.nav_to_login).setIcon(R.drawable.baseline_hail_24)
         } else {
-            binding.contentMain.childAppBar.menu.findItem(R.id.nav_to_login).setIcon(R.drawable.baseline_account_circle_24)
+            binding.childAppBar.menu.findItem(R.id.nav_to_login).setIcon(R.drawable.baseline_account_circle_24)
         }
         return true
 
