@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentTimelineBinding
-import dk.itu.moapd.copenhagenbuzz.astb.models.DataViewModel
+import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
 
 
