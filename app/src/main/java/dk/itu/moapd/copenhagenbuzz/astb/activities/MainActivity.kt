@@ -33,6 +33,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.google.firebase.auth.FirebaseAuth
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.ActivityMainBinding
 
@@ -44,6 +45,7 @@ import dk.itu.moapd.copenhagenbuzz.astb.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var auth: FirebaseAuth
     /**
      * View binding that creates a direct reference to make coding easier
      */
@@ -66,7 +68,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Calls method to create the correct icon determining if you are logged in or not
-        onPrepareOptionsMenu(binding.contentMain.childAppBar.menu)
+        //onPrepareOptionsMenu(binding.contentMain.childAppBar.menu)
 
         /* Initializing navHosFragment which is responsible for displaying destinations
         via Navigation Graph
@@ -83,20 +85,37 @@ class MainActivity : AppCompatActivity() {
         binding.contentMain.bottomNavigation.setupWithNavController(navController)
 
 
-        // Listener for user interaction with top app bar to either login or out
+        auth = FirebaseAuth.getInstance()
+
+       /* // Listener for user interaction with top app bar to either login or out
         binding.contentMain.childAppBar.setOnMenuItemClickListener{
-            handleGoToLogin()
+            onStart()
             true
-        }
+        }*/
 
     }
+
+    override fun onStart() {
+        super.onStart()
+        // Redirect the user to the LoginActivity
+        // if they are not logged in.
+        auth.currentUser ?: startLoginActivity()
+    }
+
+    private fun startLoginActivity() {
+        Intent(this, LoginActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }.let(::startActivity)
+    }
+
 
     /**
      * Changes the icon depending on if you're logged in or are using CopenhagenBuzz as a guest
      * @param menu The top app bar
      *
      * @return return if the user is logged in or not
-     */
+
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         isLoggedIn = intent.getBooleanExtra("IsLoggedIn", false)
         if(isLoggedIn) {
@@ -108,14 +127,16 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    /**
+
+
      * Handles the top menu button to go to the login-page
-     */
+
     private fun handleGoToLogin() {
         val intent = Intent(this, LoginActivity::class.java).putExtra("IsLoggedIn",isLoggedIn)
         startActivity(intent)
         finish()
     }
+    */
 
 
 
