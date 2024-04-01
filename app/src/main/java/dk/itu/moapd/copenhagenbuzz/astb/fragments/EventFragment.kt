@@ -9,12 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
-import dk.itu.moapd.copenhagenbuzz.astb.R
-import dk.itu.moapd.copenhagenbuzz.astb.activities.MainActivity
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentEventBinding
-import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentTimelineBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import java.util.Date
+import java.util.Locale
 
 
 /**
@@ -27,7 +25,7 @@ class EventFragment : Fragment() {
 
     // A set of private constants used in this class .
     companion object {
-        private val TAG = MainActivity::class.qualifiedName
+        private val TAG = EventFragment::class.qualifiedName
     }
 
     // An instance of the ‘Event ‘ class.
@@ -44,23 +42,42 @@ class EventFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View = FragmentEventBinding.inflate(inflater, container, false).also {
         _binding = it
-
-        // Listener for user interaction in the ‘Add Event‘ button.
-        binding.addEventButton.setOnClickListener {
-            // Only execute the following code when the user fills all ‘EditText ‘.
-            handleEventButtonOnClick()
-        }
-
-        // Listener for user interaction in the "Add event date" textfield
-        binding.editTextEventDate.setOnClickListener {
-            handleDateOnClick()
-        }
     }.root
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Set up data binding and lifecycle owner.
+        binding.apply {
+            // Listener for user interaction in the ‘Add Event‘ button.
+            addEventButton.setOnClickListener {
+                // Only execute the following code when the user fills all ‘EditText‘.
+                handleEventButtonOnClick()
+            }
+
+            // Listener for user interaction in the "Add event date" textfield
+            editTextEventDate.setOnClickListener {
+                handleDateOnClick()
+            }
+
+            setupDatePicker()
+        }
+    }
+
 
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun setupDatePicker() {
+        with(binding.editTextEventDate) {
+            keyListener = null
+            setOnFocusChangeListener { _, infocus ->
+                if (infocus) handleDateOnClick()
+            }
+        }
     }
 
     /**
@@ -73,18 +90,24 @@ class EventFragment : Fragment() {
      */
 
     private fun handleDateOnClick() {
-        // TODO: Fix it so you dont have to press twice for it to open.
-        val dateRangePicker =
-            MaterialDatePicker.Builder.dateRangePicker().setTitleText("Select dates").build()
-        dateRangePicker.show(parentFragmentManager, "DatePicker")
+        with(binding.editTextEventDate){
+            val dateRangePicker =
+                MaterialDatePicker.Builder.dateRangePicker().setTitleText("Select dates").build()
+            dateRangePicker.show(parentFragmentManager, "DatePicker")
 
-        dateRangePicker.addOnPositiveButtonClickListener { datePicked ->
-            val startDate = datePicked.first
-            val endDate = datePicked.second
+            dateRangePicker.addOnPositiveButtonClickListener { datePicked ->
+                val startDate = Date(datePicked.first)
+                val endDate = Date(datePicked.second)
 
-            binding.editTextEventDate.setText(
-                convertLongToDate(startDate) + " - " + convertLongToDate(endDate)
-            )
+                //set event date
+
+                val formatDate = SimpleDateFormat("E, MMM dd yyyy", Locale.US)
+
+                setText(
+                    // Don't do this - use a string resource
+                    formatDate.format(startDate) + " - " + formatDate.format(endDate)
+                )
+            }
         }
     }
 
@@ -133,8 +156,11 @@ class EventFragment : Fragment() {
             Event(eventIcon, eventName, eventLocation, eventDate, eventType, eventDescription)
 
             // Show snackbar with the event
-            Snackbar.make(binding.root, eventName+" " +eventLocation+" "+eventDate+" "+eventType+" "+eventDescription, Snackbar.LENGTH_SHORT).show()
-
+            Snackbar.make(
+                requireView(),
+                "$eventName $eventLocation $eventDate $eventType $eventDescription",
+                Snackbar.LENGTH_SHORT
+            ).show()
 
             // Write in the 'Logcat' system
             showMessage()

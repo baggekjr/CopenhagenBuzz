@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "434896233169",
+    "project_id": "copenhagenbuzz-b8a16",
+    "storage_bucket": "copenhagenbuzz-b8a16.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:434896233169:android:e1f9afaa25ffabd1c49bf0",
+        "android_client_info": {
+          "package_name": "dk.itu.moapd.copenhagenbuzz.astb"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHonnD9ZTa9FwBMJtAC-x9gqpXHPmwuZk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
