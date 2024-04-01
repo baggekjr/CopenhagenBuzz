@@ -12,6 +12,7 @@
         android:id="@+id/fragment_event"
         android:icon="@drawable/baseline_event_24"
         android:title="@string/event"
+        android:visible="false"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/fragment_favorites"

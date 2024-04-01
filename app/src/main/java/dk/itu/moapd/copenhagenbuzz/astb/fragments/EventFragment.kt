@@ -53,6 +53,7 @@ class EventFragment : Fragment() {
             addEventButton.setOnClickListener {
                 // Only execute the following code when the user fills all ‘EditText‘.
                 handleEventButtonOnClick()
+
             }
 
             // Listener for user interaction in the "Add event date" textfield

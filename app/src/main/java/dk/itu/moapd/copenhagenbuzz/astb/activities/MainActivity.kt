@@ -26,17 +26,21 @@
 package dk.itu.moapd.copenhagenbuzz.astb.activities
 
 
+
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.firebase.auth.FirebaseAuth
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.ActivityMainBinding
-
 
 
 /**
@@ -50,7 +54,26 @@ class MainActivity : AppCompatActivity() {
      * View binding that creates a direct reference to make coding easier
      */
     private lateinit var binding: ActivityMainBinding
+    private lateinit var appBarConfiguration: AppBarConfiguration
     private var isLoggedIn: Boolean = false
+
+    override fun onStart() {
+        super.onStart()
+        // Redirect the user to the LoginActivity
+        // if they are not logged in.
+        //auth.currentUser ?: startLoginActivity()
+
+        // Check if user is authenticated
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            // User is authenticated, make "Add Event" menu item visible
+            binding.contentMain.bottomNavigation.menu.findItem(R.id.fragment_event)?.isVisible = true
+        } else {
+            // User is not authenticated, hide "Add Event" menu item
+            binding.contentMain.bottomNavigation.menu.findItem(R.id.fragment_event)?.isVisible = false
+        }
+
+    }
 
     /**
      * Main function to create the MainActivity at the start. Calls relevant functions to
@@ -81,11 +104,17 @@ class MainActivity : AppCompatActivity() {
          */
         val navController = navHostFragment.navController
 
+        setSupportActionBar(binding.contentMain.childAppBar)
+        appBarConfiguration = AppBarConfiguration(navController.graph)
+        setupActionBarWithNavController(navController, appBarConfiguration)
+
         // Adds the bottomNavigation to easily navigate through the application
         binding.contentMain.bottomNavigation.setupWithNavController(navController)
 
 
         auth = FirebaseAuth.getInstance()
+
+
 
        /* // Listener for user interaction with top app bar to either login or out
         binding.contentMain.childAppBar.setOnMenuItemClickListener{
@@ -95,12 +124,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onStart() {
-        super.onStart()
-        // Redirect the user to the LoginActivity
-        // if they are not logged in.
-        auth.currentUser ?: startLoginActivity()
-    }
+
 
     private fun startLoginActivity() {
         Intent(this, LoginActivity::class.java).apply {
@@ -108,35 +132,62 @@ class MainActivity : AppCompatActivity() {
                     Intent.FLAG_ACTIVITY_CLEAR_TASK
         }.let(::startActivity)
     }
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        Log.d("MainActivity", "onCreateOptionsMenu called") // Add this log statement
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.top_app_bar, menu)
+        return true
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        //isLoggedIn = intent.getBooleanExtra("IsLoggedIn", false)
+            when (item.itemId) {
+                R.id.action_logout -> {
+                    Log.d("MainActivity", "Logout menu item clicked") // Add this log statement
+                    auth.signOut()
+                    startLoginActivity()
+                    // Return false to allow normal processing
+                }
+            }
+            return true
+
+    }
 
 
-    /**
-     * Changes the icon depending on if you're logged in or are using CopenhagenBuzz as a guest
+
+
+
+
+     /* Changes the icon depending on if you're logged in or are using CopenhagenBuzz as a guest
      * @param menu The top app bar
      *
      * @return return if the user is logged in or not
+    */
 
-    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+    /*override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         isLoggedIn = intent.getBooleanExtra("IsLoggedIn", false)
         if(isLoggedIn) {
-            binding.contentMain.childAppBar.menu.findItem(R.id.nav_to_login).setIcon(R.drawable.baseline_hail_24)
+            binding.contentMain.childAppBar.menu.findItem(R.id.action_logout).setIcon(R.drawable.baseline_hail_24)
         } else {
-            binding.contentMain.childAppBar.menu.findItem(R.id.nav_to_login).setIcon(R.drawable.baseline_account_circle_24)
+            binding.contentMain.childAppBar.menu.findItem(R.id.action_logout).setIcon(R.drawable.baseline_account_circle_24)
         }
         return true
 
     }
 
+     */
 
 
-     * Handles the top menu button to go to the login-page
 
-    private fun handleGoToLogin() {
+     //* Handles the top menu button to go to the login-page
+
+    /*private fun handleGoToLogin() {
         val intent = Intent(this, LoginActivity::class.java).putExtra("IsLoggedIn",isLoggedIn)
         startActivity(intent)
         finish()
     }
-    */
+
+     */
+
 
 
 

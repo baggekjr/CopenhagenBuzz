@@ -3,6 +3,7 @@ package dk.itu.moapd.copenhagenbuzz.astb.activities
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.core.view.WindowCompat
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
@@ -13,41 +14,18 @@ import dk.itu.moapd.copenhagenbuzz.astb.databinding.ActivityLoginBinding
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.ActivityMainBinding
 
 class LoginActivity : AppCompatActivity() {
+    private var isLoggedIn: Boolean = false
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
     ) { result ->
         onSignInResult(result)
     }
 
-    private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
-        when (result.resultCode) {
-            RESULT_OK -> {
-                // Successfully signed in.
-                showSnackBar("User logged in the app.")
-                startMainActivity()
-            }
-            else -> {
-                // Sign in failed.
-                showSnackBar("Authentication failed.")
-            }
-        }
 
-    }
-
-    private fun startMainActivity() {
-        Intent(this, MainActivity::class.java).apply {
-            startActivity(this)
-            finish()
-        }
-    }
-    private fun showSnackBar(message: String) {
-        Snackbar.make(
-            window.decorView.rootView, message, Snackbar.LENGTH_SHORT
-        ).show()
-    }
 
     private lateinit var binding: ActivityLoginBinding
     override fun onCreate(savedInstanceState: Bundle?) {
+        //TODO: kan windowCompat.... slettes??
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
 
@@ -55,13 +33,13 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.loginButton.setOnClickListener{
-            //navigateToMain(isLoggedIn = true)
-            signInLauncher
-        }
-        binding.guestButton.setOnClickListener{
+            createSignInIntent()
 
         }
-        createSignInIntent()
+        binding.guestButton.setOnClickListener{
+            navigateToMain(isLoggedIn = false)
+
+        }
     }
 
     private fun createSignInIntent() {
@@ -77,7 +55,8 @@ class LoginActivity : AppCompatActivity() {
             .createSignInIntentBuilder()
             .setAvailableProviders(providers)
             .setIsSmartLockEnabled(false)
-            .setLogo(R.drawable.baseline_add_location_alt_24)
+            .setLogo(R.drawable.baseline_hail_24)
+            .setTheme(R.style.Theme_CopenhagenBuzz)
             .apply {
                 setTosAndPrivacyPolicyUrls(
                     "https://firebase.google.com/terms/",
@@ -88,7 +67,40 @@ class LoginActivity : AppCompatActivity() {
         signInLauncher.launch(signInIntent)
     }
 
-    /*private fun navigateToMain(isLoggedIn : Boolean) {
+    private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
+        when (result.resultCode) {
+            RESULT_OK -> {
+                isLoggedIn
+                // Successfully signed in.
+                showSnackBar("User logged in the app.")
+                //isLoggedIn = true
+                startMainActivity()
+
+            }
+            else -> {
+                // Sign in failed.
+                showSnackBar("Authentication failed.")
+            }
+        }
+    }
+
+
+
+
+    private fun startMainActivity() {
+        Intent(this, MainActivity::class.java).apply {
+            startActivity(this)
+            finish()
+        }
+    }
+
+    private fun showSnackBar(message: String) {
+        Snackbar.make(
+            window.decorView.rootView, message, Snackbar.LENGTH_SHORT
+        ).show()
+    }
+
+    private fun navigateToMain(isLoggedIn : Boolean) {
         val intent = Intent(this, MainActivity::class.java).apply {
             putExtra("IsLoggedIn", isLoggedIn)
         }
@@ -96,5 +108,6 @@ class LoginActivity : AppCompatActivity() {
         finish()
     }
 
-     */
+
+
 }
