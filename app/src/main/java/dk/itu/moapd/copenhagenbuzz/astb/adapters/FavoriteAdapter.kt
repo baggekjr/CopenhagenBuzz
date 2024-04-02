@@ -1,5 +1,6 @@
 package dk.itu.moapd.copenhagenbuzz.astb.adapters
 
+import android.content.ContentValues.TAG
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +16,7 @@ import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 
 class FavoriteAdapter(private val favorites: List<Event>) : RecyclerView.Adapter<FavoriteAdapter.ViewHolder>() {
 
-    class ViewHolder(private val binding: FragmentFavoritesBinding) : RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(private val binding: FavoritesRowItemBinding) : RecyclerView.ViewHolder(binding.root)
     {
         fun bind(event: Event) {
             with(binding) {
@@ -28,15 +29,15 @@ class FavoriteAdapter(private val favorites: List<Event>) : RecyclerView.Adapter
 
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder = FavoritesRowItemBinding{
-        .inflate(LayoutInflater.from(parent.context), parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder = FavoritesRowItemBinding
+        .inflate(LayoutInflater.from(parent.context), parent, false)
         .let(::ViewHolder)
 
-    }
+
 
     override fun onBindViewHolder(holder: FavoriteAdapter.ViewHolder, position: Int) {
         Log.d(TAG, "Populate at position: $position")
-        favorites[position].let(viewHolder::bind)
+        favorites[position].let(holder::bind)
 
 
     }
