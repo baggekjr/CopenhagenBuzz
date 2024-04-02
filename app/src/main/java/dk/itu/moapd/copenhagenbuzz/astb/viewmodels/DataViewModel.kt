@@ -3,6 +3,7 @@ package dk.itu.moapd.copenhagenbuzz.astb.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.javafaker.Faker
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import kotlinx.coroutines.CoroutineScope
@@ -24,18 +25,15 @@ class DataViewModel : ViewModel() {
     val favorites: LiveData<List<Event>>
         get() = _favorites
 
-
     init {
-
+        getEventsAndFavorites()
     }
 
-    private fun generateRandomFavorites(events: List<Event>): List<Event> {
-        val shuffledIndices = (events.indices).shuffled().take(25).sorted()
-        return shuffledIndices.mapNotNull { index -> events.getOrNull(index) }
-    }
-
-    init {
-        makeEvents()
+    private fun getEventsAndFavorites() {
+        viewModelScope.launch {
+            makeEvents()
+            generateRandomFavorites()
+        }
     }
 
     private fun makeEvents() {
@@ -56,7 +54,28 @@ class DataViewModel : ViewModel() {
                 println(eventList)
             }
             _events.postValue(eventList)
+
         }
+
     }
+    private fun generateRandomFavorites(): List<Event> {
+        val events = _events.value!!
+        val shuffledIndices = (events.indices).shuffled().take(25).sorted()
+        return shuffledIndices.mapNotNull { index -> events.getOrNull(index) }
+    }
+
+    fun addToFavorites(event: Event) {
+        val currentList = _favorites.value?.toMutableList() ?: mutableListOf()
+        currentList.add(event)
+        _favorites.postValue(currentList)
+    }
+
+    // Method to remove an event from favorites
+    fun removeFromFavorites(event: Event) {
+        val currentList = _favorites.value?.toMutableList() ?: mutableListOf()
+        currentList.remove(event)
+        _favorites.postValue(currentList)
+    }
+
 
 }
