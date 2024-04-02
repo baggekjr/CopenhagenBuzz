@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
      */
     private lateinit var binding: ActivityMainBinding
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private var isLoggedIn: Boolean = false
+    //private var isLoggedIn: Boolean = false
 
     override fun onStart() {
         super.onStart()
@@ -103,6 +103,7 @@ class MainActivity : AppCompatActivity() {
         swapping between destinations as users use CopenhagenBuzz
          */
         val navController = navHostFragment.navController
+
 
         setSupportActionBar(binding.contentMain.childAppBar)
         appBarConfiguration = AppBarConfiguration(navController.graph)
@@ -163,18 +164,22 @@ class MainActivity : AppCompatActivity() {
      * @return return if the user is logged in or not
     */
 
-    /*override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        isLoggedIn = intent.getBooleanExtra("IsLoggedIn", false)
-        if(isLoggedIn) {
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            // User is authenticated, make "Add Event" menu item visible
             binding.contentMain.childAppBar.menu.findItem(R.id.action_logout).setIcon(R.drawable.baseline_hail_24)
+
         } else {
+            // User is not authenticated, hide "Add Event" menu item
             binding.contentMain.childAppBar.menu.findItem(R.id.action_logout).setIcon(R.drawable.baseline_account_circle_24)
+
         }
         return true
 
     }
 
-     */
+
 
 
 
