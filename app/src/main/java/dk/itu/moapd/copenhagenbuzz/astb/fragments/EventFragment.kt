@@ -13,6 +13,12 @@ import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentEventBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import java.util.Date
 import java.util.Locale
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
 
 
 /**
@@ -22,6 +28,9 @@ import java.util.Locale
  */
 class EventFragment : Fragment() {
     private var _binding: FragmentEventBinding? = null
+    private lateinit var auth : FirebaseAuth
+    private lateinit var database : DatabaseReference
+
 
     // A set of private constants used in this class .
     companion object {
@@ -29,7 +38,7 @@ class EventFragment : Fragment() {
     }
 
     // An instance of the ‘Event ‘ class.
-    private val event: Event = Event( 0,"","", "", "", "", "")
+    private val event: Event = Event( "","", "", "", "", "")
 
     private val binding
         get() = requireNotNull(_binding) {
@@ -46,6 +55,9 @@ class EventFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        auth = FirebaseAuth.getInstance()
+        database = Firebase.database(DATABASE_URL).reference.child("CopenhagenBuzz")
 
         // Set up data binding and lifecycle owner.
         binding.apply {
@@ -147,7 +159,6 @@ class EventFragment : Fragment() {
                 .isNotEmpty()
         ) {
             // Update the object attributes.
-            val userID = 0
             val eventIcon = "picture"
             val eventName = binding.editTextEventName.text.toString().trim()
             val eventLocation = binding.editTextEventLocation.text.toString().trim()
@@ -155,8 +166,23 @@ class EventFragment : Fragment() {
             val eventType = binding.editTextEventType.text.toString().trim()
             val eventDescription = binding.editTextEventDescription.text.toString().trim()
 
-            Event(userID, eventIcon, eventName, eventLocation, eventDate, eventType, eventDescription)
+            val newEvent = Event(eventIcon, eventName, eventLocation, eventDate, eventType, eventDescription)
 
+
+            auth.currentUser?.let { user ->
+                database.child("events")
+                    .child(user.uid)
+                    .push()
+                    .key?.let { uid ->
+                        database.child("events")
+                            .child(uid)
+                            .setValue(newEvent).addOnSuccessListener { showMessage() }
+
+                    }
+
+            }
+
+            /*
             // Show snackbar with the event
             Snackbar.make(
                 requireView(),
@@ -164,13 +190,20 @@ class EventFragment : Fragment() {
                 Snackbar.LENGTH_SHORT
             ).show()
 
+             */
+
             // Write in the 'Logcat' system
-            showMessage()
+            //showMessage()
         }
     }
+
 
 
     private fun showMessage() {
         Log.d(EventFragment.TAG, event.toString())
     }
+
+
+
+
 }
