@@ -8,6 +8,7 @@
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
 google-services.json
+src/main/assets/env
 
 .DS_Store
 /build

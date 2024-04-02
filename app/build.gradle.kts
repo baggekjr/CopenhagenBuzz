@@ -59,6 +59,9 @@ dependencies {
     implementation("com.firebaseui:firebase-ui-auth:8.0.0")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.firebaseui:firebase-ui-database:8.0.0")
+    implementation("com.google.firebase:firebase-database-ktx")
+    implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
 
 
 }
