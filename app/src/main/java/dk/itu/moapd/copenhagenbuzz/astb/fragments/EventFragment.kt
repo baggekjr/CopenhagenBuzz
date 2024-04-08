@@ -38,7 +38,7 @@ class EventFragment : Fragment() {
     }
 
     // An instance of the ‘Event ‘ class.
-    private val event: Event = Event( "","", "", "", "", "")
+    private val event: Event = Event( "","", "", "", "", "", "")
 
     private val binding
         get() = requireNotNull(_binding) {
@@ -159,6 +159,7 @@ class EventFragment : Fragment() {
                 .isNotEmpty()
         ) {
             // Update the object attributes.
+            val userId = auth.currentUser!!.uid
             val eventIcon = "picture"
             val eventName = binding.editTextEventName.text.toString().trim()
             val eventLocation = binding.editTextEventLocation.text.toString().trim()
@@ -166,23 +167,23 @@ class EventFragment : Fragment() {
             val eventType = binding.editTextEventType.text.toString().trim()
             val eventDescription = binding.editTextEventDescription.text.toString().trim()
 
-            val newEvent = Event(eventIcon, eventName, eventLocation, eventDate, eventType, eventDescription)
+            val newEvent = Event(userId, eventIcon, eventName, eventLocation, eventDate, eventType, eventDescription)
 
 
-            auth.currentUser?.let { user ->
+            userId.let { uid ->
                 database.child("events")
-                    .child(user.uid)
+                    .child(uid)
                     .push()
-                    .key?.let { uid ->
+                    .key?.let { event ->
                         database.child("events")
-                            .child(uid)
+                            .child(event)
                             .setValue(newEvent).addOnSuccessListener { showMessage() }
 
                     }
 
             }
 
-            /*
+
             // Show snackbar with the event
             Snackbar.make(
                 requireView(),
@@ -190,7 +191,7 @@ class EventFragment : Fragment() {
                 Snackbar.LENGTH_SHORT
             ).show()
 
-             */
+
 
             // Write in the 'Logcat' system
             //showMessage()
@@ -201,6 +202,7 @@ class EventFragment : Fragment() {
 
     private fun showMessage() {
         Log.d(EventFragment.TAG, event.toString())
+
     }
 
 

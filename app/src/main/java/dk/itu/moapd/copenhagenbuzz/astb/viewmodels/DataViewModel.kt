@@ -28,6 +28,7 @@ class DataViewModel : ViewModel() {
             val eventList = mutableListOf<Event>()
             for (i in 1..10) {
                 val event = Event(
+                    userId = faker.number().digit(),
                     eventIcon = faker.avatar().image(),
                     eventName = faker.lorem().word(),
                     eventLocation = faker.address().fullAddress(),
