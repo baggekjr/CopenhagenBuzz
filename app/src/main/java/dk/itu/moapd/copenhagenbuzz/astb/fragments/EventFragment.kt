@@ -38,7 +38,7 @@ class EventFragment : Fragment() {
     }
 
     // An instance of the ‘Event ‘ class.
-    private val event: Event = Event( "","", "", "", "", "", "")
+    private val event: Event = Event( "","", "", "", 0, "", "")
 
     private val binding
         get() = requireNotNull(_binding) {
@@ -115,10 +115,12 @@ class EventFragment : Fragment() {
                 //set event date
 
                 val formatDate = SimpleDateFormat("E, MMM dd yyyy", Locale.US)
+                val date = datePicked.first + datePicked.second
 
                 setText(
                     // Don't do this - use a string resource
-                    formatDate.format(startDate) + " - " + formatDate.format(endDate)
+                    date.toString()
+                    //formatDate.format(startDate) + " - " + formatDate.format(endDate)
                 )
             }
         }
@@ -167,7 +169,7 @@ class EventFragment : Fragment() {
             val eventType = binding.editTextEventType.text.toString().trim()
             val eventDescription = binding.editTextEventDescription.text.toString().trim()
 
-            val newEvent = Event(userId, eventIcon, eventName, eventLocation, eventDate, eventType, eventDescription)
+            val newEvent = Event(userId, eventIcon, eventName, eventLocation, eventDate.toLong(), eventType, eventDescription)
 
 
             userId.let { uid ->

@@ -11,7 +11,7 @@ data class Event(
     val eventIcon: String,
     val eventName: String,
     val eventLocation: String,
-    val startDate: String,
+    val startDate: Long,
     val eventType: String,
     var eventDescription: String,
 )

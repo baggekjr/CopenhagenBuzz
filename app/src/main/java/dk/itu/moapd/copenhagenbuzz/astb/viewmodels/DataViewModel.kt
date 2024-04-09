@@ -1,5 +1,6 @@
 package dk.itu.moapd.copenhagenbuzz.astb.viewmodels
 
+import androidx.core.graphics.convertTo
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -32,7 +33,7 @@ class DataViewModel : ViewModel() {
                     eventIcon = faker.avatar().image(),
                     eventName = faker.lorem().word(),
                     eventLocation = faker.address().fullAddress(),
-                    startDate = faker.lorem().word(),
+                    startDate = faker.number().randomNumber(),
                     eventType = faker.lorem().word(),
                     eventDescription = faker.lorem().paragraph()
 

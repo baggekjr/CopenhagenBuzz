@@ -34,7 +34,7 @@ class EventAdapter(private val context: Context, private val events: List<Event>
             eventIcon.setImageResource(R.drawable.baseline_map_24)
             eventName.text = event.eventName
             eventLocation.text = event.eventLocation
-            eventDate.text = event.startDate
+            eventDate.text = event.startDate.toString()
             eventType.text = event.eventType
             eventDescription.text = event.eventDescription
         }
