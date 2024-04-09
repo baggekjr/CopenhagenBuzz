@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.firebase.ui.database.FirebaseListOptions
 import com.firebase.ui.database.FirebaseRecyclerOptions
@@ -27,7 +28,7 @@ import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 class TimelineFragment : Fragment() {
 
     private var _binding: FragmentTimelineBinding? = null
-    private val dataViewModel: DataViewModel by viewModels()
+    private val dataViewModel: DataViewModel by activityViewModels()
     private lateinit var eventAdapter: EventAdapter
 
     private val binding
