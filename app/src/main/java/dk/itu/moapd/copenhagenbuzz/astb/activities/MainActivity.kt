@@ -40,6 +40,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.firebase.auth.FirebaseAuth
 import dk.itu.moapd.copenhagenbuzz.astb.R
+import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.ActivityMainBinding
 
 
@@ -72,6 +73,8 @@ class MainActivity : AppCompatActivity() {
             // User is not authenticated, hide "Add Event" menu item
             binding.contentMain.bottomNavigation.menu.findItem(R.id.fragment_event)?.isVisible = false
         }
+
+
 
     }
 
