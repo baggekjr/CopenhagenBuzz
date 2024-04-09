@@ -46,10 +46,11 @@ class TimelineFragment : Fragment() {
                                savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        FirebaseAuth.getInstance().currentUser?.uid?.let { userId ->
+        FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
             val query = Firebase.database(DATABASE_URL).reference
+                .child("CopenhagenBuzz")
                 .child("events")
-                .child(userId)
+                .child(uid)
                 .orderByChild("startDate")
 
             val options = FirebaseListOptions.Builder<Event>()
