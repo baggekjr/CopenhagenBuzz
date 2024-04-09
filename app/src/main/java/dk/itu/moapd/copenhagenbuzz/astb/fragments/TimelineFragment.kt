@@ -6,11 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import com.firebase.ui.database.FirebaseListOptions
+import com.firebase.ui.database.FirebaseRecyclerOptions
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.database
+import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
+import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentTimelineBinding
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
-
-
+import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 
 
 /**
@@ -40,17 +46,25 @@ class TimelineFragment : Fragment() {
                                savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        FirebaseAuth.getInstance().currentUser?.uid?.let { userId ->
+            val query = Firebase.database(DATABASE_URL).reference
+                .child("events")
+                .child(userId)
+                .orderByChild("startDate")
 
-        // Set up data binding and lifecycle owner.
-        binding.apply {
-            dataViewModel.events.observe(viewLifecycleOwner) {
-                eventAdapter = EventAdapter(requireContext(), it)
-                listView.adapter = eventAdapter
-            }
+            val options = FirebaseListOptions.Builder<Event>()
+                .setQuery(query, Event::class.java)
+                .setLayout(R.layout.event_row_item)
+                .setLifecycleOwner(this)
+                .build()
+
+            eventAdapter = EventAdapter(requireActivity(), requireContext(), options)
+
+            binding.listView.adapter=eventAdapter
+            // Set up data binding and lifecycle owner.
 
 
         }
-
     }
     override fun onDestroyView() {
         super.onDestroyView()

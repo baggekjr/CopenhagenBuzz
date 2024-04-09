@@ -1,18 +1,20 @@
 package dk.itu.moapd.copenhagenbuzz.astb.adapters
 
+import android.app.Activity
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.ArrayAdapter
 import android.widget.ImageView
+import androidx.lifecycle.LiveData
+import com.firebase.ui.database.FirebaseListAdapter
+import com.firebase.ui.database.FirebaseListOptions
 import dk.itu.moapd.copenhagenbuzz.astb.R
-import dk.itu.moapd.copenhagenbuzz.astb.databinding.EventRowItemBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 
-class EventAdapter(private val context: Context, private val events: List<Event>) :
-    ArrayAdapter<Event>(context, R.layout.event_row_item, events) {
+class EventAdapter(activity: Activity, private val context: Context, private val options: FirebaseListOptions<Event>) :
+    FirebaseListAdapter<Event>(options) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view = convertView ?: LayoutInflater.from(context).inflate(
@@ -27,6 +29,11 @@ class EventAdapter(private val context: Context, private val events: List<Event>
         view.tag = viewHolder
 
         return view
+    }
+
+    override fun populateView(v: View, model: Event, position: Int) {
+        val viewHolder = ViewHolder(v)
+        populateViewHolder(viewHolder, model)
     }
 
     private fun populateViewHolder(viewHolder: ViewHolder, event: Event) {
