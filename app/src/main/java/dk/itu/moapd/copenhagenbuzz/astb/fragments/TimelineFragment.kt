@@ -51,7 +51,6 @@ class TimelineFragment : Fragment() {
             val query = Firebase.database(DATABASE_URL).reference
                 .child("CopenhagenBuzz")
                 .child("events")
-                .child(uid)
                 .orderByChild("startDate")
 
             val options = FirebaseListOptions.Builder<Event>()
