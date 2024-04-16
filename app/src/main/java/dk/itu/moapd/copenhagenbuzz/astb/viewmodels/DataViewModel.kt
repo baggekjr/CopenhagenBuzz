@@ -69,16 +69,16 @@ class DataViewModel : ViewModel() {
 
 
     fun addToFavorites(event: Event) {
-        val currentList = _favorites.value?.toMutableList() ?: mutableListOf()
-        currentList.add(event)
-        _favorites.postValue(currentList)
+        val favoriteList = _favorites.value?.toMutableList() ?: mutableListOf()
+        favoriteList.add(event)
+        _favorites.postValue(favoriteList)
     }
 
     // Method to remove an event from favorites
     fun removeFromFavorites(event: Event) {
-        val currentList = _favorites.value?.toMutableList() ?: mutableListOf()
-        currentList.remove(event)
-        _favorites.postValue(currentList)
+        val favoriteList = _favorites.value?.toMutableList() ?: mutableListOf()
+        favoriteList.remove(event)
+        _favorites.postValue(favoriteList)
     }
 
 
