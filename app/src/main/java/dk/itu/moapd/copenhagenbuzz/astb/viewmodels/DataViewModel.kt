@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.javafaker.Faker
+import com.google.firebase.database.DatabaseReference
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +29,12 @@ class DataViewModel : ViewModel() {
 
     init {
         getEventsAndFavorites()
+    }
+
+    fun editEvent(id: DatabaseReference, event: Event) {
+        viewModelScope.launch {
+           id.setValue(event)
+        }
     }
 
     private fun getEventsAndFavorites() {

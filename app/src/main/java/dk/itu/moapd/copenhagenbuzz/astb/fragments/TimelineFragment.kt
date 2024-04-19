@@ -5,15 +5,17 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import com.firebase.ui.database.FirebaseListOptions
-import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.database
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
+import dk.itu.moapd.copenhagenbuzz.astb.OnItemClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.R
+import dk.itu.moapd.copenhagenbuzz.astb.UpdateEventFragment
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentTimelineBinding
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
@@ -43,8 +45,10 @@ class TimelineFragment : Fragment() {
         _binding = it
     }.root
 
-    override fun onViewCreated(view: View,
-                               savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
@@ -59,16 +63,20 @@ class TimelineFragment : Fragment() {
                 .setLifecycleOwner(this)
                 .build()
 
-            eventAdapter = EventAdapter(requireActivity(), requireContext(), options)
+            eventAdapter = EventAdapter(requireActivity().supportFragmentManager, requireContext(), options)
 
-            binding.listView.adapter=eventAdapter
+            binding.listView.adapter = eventAdapter
             // Set up data binding and lifecycle owner.
-
 
         }
     }
+
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
+
+
 }

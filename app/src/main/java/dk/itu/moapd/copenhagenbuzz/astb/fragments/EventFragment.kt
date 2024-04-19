@@ -19,6 +19,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
+import dk.itu.moapd.copenhagenbuzz.astb.R
 
 
 /**
@@ -72,6 +73,11 @@ class EventFragment : Fragment() {
             editTextEventDate.setOnClickListener {
                 handleDateOnClick()
             }
+
+
+
+
+
 
             setupDatePicker()
         }
