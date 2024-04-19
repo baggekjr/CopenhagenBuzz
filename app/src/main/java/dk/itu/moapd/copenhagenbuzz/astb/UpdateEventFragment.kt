@@ -49,6 +49,30 @@ class UpdateEventFragment(private val event: Event, private val position: Int,  
             handleEventButtonOnClick()
             dialog.dismiss()
         }
+
+        binding.apply {
+            val name = editTextEventName.setText(event.eventName)
+            val loc = editTextEventLocation.setText(event.eventLocation)
+            val des = editTextEventDescription.setText(event.eventDescription)
+            val type = editTextEventType.setText(event.eventType)
+
+            // Convert the start date (which is in milliseconds) to a readable date format
+            val startDateString = event.startDate?.toString() ?: ""
+
+
+
+// Set the formatted start date to the EditText
+            val date = binding.editTextEventDate.setText(startDateString)
+
+
+            // Listener for user interaction in the "Add event date" textfield
+            editTextEventDate.setOnClickListener {
+                handleDateOnClick()
+            }
+
+            setupDatePicker()
+        }
+
         return MaterialAlertDialogBuilder(requireContext()).apply {
             setView(binding.root)
             setTitle(getString(R.string.dialog_update_eventName))
