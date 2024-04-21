@@ -167,7 +167,18 @@ class EventFragment : Fragment() {
                 .isNotEmpty()
         ) {
             // Update the object attributes.
-            val userId = auth.currentUser!!.uid
+            val userId = auth.currentUser?.uid
+            //handle if userID is null
+            //TODO: dont know if this is necessary.
+            if (userId.isNullOrEmpty()) {
+                // User not logged in
+                Snackbar.make(
+                    requireView(),
+                    "User not logged in",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+                return
+            }
             val eventIcon = "picture"
             val eventName = binding.editTextEventName.text.toString().trim()
             val eventLocation = binding.editTextEventLocation.text.toString().trim()
@@ -175,7 +186,20 @@ class EventFragment : Fragment() {
             val eventType = binding.editTextEventType.text.toString().trim()
             val eventDescription = binding.editTextEventDescription.text.toString().trim()
 
-            val newEvent = Event(userId, eventIcon, eventName, eventLocation, eventDate.toLong(), eventType, eventDescription)
+            val eventDateLong = try {
+                eventDate.toLong()
+            } catch (e: NumberFormatException) {
+                // Handle parsing error
+                Log.e(TAG, "Error parsing event date: ${e.message}")
+                Snackbar.make(
+                    requireView(),
+                    "Error parsing event date",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+                return
+            }
+
+            val newEvent = Event(userId, eventIcon, eventName, eventLocation, eventDateLong, eventType, eventDescription)
 
 
             userId.let { uid ->
@@ -185,35 +209,39 @@ class EventFragment : Fragment() {
                     .key?.let { event ->
                         database.child("events")
                             .child(event)
-                            .setValue(newEvent).addOnSuccessListener { showMessage() }
+                            .setValue(newEvent).addOnSuccessListener {
+                                Snackbar.make(
+                                    requireView(),
+                                    "Event saved successfully: \"$eventName $eventLocation $eventDate $eventType $eventDescription\",\n",
+                                    Snackbar.LENGTH_SHORT
+                                ).show()
+                            }
+                            .addOnFailureListener { exception ->
+                                Log.e(TAG, "Error saving event: ${exception.message}")
+                                Snackbar.make(
+                                    requireView(),
+                                    "Failed to save event: ${exception.message}",
+                                    Snackbar.LENGTH_SHORT
+                                ).show()
+                            }
 
                     }
 
             }
 
-
-            // Show snackbar with the event
+        } else{
             Snackbar.make(
                 requireView(),
-                "$eventName $eventLocation $eventDate $eventType $eventDescription",
+                "Please fill out all fields",
                 Snackbar.LENGTH_SHORT
             ).show()
-
-
-
-            // Write in the 'Logcat' system
-            //showMessage()
+        }
         }
     }
 
 
 
-    private fun showMessage() {
-        Log.d(EventFragment.TAG, event.toString())
-
-    }
 
 
 
 
-}
