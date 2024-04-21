@@ -2,29 +2,19 @@ package dk.itu.moapd.copenhagenbuzz.astb
 
 import android.app.Dialog
 import android.content.DialogInterface
-import android.icu.text.SimpleDateFormat
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
-import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentEventBinding
-import dk.itu.moapd.copenhagenbuzz.astb.models.Event
-import java.util.Date
-import java.util.Locale
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentUpdateEventBinding
-import dk.itu.moapd.copenhagenbuzz.astb.fragments.EventFragment
+import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 
 class UpdateEventFragment(private val event: Event, private val position: Int,  private val id: DatabaseReference) : DialogFragment() {
@@ -87,18 +77,6 @@ class UpdateEventFragment(private val event: Event, private val position: Int,  
         auth = FirebaseAuth.getInstance()
 
 
-
-        binding.apply {
-            addEventButton.setOnClickListener {
-                handleEventButtonOnClick()
-            }
-
-            editTextEventDate.setOnClickListener {
-                handleDateOnClick()
-            }
-
-            setupDatePicker()
-        }
     }
 
     override fun onDestroyView() {
@@ -171,5 +149,15 @@ class UpdateEventFragment(private val event: Event, private val position: Int,  
     }
     private fun showMessage(event: String) {
        // Log.d(EventFragment.TAG, event)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val dialog = dialog
+        if (dialog != null) {
+            val width = ViewGroup.LayoutParams.MATCH_PARENT
+            val height = ViewGroup.LayoutParams.MATCH_PARENT
+            dialog.window!!.setLayout(width, height)
+        }
     }
 }
