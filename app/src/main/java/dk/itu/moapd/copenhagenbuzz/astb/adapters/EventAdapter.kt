@@ -1,25 +1,20 @@
 package dk.itu.moapd.copenhagenbuzz.astb.adapters
 
-import android.app.Activity
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.Button
 import android.widget.TextView
 import android.widget.ImageView
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.LiveData
 import com.firebase.ui.database.FirebaseListAdapter
 import com.firebase.ui.database.FirebaseListOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import dk.itu.moapd.copenhagenbuzz.astb.DeleteEventDialogFragment
-import dk.itu.moapd.copenhagenbuzz.astb.OnItemClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.R
-import dk.itu.moapd.copenhagenbuzz.astb.UpdateEventFragment
+import dk.itu.moapd.copenhagenbuzz.astb.UpdateEventDialogFragment
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 
 class EventAdapter(private val fragmentManager: FragmentManager, private val context: Context, private val options: FirebaseListOptions<Event>) :
@@ -69,7 +64,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
             if(currentUserUid == eventUserId) {
                 editButton?.visibility = View.VISIBLE
                 editButton?.setOnClickListener {
-                    UpdateEventFragment(event, position, getId(position)).apply {
+                    UpdateEventDialogFragment(event, position, getId(position)).apply {
                         isCancelable = false
                     }.show(fragmentManager, "UpdateEventFragment")
                 }

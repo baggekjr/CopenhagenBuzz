@@ -17,7 +17,7 @@ import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentUpdateEventBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 
-class UpdateEventFragment(private val event: Event, private val position: Int,  private val id: DatabaseReference) : DialogFragment() {
+class UpdateEventDialogFragment(private val event: Event, private val position: Int, private val id: DatabaseReference) : DialogFragment() {
     private var _binding: FragmentUpdateEventBinding? = null
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
     private lateinit var database: DatabaseReference
