@@ -1,32 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".fragments.EventFragment">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ScrollView01"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 
-    <ScrollView
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:fillViewport="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             style="@style/linear_layout_style"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            android:id="@+id/instructions_view"
+            >
 
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/text_field_event_name"
                 style="@style/event_input_field"
                 android:hint="@string/event_name"
-                app:layout_constraintTop_toTopOf="parent"
-                app:startIconDrawable="@drawable/baseline_festival_24">
+                >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edit_text_event_name"
@@ -40,9 +34,7 @@
                 android:id="@+id/text_field_event_location"
                 style="@style/event_input_field"
                 android:hint="@string/event_location"
-                app:layout_constraintTop_toBottomOf="@+id/text_field_event_name"
-                app:startIconDrawable="@drawable/baseline_add_location_alt_24">
-
+                >
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edit_text_event_location"
                     android:text="Copenhagen"
@@ -55,8 +47,7 @@
                 android:id="@+id/text_field_event_date"
                 style="@style/event_input_field"
                 android:hint="@string/event_date"
-                app:layout_constraintTop_toBottomOf="@+id/text_field_event_location"
-                app:startIconDrawable="@drawable/baseline_calendar_month_24">
+                >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edit_text_event_date"
@@ -69,8 +60,7 @@
                 android:id="@+id/event_type"
                 style="@style/event_input_field"
                 android:hint="@string/event_type"
-                app:layout_constraintTop_toBottomOf="@+id/text_field_event_date"
-                app:startIconDrawable="@drawable/baseline_celebration_24">
+                >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edit_text_event_type"
@@ -82,7 +72,7 @@
                 android:id="@+id/text_field_event_description"
                 style="@style/event_input_field"
                 android:hint="@string/event_description"
-                app:layout_constraintTop_toBottomOf="@+id/event_type">
+                >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edit_text_event_description"
@@ -90,9 +80,9 @@
                     android:layout_height="wrap_content" />
 
             </com.google.android.material.textfield.TextInputLayout>
+
         </LinearLayout>
-    </ScrollView>
 
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

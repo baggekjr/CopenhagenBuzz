@@ -2,6 +2,7 @@ package dk.itu.moapd.copenhagenbuzz.astb.adapters
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +14,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import com.firebase.ui.database.FirebaseListAdapter
 import com.firebase.ui.database.FirebaseListOptions
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
+import dk.itu.moapd.copenhagenbuzz.astb.DeleteEventDialogFragment
 import dk.itu.moapd.copenhagenbuzz.astb.OnItemClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.UpdateEventFragment
@@ -21,6 +24,8 @@ import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 
 class EventAdapter(private val fragmentManager: FragmentManager, private val context: Context, private val options: FirebaseListOptions<Event>) :
     FirebaseListAdapter<Event>(options) {
+
+    private var auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view = convertView ?: LayoutInflater.from(context).inflate(
@@ -56,14 +61,33 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
             eventDate.text = event.startDate.toString()
             eventType.text = event.eventType
             eventDescription.text = event.eventDescription
-        }
-        viewHolder.editButton?.setOnClickListener {
-            UpdateEventFragment(event, position, getId(position)).apply {
-                isCancelable = false
-            }.show(fragmentManager, "UpdateEventFragment")
-        }
 
+            val currentUser = auth.currentUser
+            val currentUserUid = currentUser?.uid
+            val eventUserId = event.userId
+
+            if(currentUserUid == eventUserId) {
+                editButton?.visibility = View.VISIBLE
+                editButton?.setOnClickListener {
+                    UpdateEventFragment(event, position, getId(position)).apply {
+                        isCancelable = false
+                    }.show(fragmentManager, "UpdateEventFragment")
+                }
+
+                deleteButton?.visibility = View.VISIBLE
+                deleteButton?.setOnClickListener { adapter ->
+                    DeleteEventDialogFragment(event, position, this@EventAdapter).apply {
+                        isCancelable = false
+                    }.show(fragmentManager, "DeleteEventDialogFragment")
+                }
+            } else {
+                editButton?.visibility = View.GONE
+                deleteButton?.visibility = View.GONE
+            }
+        }
     }
+
+
 
 
     private class ViewHolder(view: View) {
@@ -73,7 +97,9 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
         val eventDate = view.findViewById<TextView>(R.id.event_date)
         val eventType = view.findViewById<TextView>(R.id.event_type)
         val eventDescription = view.findViewById<TextView>(R.id.event_description)
-        val editButton = view.findViewById<Button>(R.id.edit_event_button) // Add this line
+        val editButton = view.findViewById<Button>(R.id.edit_button)
+        val deleteButton = view.findViewById<Button>(R.id.delete_button)
+
 
     }
 

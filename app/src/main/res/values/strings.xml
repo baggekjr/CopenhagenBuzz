@@ -26,7 +26,9 @@
     <string name="dialog_update_eventType">Update a selected data from the database</string>
     <string name="button_update">Update</string>
     <string name="button_cancel">Cancel</string>
-
+    <string name="Delete">Delete</string>
+    <string name="dialog_delete_title">Delete an entry</string>
+    <string name="dialog_delete_message">Delete the selected image from the database</string>
 
 
 </resources>
