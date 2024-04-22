@@ -2,6 +2,7 @@ package dk.itu.moapd.copenhagenbuzz.astb.fragments
 
 import android.app.Dialog
 import android.content.DialogInterface
+import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,8 @@ import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentUpdateEventBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
+import java.util.Date
+import java.util.Locale
 
 class UpdateEventDialogFragment(private val event: Event, private val position: Int, private val id: DatabaseReference) : DialogFragment() {
     private var _binding: FragmentUpdateEventBinding? = null
@@ -43,18 +46,10 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
         }
 
         binding.apply {
-            val name = editTextEventName.setText(event.eventName)
-            val loc = editTextEventLocation.setText(event.eventLocation)
-            val des = editTextEventDescription.setText(event.eventDescription)
-            val type = editTextEventType.setText(event.eventType)
-
-            // Convert the start date (which is in milliseconds) to a readable date format
-            val startDateString = event.startDate?.toString() ?: ""
-
-
-
-// Set the formatted start date to the EditText
-            val date = binding.editTextEventDate.setText(startDateString)
+            editTextEventName.setText(event.eventName)
+            editTextEventLocation.setText(event.eventLocation)
+            editTextEventDescription.setText(event.eventDescription)
+            editTextEventType.setText(event.eventType)
 
 
             // Listener for user interaction in the "Add event date" textfield
@@ -142,10 +137,19 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
             dateRangePicker.show(parentFragmentManager, "DatePicker")
 
             dateRangePicker.addOnPositiveButtonClickListener { datePicked ->
+                val startDate = Date(datePicked.first)
+                val endDate = Date(datePicked.second)
 
+                //set event date
+
+                val formatDate = SimpleDateFormat("E, MMM dd yyyy", Locale.US)
                 val date = datePicked.first + datePicked.second
 
-                setText(date.toString())
+                setText(
+                    // Don't do this - use a string resource
+                    date.toString()
+                    //formatDate.format(startDate) + " - " + formatDate.format(endDate)
+                )
             }
         }
     }

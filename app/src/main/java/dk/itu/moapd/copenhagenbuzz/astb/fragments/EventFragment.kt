@@ -215,6 +215,16 @@ class EventFragment : Fragment() {
                                     "Event saved successfully: \"$eventName $eventLocation $eventDate $eventType $eventDescription\",\n",
                                     Snackbar.LENGTH_SHORT
                                 ).show()
+                                binding.apply {
+                                    editTextEventName.text?.clear()
+                                    editTextEventLocation.text?.clear()
+                                    editTextEventDate.text?.clear()
+                                    editTextEventType.text?.clear()
+                                    editTextEventDescription.text?.clear()
+                                    editTextEventDate.clearFocus()
+
+                                }
+
                             }
                             .addOnFailureListener { exception ->
                                 Log.e(TAG, "Error saving event: ${exception.message}")
