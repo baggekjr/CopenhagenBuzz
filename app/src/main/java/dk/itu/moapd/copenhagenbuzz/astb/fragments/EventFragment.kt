@@ -224,7 +224,13 @@ class EventFragment : Fragment() {
                                     editTextEventDate.text?.clear()
                                     editTextEventType.text?.clear()
                                     editTextEventDescription.text?.clear()
+
+                                    //clearFocus to make it unfocussed
+                                    editTextEventName.clearFocus()
+                                    editTextEventLocation.clearFocus()
                                     editTextEventDate.clearFocus()
+                                    editTextEventType.clearFocus()
+                                    editTextEventDescription.clearFocus()
 
                                 }
 
