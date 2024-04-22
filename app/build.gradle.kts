@@ -64,6 +64,8 @@ dependencies {
     implementation("com.firebaseui:firebase-ui-database:8.0.0")
     implementation("com.google.firebase:firebase-database-ktx")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
+    implementation ("com.google.firebase:firebase-storage-ktx:20.0.0")
+
 
 
 }
