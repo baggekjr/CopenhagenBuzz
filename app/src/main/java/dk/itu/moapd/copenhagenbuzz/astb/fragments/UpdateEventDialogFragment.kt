@@ -102,18 +102,18 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
                 eventIcon = event.eventIcon,
                 eventName = eventName,
                 eventLocation = eventLocation,
-                //startDate = eventDate.toLong(),
+                startDate = eventDate.toLong(),
                 eventType = eventType,
                 eventDescription = eventDescription
             )
-            dataViewModel.editEvent(id, event)
+            dataViewModel.editEvent(id, updatedEvent)
 
-            // Update the event in the Firebase database
+           /* // Update the event in the Firebase database
             FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
                 database.child("events")
                     .child(uid)
                     .setValue(updatedEvent)
-            }
+            }*/
 
             /*Snackbar.make(
                 view,
