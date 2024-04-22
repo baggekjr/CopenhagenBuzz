@@ -225,7 +225,7 @@ class EventFragment : Fragment() {
                                     editTextEventType.text?.clear()
                                     editTextEventDescription.text?.clear()
 
-                                    //clearFocus to make it unfocussed
+                                    //clearFocus to make it unfocused
                                     editTextEventName.clearFocus()
                                     editTextEventLocation.clearFocus()
                                     editTextEventDate.clearFocus()
