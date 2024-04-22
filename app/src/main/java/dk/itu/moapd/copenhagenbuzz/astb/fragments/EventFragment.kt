@@ -215,6 +215,9 @@ class EventFragment : Fragment() {
                                     "Event saved successfully: \"$eventName $eventLocation $eventDate $eventType $eventDescription\",\n",
                                     Snackbar.LENGTH_SHORT
                                 ).show()
+
+                                //Clears event after saving
+                                // TODO: idk if it is the right place to put it but it works lol
                                 binding.apply {
                                     editTextEventName.text?.clear()
                                     editTextEventLocation.text?.clear()
