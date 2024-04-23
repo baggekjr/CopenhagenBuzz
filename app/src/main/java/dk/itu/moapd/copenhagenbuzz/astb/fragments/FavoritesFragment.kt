@@ -71,16 +71,26 @@ class FavoritesFragment : Fragment() {
                 viewModel.favorites.observe(viewLifecycleOwner) {
                     recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-                    val adapter = FavoriteAdapter(options)
+                    val adapter = FavoriteAdapter(options) { event , isChecked ->
+                        handleFavorites(event, isChecked)
+                    }
                     recyclerView.adapter = adapter
                 }
             }
         }
+    }
 
-
-        fun onDestroyView() {
-            super.onDestroyView()
-            _binding = null
+    private fun handleFavorites(event: Event, isChecked: Boolean) {
+        if (isChecked) {
+            viewModel.removeFromFavorites(event)
+        } else {
+            viewModel.addToFavorites(event)
         }
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
 }

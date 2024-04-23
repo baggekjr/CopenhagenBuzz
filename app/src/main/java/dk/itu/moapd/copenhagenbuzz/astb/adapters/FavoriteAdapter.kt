@@ -16,15 +16,24 @@ import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentEventBinding
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentFavoritesBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 
-class FavoriteAdapter( options: FirebaseRecyclerOptions<Event>) : FirebaseRecyclerAdapter<Event, FavoriteAdapter.ViewHolder>(options) {
+class FavoriteAdapter(options: FirebaseRecyclerOptions<Event>, private val onFavoriteCheckedChanged: (Event, Boolean) -> Unit) : FirebaseRecyclerAdapter<Event, FavoriteAdapter.ViewHolder>(options) {
 
-    class ViewHolder(private val binding: FavoritesRowItemBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class ViewHolder(private val binding: FavoritesRowItemBinding) : RecyclerView.ViewHolder(binding.root)
     {
+        val favoriteCheckbox = binding.favoriteButton
         fun bind(event: Event) {
             with(binding) {
-                eventIcon.setImageResource(R.drawable.baseline_map_24)
                 eventName.text = event.eventName
                 eventType.text = event.eventType
+                favoriteCheckbox.isChecked = event.isFavorite
+                favoriteButton.setOnCheckedChangeListener{ _, isChecked ->
+                    onFavoriteCheckedChanged(event, isChecked)
+                }
+                if (event.isFavorite) {
+                    favoriteCheckbox.setButtonDrawable(R.drawable.baseline_favorite_24)
+                } else {
+                    favoriteCheckbox.setButtonDrawable(R.drawable.baseline_favorite_border_24)
+                }
 
             }
         }
@@ -41,8 +50,6 @@ class FavoriteAdapter( options: FirebaseRecyclerOptions<Event>) : FirebaseRecycl
     }
 
 
-
-    //override fun getItemCount() = favorites.size
 
 
 

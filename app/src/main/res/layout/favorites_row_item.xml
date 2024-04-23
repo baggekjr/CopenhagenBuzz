@@ -27,19 +27,17 @@
                 android:orientation="horizontal"
                 android:padding="10dp">
 
-                <ImageView
-                    android:id="@+id/event_icon"
-                    android:layout_width="30dp"
+
+                <CheckBox
+                    android:id="@+id/favorite_button"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:layout_marginStart="8dp"
+                    app:icon="@drawable/baseline_favorite_border_24"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/event_name"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/baseline_home_24"
-
-                    />
-
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/event_name"
@@ -51,7 +49,7 @@
                     android:textAppearance="?attr/textAppearanceTitleMedium"
                     android:textSize="32dp"
                     app:layout_constraintBottom_toTopOf="@+id/event_type"
-                    app:layout_constraintStart_toEndOf="@id/event_icon"
+                    app:layout_constraintStart_toEndOf="@id/favorite_button"
                     app:layout_constraintTop_toTopOf="parent"
 
                     />

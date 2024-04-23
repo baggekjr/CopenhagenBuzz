@@ -59,7 +59,9 @@ class TimelineFragment : Fragment() {
                 .setLifecycleOwner(this)
                 .build()
 
-            eventAdapter = EventAdapter(requireActivity(), requireContext(), options)
+            eventAdapter = EventAdapter(requireActivity(), requireContext(), options) {event, isChecked ->
+                handleFavorites(event, isChecked)
+            }
 
             binding.listView.adapter=eventAdapter
             // Set up data binding and lifecycle owner.
@@ -67,6 +69,15 @@ class TimelineFragment : Fragment() {
 
         }
     }
+
+    private fun handleFavorites(event: Event, isChecked: Boolean) {
+        if (isChecked) {
+            dataViewModel.removeFromFavorites(event)
+        } else {
+            dataViewModel.addToFavorites(event)
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

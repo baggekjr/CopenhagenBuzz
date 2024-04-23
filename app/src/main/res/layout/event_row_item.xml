@@ -55,12 +55,13 @@
                 app:layout_constraintStart_toStartOf="@+id/event_name"
                 />
 
-            <com.google.android.material.button.MaterialButton
+            <CheckBox
                 style="@style/Widget.Material3.Button.IconButton"
+                android:id="@+id/favorite_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                app:icon="@drawable/baseline_favorite_24"
+                app:icon="@drawable/baseline_favorite_border_24"
                 app:layout_constraintEnd_toEndOf="parent" />
 
 
