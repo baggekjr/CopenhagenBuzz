@@ -19,8 +19,20 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="Edit">Edit</string>
     <string name="info">Info</string>
-
-
-
+    <string name="dialog_update_eventName">Update an Event</string>
+    <string name="dialog_update_eventLocation">Update the selected event</string>
+    <string name="dialog_update_eventDate">Update a selected data from the database</string>
+    <string name="dialog_update_eventDescription">Update a selected data from the database</string>
+    <string name="dialog_update_eventType">Update a selected data from the database</string>
+    <string name="button_update">Update</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="Delete">Delete</string>
+    <string name="dialog_delete_title">Delete Event</string>
+    <string name="dialog_delete_message">Are you sure you want to delete this event?</string>
+    <string name="network_error_message">Network error occurred. Please check your internet connection and try again.</string>
+    <string name="auth_error_message">Authentication error occurred. Please sign in again.</string>
+    <string name="storage_error_message">Storage error occurred. Please try again later.</string>
+    <string name="generic_error_message">An error occurred. Please try again later.</string>
+    <string name="event_deleted">Event deleted successfully.</string>
 
 </resources>

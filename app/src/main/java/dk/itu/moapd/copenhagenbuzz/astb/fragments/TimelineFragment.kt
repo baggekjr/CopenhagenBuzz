@@ -43,8 +43,10 @@ class TimelineFragment : Fragment() {
         _binding = it
     }.root
 
-    override fun onViewCreated(view: View,
-                               savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
@@ -59,16 +61,18 @@ class TimelineFragment : Fragment() {
                 .setLifecycleOwner(this)
                 .build()
 
-            eventAdapter = EventAdapter(requireActivity(), requireContext(), options) {event, isChecked ->
+            eventAdapter = EventAdapter(requireActivity().supportFragmentManager, requireContext(), options) {event, isChecked ->
                 handleFavorites(event, isChecked)
             }
 
-            binding.listView.adapter=eventAdapter
+            binding.listView.adapter = eventAdapter
             // Set up data binding and lifecycle owner.
 
 
         }
     }
+
+
 
     private fun handleFavorites(event: Event, isChecked: Boolean) {
         if (isChecked) {
@@ -82,4 +86,7 @@ class TimelineFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+
+
 }

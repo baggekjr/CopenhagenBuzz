@@ -1,22 +1,18 @@
 package dk.itu.moapd.copenhagenbuzz.astb.viewmodels
 
+import androidx.core.graphics.convertTo
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.javafaker.Faker
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
+import com.google.firebase.database.DatabaseReference
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class DataViewModel : ViewModel() {
-
-
 
     private val _events: MutableLiveData<List<Event>> by lazy {
         MutableLiveData<List<Event>>()
@@ -33,6 +29,12 @@ class DataViewModel : ViewModel() {
 
     init {
         getEventsAndFavorites()
+    }
+
+    fun editEvent(id: DatabaseReference, event: Event) {
+        viewModelScope.launch {
+           id.setValue(event)
+        }
     }
 
     private fun getEventsAndFavorites() {
@@ -66,8 +68,6 @@ class DataViewModel : ViewModel() {
         val shuffledIndices = (events.indices).shuffled().take(25).sorted()
         return shuffledIndices.mapNotNull { index -> events.getOrNull(index) }
     }
-
-
 
 
 
