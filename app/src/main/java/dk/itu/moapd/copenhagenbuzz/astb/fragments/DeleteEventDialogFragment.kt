@@ -39,15 +39,9 @@ class DeleteEventDialogFragment(
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
-                        .addOnFailureListener { e ->
-                            handleError(e)
-                        }
-                }
-                .addOnFailureListener { e ->
-                    handleError(e)
-                }
 
-            dialog.dismiss()
+                    dialog.dismiss()
+                }
         }
 
         // Create and return a new instance of MaterialAlertDialogBuilder.
@@ -59,37 +53,5 @@ class DeleteEventDialogFragment(
         }.create()
     }
 
-    //Handle possible errors
-    private fun handleError(exception: Exception) {
-        when (exception) {
-            is FirebaseNetworkException -> {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.network_error_message),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-            is FirebaseAuthException -> {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.auth_error_message),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-            is StorageException -> {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.storage_error_message),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-            else -> {
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.generic_error_message),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-    }
+
 }
