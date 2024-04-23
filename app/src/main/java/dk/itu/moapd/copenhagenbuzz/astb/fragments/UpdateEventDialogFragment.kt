@@ -53,7 +53,7 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
             editTextEventDescription.setText(event.eventDescription)
             editTextEventType.setText(event.eventType)
 
-
+            editTextEventDate.setText(event.startDate.toString())
             // Listener for user interaction in the "Add event date" textfield
             editTextEventDate.setOnClickListener {
                 handleDateOnClick()
@@ -158,6 +158,7 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
 
                 val formatDate = SimpleDateFormat("E, MMM dd yyyy", Locale.US)
                 val date = datePicked.first + datePicked.second
+
 
                 setText(
                     // Don't do this - use a string resource
