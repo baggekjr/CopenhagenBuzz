@@ -19,8 +19,8 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="Edit">Edit</string>
     <string name="info">Info</string>
-    <string name="dialog_update_eventName">Update an entry</string>
-    <string name="dialog_update_eventLocation">Update a selected data from the database</string>
+    <string name="dialog_update_eventName">Update an Event</string>
+    <string name="dialog_update_eventLocation">Update the selected event</string>
     <string name="dialog_update_eventDate">Update a selected data from the database</string>
     <string name="dialog_update_eventDescription">Update a selected data from the database</string>
     <string name="dialog_update_eventType">Update a selected data from the database</string>
