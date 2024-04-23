@@ -10,6 +10,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
@@ -82,14 +84,15 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
     }
 
     private fun handleEventButtonOnClick() {
-
-        //val userId = auth.currentUser!!.uid
-
+        try {
             val eventName = binding.editTextEventName.text.toString().trim()
             val eventLocation = binding.editTextEventLocation.text.toString().trim()
             val eventDate = binding.editTextEventDate.text.toString().trim()
             val eventType = binding.editTextEventType.text.toString().trim()
             val eventDescription = binding.editTextEventDescription.text.toString().trim()
+
+            // Validate user inputs
+            validateInputs(eventName, eventLocation, eventDate, eventType, eventDescription)
 
             // Create a new Event object with updated eventName
             val updatedEvent = Event(
@@ -101,25 +104,36 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
                 eventType = eventType,
                 eventDescription = eventDescription
             )
+
+            // Perform database operation
             dataViewModel.editEvent(id, updatedEvent)
 
-           /* // Update the event in the Firebase database
-            FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
-                database.child("events")
-                    .child(uid)
-                    .setValue(updatedEvent)
-            }*/
 
-            /*Snackbar.make(
-                view,
-                "Event updated successfully",
-                Snackbar.LENGTH_SHORT
-            ).show()*/
-
-            dismiss() // Dismiss the dialog after updating the event
+            // Dismiss the dialog after updating the event
+            dismiss()
+        } catch (e: IllegalArgumentException) {
+            // Handle validation errors
+            showMessage(requireView(),"Validation Error: ${e.message}")
+        } catch (e: FirebaseException) {
+            // Handle Firebase database operation errors
+            showMessage(requireView(),"Database Error: ${e.message}")
+        } catch (e: Exception) {
+            // Handle other unexpected errors
+            showMessage(requireView(),"Error: ${e.message}")
+        }
     }
 
-
+    private fun validateInputs(
+        eventName: String,
+        eventLocation: String,
+        eventDate: String,
+        eventType: String,
+        eventDescription: String
+    ) {
+        if (eventName.isEmpty() || eventLocation.isEmpty() || eventDate.isEmpty() || eventType.isEmpty() || eventDescription.isEmpty()) {
+            throw IllegalArgumentException("Please fill out all fields")
+        }
+    }
 
     private fun setupDatePicker() {
                 with(binding.editTextEventDate) {
@@ -153,8 +167,8 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
             }
         }
     }
-    private fun showMessage(event: String) {
-       // Log.d(EventFragment.TAG, event)
+    fun showMessage(view: View, message: String) {
+        Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun onStart() {

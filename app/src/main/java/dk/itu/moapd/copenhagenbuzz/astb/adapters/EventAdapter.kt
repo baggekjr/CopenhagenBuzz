@@ -1,5 +1,6 @@
 package dk.itu.moapd.copenhagenbuzz.astb.adapters
 
+import DeleteEventDialogFragment
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +13,6 @@ import com.firebase.ui.database.FirebaseListAdapter
 import com.firebase.ui.database.FirebaseListOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
-import dk.itu.moapd.copenhagenbuzz.astb.fragments.DeleteEventDialogFragment
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.fragments.UpdateEventDialogFragment
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
