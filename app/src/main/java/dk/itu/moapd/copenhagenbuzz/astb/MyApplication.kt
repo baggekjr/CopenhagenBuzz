@@ -19,6 +19,7 @@ class MyApplication: Application() {
     override fun onCreate() {
         super.onCreate()
         DynamicColors.applyToActivitiesIfAvailable(this)
+        SharedPreferenceUtil.saveLocationTrackingPref(this, false)
 
         // Enable disk persistence for the Firebase Realtime Database and keep it synchronized.
         Firebase.database(DATABASE_URL).setPersistenceEnabled(true)
