@@ -39,11 +39,12 @@ class DataViewModel : ViewModel() {
 
     private fun getEventsAndFavorites() {
         viewModelScope.launch {
-            _events.value = makeEvents()
+            //_events.value = makeEvents()
             _events.value?.let { events -> _favorites.value = generateRandomFavorites(events) }
         }
     }
 
+    /*
     private fun makeEvents() : List<Event> {
             val faker = Faker()
             val eventList = mutableListOf<Event>()
@@ -63,6 +64,8 @@ class DataViewModel : ViewModel() {
             }
         return eventList
     }
+
+     */
     private fun generateRandomFavorites(events: List<Event>): List<Event> {
         val shuffledIndices = (events.indices).shuffled().take(25).sorted()
         return shuffledIndices.mapNotNull { index -> events.getOrNull(index) }

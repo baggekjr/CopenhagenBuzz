@@ -20,15 +20,20 @@ import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentUpdateEventBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
+import dk.itu.moapd.copenhagenbuzz.astb.models.EventLocation
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 import java.util.Date
 import java.util.Locale
+import dk.itu.moapd.copenhagenbuzz.astb.GeocodingHelper
+
 
 class UpdateEventDialogFragment(private val event: Event, private val position: Int, private val id: DatabaseReference) : DialogFragment() {
     private var _binding: FragmentUpdateEventBinding? = null
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
     private lateinit var database: DatabaseReference
     private val dataViewModel: DataViewModel by viewModels()
+    private lateinit var geocodingHelper: GeocodingHelper
+
 
     private val binding
         get() = requireNotNull(_binding) {
@@ -41,6 +46,7 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
         //binding.editTextName.setText(dummy.name)
         //auth = FirebaseAuth.getInstance()
         database = Firebase.database(DATABASE_URL).reference.child("CopenhagenBuzz")
+        geocodingHelper = GeocodingHelper(requireContext())
 
         val onPositiveButtonClick: (DialogInterface, Int) -> Unit = { dialog, _ ->
             handleEventButtonOnClick()
@@ -49,7 +55,9 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
 
         binding.apply {
             editTextEventName.setText(event.eventName)
-            editTextEventLocation.setText(event.eventLocation)
+            event.eventLocation?.let { eventLocation ->
+                editTextEventLocation.setText(eventLocation.address)
+            }
             editTextEventDescription.setText(event.eventDescription)
             editTextEventType.setText(event.eventType)
 
@@ -61,6 +69,7 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
 
             setupDatePicker()
         }
+
 
         return MaterialAlertDialogBuilder(requireContext()).apply {
             setView(binding.root)
@@ -75,7 +84,6 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
         super.onViewCreated(view, savedInstanceState)
         auth = FirebaseAuth.getInstance()
 
-
     }
 
     override fun onDestroyView() {
@@ -86,31 +94,37 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
     private fun handleEventButtonOnClick() {
         try {
             val eventName = binding.editTextEventName.text.toString().trim()
-            val eventLocation = binding.editTextEventLocation.text.toString().trim()
+            val eventLocationStr = binding.editTextEventLocation.text.toString().trim()
             val eventDate = binding.editTextEventDate.text.toString().trim()
             val eventType = binding.editTextEventType.text.toString().trim()
             val eventDescription = binding.editTextEventDescription.text.toString().trim()
 
             // Validate user inputs
-            validateInputs(eventName, eventLocation, eventDate, eventType, eventDescription)
+            validateInputs(eventName, eventLocationStr, eventDate, eventType, eventDescription)
 
-            // Create a new Event object with updated eventName
-            val updatedEvent = Event(
-                userId = event.userId,
-                eventIcon = event.eventIcon,
-                eventName = eventName,
-                eventLocation = eventLocation,
-                startDate = eventDate.toLong(),
-                eventType = eventType,
-                eventDescription = eventDescription
-            )
+            geocodingHelper.getLocationFromAddress(eventLocationStr) { latitude, longitude ->
+                if (latitude != null && longitude != null) {
+                    // Create an EventLocation object with the obtained latitude, longitude, and address
+                    val eventLocation = EventLocation(latitude, longitude, eventLocationStr)
 
-            // Perform database operation
-            dataViewModel.editEvent(id, updatedEvent)
+                    // Create a new Event object with updated location and other details
+                    val updatedEvent = Event(
+                        userId = event.userId,
+                        eventIcon = event.eventIcon,
+                        eventName = eventName,
+                        eventLocation = eventLocation,
+                        startDate = eventDate.toLong(),
+                        eventType = eventType,
+                        eventDescription = eventDescription
+                    )
 
+                    // Perform database operation
+                    dataViewModel.editEvent(id, updatedEvent)
 
-            // Dismiss the dialog after updating the event
-            dismiss()
+                    // Dismiss the dialog after updating the event
+                    dismiss()
+
+                }}
         } catch (e: IllegalArgumentException) {
             // Handle validation errors
             showMessage(requireView(),"Validation Error: ${e.message}")

@@ -18,6 +18,8 @@ import dk.itu.moapd.copenhagenbuzz.astb.R
 import android.Manifest.permission
 import android.content.pm.PackageManager
 import android.util.Log
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.MarkerOptions
 import dk.itu.moapd.copenhagenbuzz.astb.SharedPreferenceUtil
 
@@ -36,12 +38,14 @@ class MapsFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
     }
 
     private var _binding: FragmentMapsBinding? = null
+    private var isFirstCameraMove = true
     private val binding get() = requireNotNull(_binding) { "Binding is null" }
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var locationBroadcastReceiver: LocationBroadcastReceiver
     private lateinit var locationService: LocationService
     private var locationServiceBound = false
     private lateinit var mapFragment: SupportMapFragment
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private var googleMap: GoogleMap? = null
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -73,6 +77,10 @@ class MapsFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         val mapFragment = childFragmentManager
             .findFragmentById(binding.map.id) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
+
+
     }
 
     override fun onResume() {
@@ -85,7 +93,7 @@ class MapsFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         )
 
         // Check if the service is a foreground service, and if not, subscribe to location updates
-        if (!SharedPreferenceUtil.getLocationTrackingPref(requireContext())) {
+        if (locationServiceBound && !SharedPreferenceUtil.getLocationTrackingPref(requireContext())) {
             if (checkPermission()) {
                 locationService?.subscribeToLocationUpdates()
             } else {
@@ -94,16 +102,19 @@ class MapsFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         }
     }
 
+
     override fun onPause() {
         // Unregister the broadcast receiver.
-        LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(
-            locationBroadcastReceiver
-        )
         super.onPause()
 
-        // Unsubscribe from location updates if the service is no longer a foreground service
-        if (!SharedPreferenceUtil.getLocationTrackingPref(requireContext())) {
-            locationService?.unsubscribeToLocationUpdates()
+
+        if (::locationService.isInitialized) {
+            LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(locationBroadcastReceiver)
+
+            // Unsubscribe from location updates if the service is no longer a foreground service
+            if (!SharedPreferenceUtil.getLocationTrackingPref(requireContext())) {
+                locationService.unsubscribeToLocationUpdates()
+            }
         }
     }
 
@@ -140,23 +151,53 @@ class MapsFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListe
         _binding = null
     }
 
+
+
     override fun onMapReady(googleMap: GoogleMap) {
         Log.d("MapsFragment", "onMapReady")
         this.googleMap = googleMap
         googleMap.setPadding(0, 100, 0, 0) // Move the Google Maps UI buttons under the OS top bar.
         if (checkPermission()) {
             googleMap.isMyLocationEnabled = true
+            getCurrentLocation()
+
+        } else {
+            requestUserPermissions()
+        }
+
+
+    }
+
+
+    private fun getCurrentLocation() {
+        if (checkPermission()) {
+            fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
+                location?.let {
+                    moveCameraToLocation(it)
+                }
+            }
         } else {
             requestUserPermissions()
         }
     }
-
-
     private fun moveCameraToLocation(location: Location) {
         val latLng = LatLng(location.latitude, location.longitude)
+        // Clear existing markers
+        googleMap?.clear()
+        // Add a marker at the new location
         googleMap?.addMarker(MarkerOptions().position(latLng))
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+        googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+        /*googleMap?.addMarker(MarkerOptions().position(latLng))
+        // Move the camera to the new location with animation
+
+        if (isFirstCameraMove) {
+            // Move the camera to the new location with animation
+            googleMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+            isFirstCameraMove=false
+        }*/
+
     }
+
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
         // No need for any action here since there is no start/stop button

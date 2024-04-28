@@ -2,6 +2,8 @@ package dk.itu.moapd.copenhagenbuzz.astb.adapters
 
 import DeleteEventDialogFragment
 import android.content.Context
+import android.location.Address
+import android.location.Geocoder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +18,7 @@ import com.google.firebase.database.DatabaseReference
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.fragments.UpdateEventDialogFragment
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
+import java.util.Locale
 
 class EventAdapter(private val fragmentManager: FragmentManager, private val context: Context, private val options: FirebaseListOptions<Event>) :
     FirebaseListAdapter<Event>(options) {
@@ -52,7 +55,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
         with(viewHolder) {
             eventIcon.setImageResource(R.drawable.baseline_map_24)
             eventName.text = event.eventName
-            eventLocation.text = event.eventLocation
+            eventLocation.text = setAddress(event.eventLocation?.latitude ?: 0.0, event.eventLocation?.longitude ?: 0.0)
             eventDate.text = event.startDate.toString()
             eventType.text = event.eventType
             eventDescription.text = event.eventDescription
@@ -82,6 +85,13 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
         }
     }
 
+    private fun setAddress(latitude: Double, longitude: Double) : String?{
+        val geocoder = Geocoder(context, Locale.getDefault())
+        val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+        val address = addresses?.firstOrNull()?.toAddressString()
+        // Assuming you have a TextView named addressTextField in your event_row_item layout
+return address
+    }
 
 
 
@@ -101,4 +111,12 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
     private fun getId(position: Int): DatabaseReference{
         return getRef(position)
     }
+}
+
+private fun Address.toAddressString(): String =
+    with(StringBuilder()) {
+        append(getAddressLine(0)).append("\n")
+        append(countryName)
+        toString()
+
 }
