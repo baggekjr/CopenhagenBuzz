@@ -47,7 +47,6 @@ class TimelineFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
             val query = Firebase.database(DATABASE_URL).reference
                 .child("CopenhagenBuzz")
                 .child("events")
@@ -64,7 +63,7 @@ class TimelineFragment : Fragment() {
             binding.listView.adapter = eventAdapter
             // Set up data binding and lifecycle owner.
 
-        }
+
     }
 
 

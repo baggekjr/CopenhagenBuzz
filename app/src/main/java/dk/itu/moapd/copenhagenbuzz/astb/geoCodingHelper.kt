@@ -20,20 +20,12 @@ class GeocodingHelper(private val context: Context) {
             callback(null, null)
         }
     }
-    fun getAddressFromLocation(latitude: Double, longitude: Double): String {
-        val geocoder = Geocoder(context, Locale.getDefault())
-        val addresses = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1) {
-            geocoder.getFromLocation(latitude, longitude, 1)
-        } else {
-            geocoder.getFromLocation(latitude, longitude, 1)
-        }
-        return addresses?.firstOrNull()?.toAddressString() ?: ""
-    }
+
 
     private fun Address.toAddressString(): String =
         with(StringBuilder()) {
             append(getAddressLine(0)).append("\n")
-            append(countryName)
+            //append(countryName)
             toString()
         }
 
