@@ -140,9 +140,26 @@ class MapsFragment : Fragment(),  SharedPreferences.OnSharedPreferenceChangeList
             }
         }
         database.child("events").addValueEventListener(eventListener)
+        googleMap.setOnMarkerClickListener {
+            val event = it.tag as Event
 
+            EventDetailsDialogFragment(event).apply {
+                isCancelable = false
+            }.also { dialogFragment ->
+                dialogFragment.show(requireActivity().supportFragmentManager, "EventInfoDialogFragment")
+            }
 
+            false
+        }
+
+        if (checkPermission()) {
+            googleMap.isMyLocationEnabled = true
+        } else {
+            requestUserPermissions()
+        }
     }
+
+
 
     override fun onResume() {
         super.onResume()
