@@ -2,6 +2,8 @@ package dk.itu.moapd.copenhagenbuzz.astb.adapters
 
 import DeleteEventDialogFragment
 import android.content.Context
+import android.location.Address
+import android.location.Geocoder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +18,7 @@ import com.google.firebase.database.DatabaseReference
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.fragments.UpdateEventDialogFragment
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
+import java.util.Locale
 
 class EventAdapter(private val fragmentManager: FragmentManager, private val context: Context, private val options: FirebaseListOptions<Event>) :
     FirebaseListAdapter<Event>(options) {
@@ -52,7 +55,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
         with(viewHolder) {
             eventIcon.setImageResource(R.drawable.baseline_map_24)
             eventName.text = event.eventName
-            eventLocation.text = event.eventLocation
+            eventLocation.text = event.eventLocation?.address
             eventDate.text = event.startDate.toString()
             eventType.text = event.eventType
             eventDescription.text = event.eventDescription
@@ -64,7 +67,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
             if(currentUserUid == eventUserId) {
                 editButton?.visibility = View.VISIBLE
                 editButton?.setOnClickListener {
-                    UpdateEventDialogFragment(event, position, getId(position)).apply {
+                    UpdateEventDialogFragment(event, position, this@EventAdapter).apply {
                         isCancelable = false
                     }.show(fragmentManager, "UpdateEventFragment")
                 }
@@ -81,7 +84,6 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
             }
         }
     }
-
 
 
 
@@ -102,3 +104,5 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
         return getRef(position)
     }
 }
+
+

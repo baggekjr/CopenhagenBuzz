@@ -47,7 +47,6 @@ class TimelineFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-
             val query = Firebase.database(DATABASE_URL).reference
                 .child("CopenhagenBuzz")
                 .child("events")
