@@ -30,6 +30,7 @@ import com.android.volley.Request
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.Volley
+import com.google.firebase.storage.ktx.storage
 import java.io.File
 import java.util.UUID
 
@@ -211,61 +212,58 @@ class EventFragment : Fragment() {
                 .isNotEmpty() && binding.editTextEventDate.text.toString()
                 .isNotEmpty() && binding.editTextEventType.text.toString()
                 .isNotEmpty() && binding.editTextEventDescription.text.toString()
-                .isNotEmpty()){
+                .isNotEmpty()
+        ) {
 
-            val userId = auth.currentUser?.uid
             val eventName = binding.editTextEventName.text.toString().trim()
-            val eventLocationStr = binding.editTextEventLocation.text.toString()
-                .replace(' ', '+')
+            val eventLocationStr = binding.editTextEventLocation.text.toString().replace(' ', '+')
             val eventDate = binding.editTextEventDate.text.toString().trim()
             val eventType = binding.editTextEventType.text.toString().trim()
             val eventDescription = binding.editTextEventDescription.text.toString().trim()
-            val eventIcon= photoName
+            val eventIcon = photoName
+            val eventIconUri: Uri? = photoUri
 
+            if (eventName.isNotEmpty() && eventLocationStr.isNotEmpty() && eventDate.isNotEmpty() && eventType.isNotEmpty() && eventDescription.isNotEmpty()) {
+                val userId = auth.currentUser?.uid
+                if (userId != null) {
+                    // Geocode the event location
+                    val key: String = "6630a5d972d20365148401gdsd0bcd5"
+                    val url =
+                        "https://geocode.maps.co/search?q=$eventLocationStr+Copenhagen&api_key=$key"
 
-            val k = event.eventIcon
-            Log.e(TAG, "OKAY DENNE: $k")
+                    val queue = Volley.newRequestQueue(activity?.applicationContext)
 
-            // Geocode the event location
-            val key: String = "6630a5d972d20365148401gdsd0bcd5"
+                    val request = JsonArrayRequest(Request.Method.GET, url, null, { response ->
+                        response.toString()
 
-            val url = "https://geocode.maps.co/search?q=${eventLocationStr}+Copenhagen&api_key=${key}"
+                        val data = response.getJSONObject(0)
+                        val lat = data.getDouble("lat")
+                        val lon = data.getDouble("lon")
+                        val prettyAddress = formatAddress(data.getString("display_name"))
 
-            val queue = Volley.newRequestQueue(activity?.applicationContext)
+                        val eventLocation = EventLocation(lat, lon, prettyAddress)
 
-
-            val request = JsonArrayRequest(Request.Method.GET, url, null, { response ->
-                response.toString()
-
-                val data = response.getJSONObject(0)
-                val lat = data.getDouble("lat")
-                val lon = data.getDouble("lon")
-                val prettyAddress = formatAddress(data.getString("display_name"))
-
-
-                eventLocation = EventLocation(lat, lon, prettyAddress)
-
-                // Save the event
-                saveEvent(
-                    userId!!,
-                    eventIcon!!,
-                    eventName,
-                    eventLocation,
-                    eventDate,
-                    eventType,
-                    eventDescription
-                )
-                Log.e(TAG, "eventICON: $eventIcon")
-            }, {error ->
-                handleFailureVolley(error)
-            })
-            queue.add(request)
-        } else {
-            Snackbar.make(
-                requireView(),
-                "Please fill out all fields",
-                Snackbar.LENGTH_SHORT
-            ).show()
+                        // Save the event
+                        saveEventWithImage(
+                            userId,
+                            eventIconUri,
+                            eventName,
+                            eventLocation,
+                            eventDate,
+                            eventType,
+                            eventDescription
+                        )
+                    }, { error ->
+                        handleFailureVolley(error)
+                    })
+                    queue.add(request)
+                } else {
+                    Snackbar.make(requireView(), "User not logged in", Snackbar.LENGTH_SHORT).show()
+                }
+            } else {
+                Snackbar.make(requireView(), "Please fill out all fields", Snackbar.LENGTH_SHORT)
+                    .show()
+            }
         }
     }
 
@@ -277,9 +275,9 @@ class EventFragment : Fragment() {
         ).show()
     }
 
-    private fun saveEvent(
+    private fun saveEventWithImage(
         userId: String,
-        eventIcon: String,
+        eventIcon: Uri?, // Image URI to upload
         eventName: String,
         eventLocation: EventLocation,
         eventDate: String,
@@ -298,43 +296,75 @@ class EventFragment : Fragment() {
             return
         }
 
-        val newEvent = Event(
-            userId,
-            eventIcon,
-            eventName,
-            eventLocation,
-            eventDateLong,
-            eventType,
-            eventDescription
-        )
+        // Upload the image to Firebase Storage
+        if (eventIcon != null) {
+            val photoName = "IMG_${UUID.randomUUID()}.jpg"
+            val photoRef = Firebase.storage.reference.child("images/$photoName")
 
-        userId.let { uid ->
-            database.child("events")
-                .child(uid)
-                .push()
-                .key?.let { eventKey ->
-                    database.child("events")
-                        .child(eventKey)
-                        .setValue(newEvent)
-                        .addOnSuccessListener {
-                            Snackbar.make(
-                                requireView(),
-                                "Event saved successfully",
-                                Snackbar.LENGTH_SHORT
-                            ).show()
-                            clearInputFields()
+            photoRef.putFile(eventIcon)
+                .addOnSuccessListener { taskSnapshot ->
+                    // Image uploaded successfully, get the download URL
+                    taskSnapshot.storage.downloadUrl.addOnSuccessListener { uri ->
+                        // URL for the uploaded image
+                        val imageUrl = uri.toString()
+
+                        // Create new Event object with image URL
+                        val newEvent = Event(
+                            userId,
+                            imageUrl,
+                            eventName,
+                            eventLocation,
+                            eventDateLong,
+                            eventType,
+                            eventDescription
+                        )
+
+                        // Save the event to Firebase Realtime Database
+                        userId.let { uid ->
+                            database.child("events")
+                                .child(uid)
+                                .push()
+                                .key?.let { eventKey ->
+                                    database.child("events")
+                                        .child(eventKey)
+                                        .setValue(newEvent)
+                                        .addOnSuccessListener {
+                                            Snackbar.make(
+                                                requireView(),
+                                                "Event saved successfully",
+                                                Snackbar.LENGTH_SHORT
+                                            ).show()
+                                            clearInputFields()
+                                        }
+                                        .addOnFailureListener { exception ->
+                                            Log.e(TAG, "Error saving event: ${exception.message}")
+                                            Snackbar.make(
+                                                requireView(),
+                                                "Failed to save event: ${exception.message}",
+                                                Snackbar.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                }
                         }
-                        .addOnFailureListener { exception ->
-                            Log.e(TAG, "Error saving event: ${exception.message}")
-                            Snackbar.make(
-                                requireView(),
-                                "Failed to save event: ${exception.message}",
-                                Snackbar.LENGTH_SHORT
-                            ).show()
-                        }
+                    }
                 }
+                .addOnFailureListener { exception ->
+                    Log.e(TAG, "Error uploading image: ${exception.message}")
+                    Snackbar.make(
+                        requireView(),
+                        "Failed to upload image: ${exception.message}",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+        } else {
+            Snackbar.make(
+                requireView(),
+                "Please take a photo",
+                Snackbar.LENGTH_SHORT
+            ).show()
         }
     }
+
 
     private fun clearInputFields() {
         binding.apply {

@@ -1,10 +1,12 @@
 package dk.itu.moapd.copenhagenbuzz.astb.adapters
 
 import DeleteEventDialogFragment
+import com.squareup.picasso.Callback
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
+import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +26,7 @@ import dk.itu.moapd.copenhagenbuzz.astb.BUCKET_URL
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.fragments.UpdateEventDialogFragment
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
+import java.io.File
 import java.util.Locale
 
 class EventAdapter(private val fragmentManager: FragmentManager, private val context: Context, private val options: FirebaseListOptions<Event>) :
@@ -39,9 +42,12 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
 
         getItem(position)?.let { event ->
             populateViewHolder(viewHolder, event, position)
+            loadImageToView(event, viewHolder.eventIcon)
         }
 
         view.tag = viewHolder
+
+
 
 
         // Set OnClickListener for the edit button
@@ -65,6 +71,8 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
             eventDate.text = event.startDate.toString()
             eventType.text = event.eventType
             eventDescription.text = event.eventDescription
+            eventIcon.setImageResource(R.drawable.baseline_hail_24)
+
             val j = event.eventIcon
             Log.e(TAG, "Måske: $j")
 
@@ -96,30 +104,6 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
     }
 
 
-    private fun loadImageToView(event: Event, eventImage: ImageView) {
-        val placeholderImage = R.drawable.baseline_celebration_24
-        val i = event.eventIcon
-        Log.e(TAG,"{omg: $i}")
-        event.eventIcon?.let { imgUrl ->
-            val storageReference = Firebase.storage.reference
-            val imageRef = storageReference.child("your_image_directory/$imgUrl") // Replace "your_image_directory" with the actual directory path in your Firebase Storage
-
-            imageRef.downloadUrl.addOnSuccessListener { uri ->
-                val imageUrl = uri.toString()
-                Log.e(TAG, "Image URL for $imgUrl: $imageUrl") // Logging the image URL
-
-                // Load the image using Picasso or any other image loading library
-                Picasso.get()
-                    .load(uri)
-                    .placeholder(placeholderImage).error(placeholderImage)
-                    .into(eventImage)
-            }.addOnFailureListener { exception ->
-                Log.e(TAG, "Error getting download URL for $imgUrl: $exception")
-                // Load placeholder image or handle error
-                Picasso.get().load(placeholderImage).into(eventImage)
-            }
-        }
-    }
 
 
     private class ViewHolder(view: View) {
@@ -135,9 +119,36 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
 
     }
 
+
+    private fun loadImageToView(event: Event, eventImage: ImageView) {
+        val placeholderImage = R.drawable.baseline_hail_24 // Placeholder image resource
+
+        event.eventIcon?.let { imageUriString ->
+            try {
+                // Load the image using Picasso
+                Picasso.get().load(imageUriString).placeholder(placeholderImage).into(eventImage)
+            } catch (e: Exception) {
+                // Log any errors that occur during image loading
+                Log.e(TAG, "Error loading image: ${e.message}")
+                // Load placeholder image if there's an error
+                Picasso.get().load(placeholderImage).into(eventImage)
+            }
+        } ?: run {
+            // If event.eventIcon is null, load placeholder image
+            Log.e(TAG, "PLACEHOLDER")
+            Picasso.get().load(placeholderImage).into(eventImage)
+        }
+    }
+
+
+
+
+
     private fun getId(position: Int): DatabaseReference{
         return getRef(position)
     }
+
+
 }
 
 
