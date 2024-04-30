@@ -68,10 +68,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
             val currentUserUid = currentUser?.uid
 
             if (currentUser != null) {
-                favoriteCheckbox.visibility = View.VISIBLE
                 favoriteCheckbox.isChecked= event.favoritedBy?.contains(currentUserUid) ?: false
-            } else {
-                favoriteCheckbox.visibility = View.GONE
             }
 
 
@@ -181,9 +178,6 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
     }
 
 
-    private fun getId(position: Int): DatabaseReference{
-        return getRef(position)
-    }
 
     private class ViewHolder(view: View) {
         val favoriteCheckbox= view.findViewById<CheckBox>(R.id.favorite_button)
@@ -203,5 +197,6 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
         return getRef(position)
     }
 }
+
 
 

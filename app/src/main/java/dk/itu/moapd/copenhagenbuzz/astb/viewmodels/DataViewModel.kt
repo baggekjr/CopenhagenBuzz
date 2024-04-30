@@ -1,12 +1,22 @@
 package dk.itu.moapd.copenhagenbuzz.astb.viewmodels
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.core.graphics.convertTo
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.javafaker.Faker
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,9 +44,11 @@ class DataViewModel : ViewModel() {
     val favorites: LiveData<List<Event>>
         get() = _favorites
 
-    init {
+    /*init {
         getEventsAndFavorites()
     }
+
+     */
 
     fun editEvent(id: DatabaseReference, event: Event) {
         viewModelScope.launch {
@@ -71,14 +83,19 @@ class DataViewModel : ViewModel() {
         return mutableLiveData
     }
 
+}
 
 
+
+    /*
     private fun getEventsAndFavorites() {
         viewModelScope.launch {
             //_events.value = makeEvents()
             _events.value?.let { events -> _favorites.value = generateRandomFavorites(events) }
         }
     }
+
+     */
 
     /*
     private fun makeEvents() : List<Event> {
@@ -147,7 +164,7 @@ class DataViewModel : ViewModel() {
 
              */
 
-
+/*
         }
 
 
@@ -164,4 +181,6 @@ class DataViewModel : ViewModel() {
     }
 
 
-}
+
+
+     */

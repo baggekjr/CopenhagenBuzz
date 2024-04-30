@@ -320,19 +320,12 @@ class EventFragment : Fragment() {
         }
     }
 
+
 }
 
-            }
 
-        } else{
-            Snackbar.make(
-                requireView(),
-                "Please fill out all fields",
-                Snackbar.LENGTH_SHORT
-            ).show()
-        }
-        }
-    }
+
+
 
 
 
