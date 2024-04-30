@@ -1,9 +1,11 @@
 package dk.itu.moapd.copenhagenbuzz.astb.adapters
 
 import DeleteEventDialogFragment
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,8 +15,12 @@ import android.widget.ImageView
 import androidx.fragment.app.FragmentManager
 import com.firebase.ui.database.FirebaseListAdapter
 import com.firebase.ui.database.FirebaseListOptions
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.storage.storage
+import com.squareup.picasso.Picasso
+import dk.itu.moapd.copenhagenbuzz.astb.BUCKET_URL
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.fragments.UpdateEventDialogFragment
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
@@ -53,12 +59,16 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
 
     private fun populateViewHolder(viewHolder: ViewHolder, event: Event, position: Int) {
         with(viewHolder) {
-            eventIcon.setImageResource(R.drawable.baseline_map_24)
+            //eventIcon.setImageResource(R.drawable.baseline_map_24)
             eventName.text = event.eventName
             eventLocation.text = event.eventLocation?.address
             eventDate.text = event.startDate.toString()
             eventType.text = event.eventType
             eventDescription.text = event.eventDescription
+            val j = event.eventIcon
+            Log.e(TAG, "Måske: $j")
+
+            loadImageToView(event, eventIcon)
 
             val currentUser = auth.currentUser
             val currentUserUid = currentUser?.uid
@@ -85,6 +95,31 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
         }
     }
 
+
+    private fun loadImageToView(event: Event, eventImage: ImageView) {
+        val placeholderImage = R.drawable.baseline_celebration_24
+        val i = event.eventIcon
+        Log.e(TAG,"{omg: $i}")
+        event.eventIcon?.let { imgUrl ->
+            val storageReference = Firebase.storage.reference
+            val imageRef = storageReference.child("your_image_directory/$imgUrl") // Replace "your_image_directory" with the actual directory path in your Firebase Storage
+
+            imageRef.downloadUrl.addOnSuccessListener { uri ->
+                val imageUrl = uri.toString()
+                Log.e(TAG, "Image URL for $imgUrl: $imageUrl") // Logging the image URL
+
+                // Load the image using Picasso or any other image loading library
+                Picasso.get()
+                    .load(uri)
+                    .placeholder(placeholderImage).error(placeholderImage)
+                    .into(eventImage)
+            }.addOnFailureListener { exception ->
+                Log.e(TAG, "Error getting download URL for $imgUrl: $exception")
+                // Load placeholder image or handle error
+                Picasso.get().load(placeholderImage).into(eventImage)
+            }
+        }
+    }
 
 
     private class ViewHolder(view: View) {
