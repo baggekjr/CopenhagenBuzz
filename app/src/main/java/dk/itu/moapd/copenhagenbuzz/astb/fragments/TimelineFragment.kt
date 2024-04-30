@@ -6,9 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import com.firebase.ui.database.FirebaseListOptions
-import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.database
@@ -49,7 +47,7 @@ class TimelineFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
+
             val query = Firebase.database(DATABASE_URL).reference
                 .child("CopenhagenBuzz")
                 .child("events")
@@ -61,26 +59,14 @@ class TimelineFragment : Fragment() {
                 .setLifecycleOwner(this)
                 .build()
 
-            eventAdapter = EventAdapter(requireActivity().supportFragmentManager, requireContext(), options) {event, isChecked ->
-                handleFavorites(event, isChecked)
-            }
+            eventAdapter = EventAdapter(requireActivity().supportFragmentManager, requireContext(), options)
 
             binding.listView.adapter = eventAdapter
             // Set up data binding and lifecycle owner.
 
 
-        }
     }
 
-
-
-    private fun handleFavorites(event: Event, isChecked: Boolean) {
-        if (isChecked) {
-            dataViewModel.removeFromFavorites(event)
-        } else {
-            dataViewModel.addToFavorites(event)
-        }
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

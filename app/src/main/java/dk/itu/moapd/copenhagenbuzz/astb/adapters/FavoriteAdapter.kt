@@ -3,38 +3,40 @@ package dk.itu.moapd.copenhagenbuzz.astb.adapters
 import android.content.ContentValues.TAG
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.firebase.ui.database.FirebaseRecyclerOptions
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FavoritesRowItemBinding
-import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentEventBinding
-import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentFavoritesBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
+import dk.itu.moapd.copenhagenbuzz.astb.models.Favorite
 
-class FavoriteAdapter(options: FirebaseRecyclerOptions<Event>, private val onFavoriteCheckedChanged: (Event, Boolean) -> Unit) : FirebaseRecyclerAdapter<Event, FavoriteAdapter.ViewHolder>(options) {
+class FavoriteAdapter(options: FirebaseRecyclerOptions<Event>) : FirebaseRecyclerAdapter<Event, FavoriteAdapter.ViewHolder>(options) {
 
     inner class ViewHolder(private val binding: FavoritesRowItemBinding) : RecyclerView.ViewHolder(binding.root)
     {
         val favoriteCheckbox = binding.favoriteButton
-        fun bind(event: Event) {
+        fun bind(favorite: Event) {
             with(binding) {
-                eventName.text = event.eventName
-                eventType.text = event.eventType
-                favoriteCheckbox.isChecked = event.isFavorite
-                favoriteButton.setOnCheckedChangeListener{ _, isChecked ->
-                    onFavoriteCheckedChanged(event, isChecked)
-                }
-                if (event.isFavorite) {
+                eventName.text = favorite.eventName
+                eventType.text = favorite.eventType
+
+                /*
+                //favoriteCheckbox.isChecked = favorite.isFavorite
+
+                if (favorite.isFavorite) {
                     favoriteCheckbox.setButtonDrawable(R.drawable.baseline_favorite_24)
+                    favoriteCheckbox.isChecked= true
                 } else {
                     favoriteCheckbox.setButtonDrawable(R.drawable.baseline_favorite_border_24)
+                    favoriteCheckbox.isChecked=false
+                }
+                favoriteCheckbox.setOnCheckedChangeListener{ _, isChecked ->
+                    onFavoriteCheckedChanged(favorite, isChecked)
                 }
 
+                 */
             }
         }
 

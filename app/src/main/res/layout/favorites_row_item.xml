@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
+        android:checked="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -30,10 +31,10 @@
 
                 <CheckBox
                     android:id="@+id/favorite_button"
-                    style="@style/Widget.Material3.Button.IconButton"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    app:icon="@drawable/baseline_favorite_border_24"
+                    android:clickable="true"
+                    android:button="@drawable/favorite_checkbox"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/event_name"
                     app:layout_constraintStart_toStartOf="parent"

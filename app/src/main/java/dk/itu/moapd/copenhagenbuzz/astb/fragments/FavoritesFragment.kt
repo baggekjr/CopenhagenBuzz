@@ -6,19 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
-import dk.itu.moapd.copenhagenbuzz.astb.R
+import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
 import dk.itu.moapd.copenhagenbuzz.astb.adapters.FavoriteAdapter
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentFavoritesBinding
-import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentTimelineBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
+import dk.itu.moapd.copenhagenbuzz.astb.models.Favorite
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 
 
@@ -31,6 +30,7 @@ class FavoritesFragment : Fragment() {
 
     private var _binding: FragmentFavoritesBinding? = null
     private val viewModel: DataViewModel by activityViewModels()
+
 
 
     private val binding
@@ -48,15 +48,25 @@ class FavoritesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        _binding?.recyclerView?.layoutManager = LinearLayoutManager(requireContext())
+
+
 
         FirebaseAuth.getInstance().currentUser?.uid?.let { userId ->
             val query = Firebase.database(DATABASE_URL).reference
                 .child("CopenhagenBuzz")
+                .child("favorites")
+                .child(userId)
+
+
+
+            val databaseReference = Firebase.database(DATABASE_URL).reference
+                .child("CopenhagenBuzz")
                 .child("events")
-                .orderByChild("startDate")
+
 
             val options = FirebaseRecyclerOptions.Builder<Event>()
-                .setQuery(query, Event::class.java)
+                .setIndexedQuery(query, databaseReference, Event::class.java)
                 .setLifecycleOwner(this)
                 .build()
 
@@ -65,28 +75,30 @@ class FavoritesFragment : Fragment() {
                 layoutManager = LinearLayoutManager(requireContext())
 
             }
+            val adapter = FavoriteAdapter(options)
 
 
             with(binding) {
-                viewModel.favorites.observe(viewLifecycleOwner) {
-                    recyclerView.layoutManager = LinearLayoutManager(requireContext())
-
-                    val adapter = FavoriteAdapter(options) { event , isChecked ->
-                        handleFavorites(event, isChecked)
-                    }
-                    recyclerView.adapter = adapter
-                }
+                viewModel.favorites.observe(viewLifecycleOwner) {}
+                recyclerView.adapter = adapter
             }
         }
+
     }
+
+
+    /*
 
     private fun handleFavorites(event: Event, isChecked: Boolean) {
         if (isChecked) {
             viewModel.removeFromFavorites(event)
         } else {
             viewModel.addToFavorites(event)
+
         }
     }
+
+     */
 
     override fun onDestroyView() {
         super.onDestroyView()
