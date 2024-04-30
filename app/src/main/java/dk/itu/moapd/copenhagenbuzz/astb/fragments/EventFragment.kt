@@ -1,12 +1,16 @@
 package dk.itu.moapd.copenhagenbuzz.astb.fragments
 
 import android.icu.text.SimpleDateFormat
+import android.location.Address
+import android.location.Geocoder
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentEventBinding
@@ -15,9 +19,18 @@ import java.util.Date
 import java.util.Locale
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
+import dk.itu.moapd.copenhagenbuzz.astb.GeocodingHelper
+import dk.itu.moapd.copenhagenbuzz.astb.R
+import dk.itu.moapd.copenhagenbuzz.astb.models.EventLocation
+import io.github.cdimascio.dotenv.dotenv
+import com.android.volley.Request
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.JsonArrayRequest
+import com.android.volley.toolbox.Volley
 
 
 /**
@@ -27,9 +40,10 @@ import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
  */
 class EventFragment : Fragment() {
     private var _binding: FragmentEventBinding? = null
-    private lateinit var auth : FirebaseAuth
-    private lateinit var database : DatabaseReference
-
+    private lateinit var auth: FirebaseAuth
+    private lateinit var database: DatabaseReference
+    private lateinit var geocodingHelper: GeocodingHelper
+    private lateinit var eventLocation: EventLocation
 
     // A set of private constants used in this class .
     companion object {
@@ -37,7 +51,7 @@ class EventFragment : Fragment() {
     }
 
     // An instance of the ‘Event ‘ class.
-    private val event: Event = Event( "","", "", "", 0, "", "")
+    private val event: Event = Event("", "", "", null, 0, "", "")
 
     private val binding
         get() = requireNotNull(_binding) {
@@ -57,6 +71,8 @@ class EventFragment : Fragment() {
 
         auth = FirebaseAuth.getInstance()
         database = Firebase.database(DATABASE_URL).reference.child("CopenhagenBuzz")
+        geocodingHelper = GeocodingHelper(requireContext())
+
 
         // Set up data binding and lifecycle owner.
         binding.apply {
@@ -71,6 +87,12 @@ class EventFragment : Fragment() {
             editTextEventDate.setOnClickListener {
                 handleDateOnClick()
             }
+
+
+
+
+
+
             setupDatePicker()
         }
     }
@@ -101,7 +123,7 @@ class EventFragment : Fragment() {
      */
 
     private fun handleDateOnClick() {
-        with(binding.editTextEventDate){
+        with(binding.editTextEventDate) {
             val dateRangePicker =
                 MaterialDatePicker.Builder.dateRangePicker().setTitleText("Select dates").build()
             dateRangePicker.show(parentFragmentManager, "DatePicker")
@@ -143,6 +165,14 @@ class EventFragment : Fragment() {
         return format.format(date)
     }
 
+    private fun formatAddress(address: String) : String{
+        val list = address
+            .split(", ")
+
+        // house number, street name, city name
+        return "${list[1]} ${list[0]}, ${list[list.size - 6]}"
+    }
+
     /**
      * Handle when the eventButton gets clicked.
      *
@@ -156,87 +186,141 @@ class EventFragment : Fragment() {
                 .isNotEmpty() && binding.editTextEventDate.text.toString()
                 .isNotEmpty() && binding.editTextEventType.text.toString()
                 .isNotEmpty() && binding.editTextEventDescription.text.toString()
-                .isNotEmpty()
-        ) {
-            // Update the object attributes.
+                .isNotEmpty()){
+
+
             val userId = auth.currentUser?.uid
-            //handle if userID is null
-            //TODO: dont know if this is necessary.
-            if (userId.isNullOrEmpty()) {
-                // User not logged in
-                Snackbar.make(
-                    requireView(),
-                    "User not logged in",
-                    Snackbar.LENGTH_SHORT
-                ).show()
-                return
-            }
-            val eventIcon = "picture"
             val eventName = binding.editTextEventName.text.toString().trim()
-            val eventLocation = binding.editTextEventLocation.text.toString().trim()
+            val eventLocationStr = binding.editTextEventLocation.text.toString()
+                .replace(' ', '+')
             val eventDate = binding.editTextEventDate.text.toString().trim()
             val eventType = binding.editTextEventType.text.toString().trim()
             val eventDescription = binding.editTextEventDescription.text.toString().trim()
 
-            val eventDateLong = try {
-                eventDate.toLong()
-            } catch (e: NumberFormatException) {
-                // Handle parsing error
-                Log.e(TAG, "Error parsing event date: ${e.message}")
-                Snackbar.make(
-                    requireView(),
-                    "Error parsing event date",
-                    Snackbar.LENGTH_SHORT
-                ).show()
-                return
-            }
+            // Geocode the event location
+            val key: String = "6630a5d972d20365148401gdsd0bcd5"
 
-            val newEvent = Event(userId, eventIcon, eventName, eventLocation, eventDateLong, eventType, eventDescription)
+            val url = "https://geocode.maps.co/search?q=${eventLocationStr}+Copenhagen&api_key=${key}"
+
+            val queue = Volley.newRequestQueue(activity?.applicationContext)
 
 
-            userId.let { uid ->
-                database.child("events")
-                    .child(uid)
-                    .push()
-                    .key?.let { event ->
-                        database.child("events")
-                            .child(event)
-                            .setValue(newEvent).addOnSuccessListener {
-                                Snackbar.make(
-                                    requireView(),
-                                    "Event saved successfully: \"$eventName $eventLocation $eventDate $eventType $eventDescription\",\n",
-                                    Snackbar.LENGTH_SHORT
-                                ).show()
+            val request = JsonArrayRequest(Request.Method.GET, url, null, { response ->
+                response.toString()
 
-                                //Clears event after saving
-                                // TODO: idk if it is the right place to put it but it works lol
-                                binding.apply {
-                                    editTextEventName.text?.clear()
-                                    editTextEventLocation.text?.clear()
-                                    editTextEventDate.text?.clear()
-                                    editTextEventType.text?.clear()
-                                    editTextEventDescription.text?.clear()
+                val data = response.getJSONObject(0)
+                val lat = data.getDouble("lat")
+                val lon = data.getDouble("lon")
+                val prettyAddress = formatAddress(data.getString("display_name"))
 
-                                    //clearFocus to make it unfocused
-                                    editTextEventName.clearFocus()
-                                    editTextEventLocation.clearFocus()
-                                    editTextEventDate.clearFocus()
-                                    editTextEventType.clearFocus()
-                                    editTextEventDescription.clearFocus()
 
-                                }
+                eventLocation = EventLocation(lat, lon, prettyAddress)
 
-                            }
-                            .addOnFailureListener { exception ->
-                                Log.e(TAG, "Error saving event: ${exception.message}")
-                                Snackbar.make(
-                                    requireView(),
-                                    "Failed to save event: ${exception.message}",
-                                    Snackbar.LENGTH_SHORT
-                                ).show()
-                            }
+                // Save the event
+                saveEvent(
+                    userId!!,
+                    eventName,
+                    eventLocation,
+                    eventDate,
+                    eventType,
+                    eventDescription
+                )
+            }, {error ->
+                handleFailureVolley(error)
+            })
+            queue.add(request)
+        } else {
+            Snackbar.make(
+                requireView(),
+                "Please fill out all fields",
+                Snackbar.LENGTH_SHORT
+            ).show()
+        }
+    }
 
-                    }
+    private fun handleFailureVolley(error: VolleyError?) {
+        Snackbar.make(
+            requireView(),
+            "VolleyError",
+            Snackbar.LENGTH_SHORT
+        ).show()
+    }
+
+    private fun saveEvent(
+        userId: String,
+        eventName: String,
+        eventLocation: EventLocation,
+        eventDate: String,
+        eventType: String,
+        eventDescription: String
+    ) {
+        val eventIcon = "picture"
+        val eventDateLong = try {
+            eventDate.toLong()
+        } catch (e: NumberFormatException) {
+            Log.e(TAG, "Error parsing event date: ${e.message}")
+            Snackbar.make(
+                requireView(),
+                "Error parsing event date",
+                Snackbar.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        val newEvent = Event(
+            userId,
+            eventIcon,
+            eventName,
+            eventLocation,
+            eventDateLong,
+            eventType,
+            eventDescription
+        )
+
+        userId.let { uid ->
+            database.child("events")
+                .child(uid)
+                .push()
+                .key?.let { eventKey ->
+                    database.child("events")
+                        .child(eventKey)
+                        .setValue(newEvent)
+                        .addOnSuccessListener {
+                            Snackbar.make(
+                                requireView(),
+                                "Event saved successfully",
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                            clearInputFields()
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.e(TAG, "Error saving event: ${exception.message}")
+                            Snackbar.make(
+                                requireView(),
+                                "Failed to save event: ${exception.message}",
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                        }
+                }
+        }
+    }
+
+    private fun clearInputFields() {
+        binding.apply {
+            editTextEventName.text?.clear()
+            editTextEventLocation.text?.clear()
+            editTextEventDate.text?.clear()
+            editTextEventType.text?.clear()
+            editTextEventDescription.text?.clear()
+            editTextEventName.clearFocus()
+            editTextEventLocation.clearFocus()
+            editTextEventDate.clearFocus()
+            editTextEventType.clearFocus()
+            editTextEventDescription.clearFocus()
+        }
+    }
+
+}
 
             }
 
@@ -255,6 +339,4 @@ class EventFragment : Fragment() {
 
 
 
-// ref = getRef(position)
-//ref.key()
 

@@ -22,13 +22,10 @@ class DeleteEventDialogFragment(
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         super.onCreateDialog(savedInstanceState)
 
-        // Create a lambda for positive button click handling.
         val onPositiveButtonClick: (DialogInterface, Int) -> Unit = { dialog, _ ->
-            // Remove an item from the Firebase Realtime database.
             adapter.getRef(position)
                 .removeValue()
                 .addOnSuccessListener {
-                    // Remove the original image.
                     Firebase.storage.reference
                         .child("event")
                         .delete()

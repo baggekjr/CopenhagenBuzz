@@ -2,6 +2,8 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+
 }
 
 android {
@@ -65,7 +67,9 @@ dependencies {
     implementation("com.google.firebase:firebase-database-ktx")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
     implementation ("com.google.firebase:firebase-storage-ktx:20.0.0")
-
-
-
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.gms:play-services-location:21.2.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0")
+    implementation("com.android.volley:volley:1.2.1")
 }
