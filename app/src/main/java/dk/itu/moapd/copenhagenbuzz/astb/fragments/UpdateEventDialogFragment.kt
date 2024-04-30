@@ -103,8 +103,9 @@ class UpdateEventDialogFragment(private val event: Event,
 
     private fun handleEventButtonOnClick() {
             val eventName = binding.editTextEventName.text.toString().trim()
-            val eventLocationStr = binding.editTextEventLocation.text.toString().trim()
-            val eventDate = binding.editTextEventDate.text.toString().trim()
+        val eventLocationStr = binding.editTextEventLocation.text.toString()
+            .replace(' ', '+')
+        val eventDate = binding.editTextEventDate.text.toString().trim()
             val eventType = binding.editTextEventType.text.toString().trim()
             val eventDescription = binding.editTextEventDescription.text.toString().trim()
 
@@ -141,7 +142,7 @@ class UpdateEventDialogFragment(private val event: Event,
                     eventDescription = eventDescription
                 )
                 adapter.getRef(position).setValue(updatedEvent).addOnSuccessListener {
-                    "Success"               }.addOnFailureListener {
+                    "Succes"         }.addOnFailureListener {
                     "Error"
                 }
 
@@ -154,13 +155,19 @@ class UpdateEventDialogFragment(private val event: Event,
 
     }
 
-private fun formatAddress(address: String) : String{
-    val list = address
-        .split(", ")
+    private fun formatAddress(address: String) : String{
+        val list = address
+            .split(", ")
 
-    // house number, street name, city name
-    return "${list[1]} ${list[0]}, ${list[list.size - 6]}"
-}
+        // house number, street name, city name
+        return "${list[1]} ${list[0]}, ${list[list.size - 6]}"
+    }
+
+
+
+
+
+
 
     private fun validateInputs(
         eventName: String,
