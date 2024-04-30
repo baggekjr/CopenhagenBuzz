@@ -105,10 +105,4 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
     }
 }
 
-private fun Address.toAddressString(): String =
-    with(StringBuilder()) {
-        append(getAddressLine(0)).append("\n")
-        append(countryName)
-        toString()
 
-}

@@ -111,29 +111,6 @@ class UpdateEventDialogFragment(private val event: Event,
             // Validate user inputs
             validateInputs(eventName, eventLocationStr, eventDate, eventType, eventDescription)
 
-            /* *//*geocodingHelper.getLocationFromAddress(eventLocationStr) { latitude, longitude ->
-                if (latitude != null && longitude != null) {
-                    // Create an EventLocation object with the obtained latitude, longitude, and address
-                    val eventLocation = EventLocation(latitude, longitude, eventLocationStr)
-
-                    // Create a new Event object with updated location and other details
-                    val updatedEvent = Event(
-                        userId = event.userId,
-                        eventIcon = event.eventIcon,
-                        eventName = eventName,
-                        eventLocation = eventLocation,
-                        startDate = eventDate.toLong(),
-                        eventType = eventType,
-                        eventDescription = eventDescription
-                    )*//*
-
-                    // Perform database operation
-                    dataViewModel.editEvent(id, updatedEvent)
-
-                    // Dismiss the dialog after updating the event
-                    dismiss()
-
-                }}*/
             val key: String = "6630a5d972d20365148401gdsd0bcd5"
 
             val url =
@@ -153,7 +130,7 @@ class UpdateEventDialogFragment(private val event: Event,
 
                 eventLocation = EventLocation(lat, lon, prettyAddress)
 
-                // Save the event
+                // Save the updated event
                 updatedEvent = Event(
                     userId = event.userId,
                     eventIcon = event.eventIcon,

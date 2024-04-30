@@ -20,10 +20,6 @@ import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
@@ -33,8 +29,6 @@ private const val ARG_PARAM2 = "param2"
 class EventDetailsDialogFragment(private val event: Event) : DialogFragment() {
 
     private var _binding: FragmentEventDetailsDialogBinding? = null
-
-    private val dateFormatter = SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH)
 
     private val binding
         get() = requireNotNull(_binding){
@@ -49,10 +43,7 @@ class EventDetailsDialogFragment(private val event: Event) : DialogFragment() {
             editTextEventLocation.setText(event.eventLocation?.address)
             editTextEventDescription.setText(event.eventDescription)
             editTextEventType.setText(event.eventType)
-
             editTextEventDate.setText(event.startDate.toString())
-            // Listener for user interaction in the "Add event date" textfield
-
 
             return MaterialAlertDialogBuilder(requireContext()).apply {
                 setView(binding.root)
