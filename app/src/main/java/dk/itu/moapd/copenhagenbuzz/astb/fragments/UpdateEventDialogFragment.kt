@@ -6,8 +6,13 @@ import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
+import com.android.volley.Request
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.JsonArrayRequest
+import com.android.volley.toolbox.Volley
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -25,20 +30,26 @@ import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 import java.util.Date
 import java.util.Locale
 import dk.itu.moapd.copenhagenbuzz.astb.GeocodingHelper
+import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
+import io.github.cdimascio.dotenv.dotenv
 
 
-class UpdateEventDialogFragment(private val event: Event, private val position: Int, private val id: DatabaseReference) : DialogFragment() {
+class UpdateEventDialogFragment(private val event: Event,
+                                private val position: Int,
+                                private val adapter: EventAdapter) : DialogFragment() {
     private var _binding: FragmentUpdateEventBinding? = null
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
     private lateinit var database: DatabaseReference
     private val dataViewModel: DataViewModel by viewModels()
     private lateinit var geocodingHelper: GeocodingHelper
-
+    private lateinit var updatedEvent: Event
+    private var eventLocation: EventLocation? = event.eventLocation
 
     private val binding
         get() = requireNotNull(_binding) {
             "Cannot access binding because it is null. Is the view visible?"
         }
+
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         super.onCreateDialog(savedInstanceState)
@@ -55,9 +66,7 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
 
         binding.apply {
             editTextEventName.setText(event.eventName)
-            event.eventLocation?.let { eventLocation ->
-                editTextEventLocation.setText(eventLocation.address)
-            }
+            editTextEventLocation.setText(event.eventLocation?.address)
             editTextEventDescription.setText(event.eventDescription)
             editTextEventType.setText(event.eventType)
 
@@ -84,6 +93,7 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
         super.onViewCreated(view, savedInstanceState)
         auth = FirebaseAuth.getInstance()
 
+
     }
 
     override fun onDestroyView() {
@@ -92,7 +102,6 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
     }
 
     private fun handleEventButtonOnClick() {
-        try {
             val eventName = binding.editTextEventName.text.toString().trim()
             val eventLocationStr = binding.editTextEventLocation.text.toString().trim()
             val eventDate = binding.editTextEventDate.text.toString().trim()
@@ -102,7 +111,7 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
             // Validate user inputs
             validateInputs(eventName, eventLocationStr, eventDate, eventType, eventDescription)
 
-            geocodingHelper.getLocationFromAddress(eventLocationStr) { latitude, longitude ->
+            /* *//*geocodingHelper.getLocationFromAddress(eventLocationStr) { latitude, longitude ->
                 if (latitude != null && longitude != null) {
                     // Create an EventLocation object with the obtained latitude, longitude, and address
                     val eventLocation = EventLocation(latitude, longitude, eventLocationStr)
@@ -116,7 +125,7 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
                         startDate = eventDate.toLong(),
                         eventType = eventType,
                         eventDescription = eventDescription
-                    )
+                    )*//*
 
                     // Perform database operation
                     dataViewModel.editEvent(id, updatedEvent)
@@ -124,18 +133,57 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
                     // Dismiss the dialog after updating the event
                     dismiss()
 
-                }}
-        } catch (e: IllegalArgumentException) {
-            // Handle validation errors
-            showMessage(requireView(),"Validation Error: ${e.message}")
-        } catch (e: FirebaseException) {
-            // Handle Firebase database operation errors
-            showMessage(requireView(),"Database Error: ${e.message}")
-        } catch (e: Exception) {
-            // Handle other unexpected errors
-            showMessage(requireView(),"Error: ${e.message}")
-        }
+                }}*/
+            val key: String = "6630a5d972d20365148401gdsd0bcd5"
+
+            val url =
+                "https://geocode.maps.co/search?q=${eventLocationStr}+Copenhagen&api_key=${key}"
+
+            val queue = Volley.newRequestQueue(activity?.applicationContext)
+
+
+            val request = JsonArrayRequest(Request.Method.GET, url, null, { response ->
+                response.toString()
+
+                val data = response.getJSONObject(0)
+                val lat = data.getDouble("lat")
+                val lon = data.getDouble("lon")
+                val prettyAddress = formatAddress(data.getString("display_name"))
+
+
+                eventLocation = EventLocation(lat, lon, prettyAddress)
+
+                // Save the event
+                updatedEvent = Event(
+                    userId = event.userId,
+                    eventIcon = event.eventIcon,
+                    eventName = eventName,
+                    eventLocation = eventLocation,
+                    startDate = eventDate.toLong(),
+                    eventType = eventType,
+                    eventDescription = eventDescription
+                )
+                adapter.getRef(position).setValue(updatedEvent).addOnSuccessListener {
+                    "Success"               }.addOnFailureListener {
+                    "Error"
+                }
+
+
+            }, { error ->
+                handleFailureVolley(error)
+            })
+            queue.add(request)
+
+
     }
+
+private fun formatAddress(address: String) : String{
+    val list = address
+        .split(", ")
+
+    // house number, street name, city name
+    return "${list[1]} ${list[0]}, ${list[list.size - 6]}"
+}
 
     private fun validateInputs(
         eventName: String,
@@ -182,9 +230,16 @@ class UpdateEventDialogFragment(private val event: Event, private val position: 
             }
         }
     }
-    fun showMessage(view: View, message: String) {
-        Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show()
+
+    private fun handleFailureVolley(error: VolleyError?) {
+        Snackbar.make(
+            requireView(),
+            "VolleyError",
+            Snackbar.LENGTH_SHORT
+        ).show()
     }
+
+
 
     override fun onStart() {
         super.onStart()

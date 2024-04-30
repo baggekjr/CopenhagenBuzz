@@ -55,7 +55,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
         with(viewHolder) {
             eventIcon.setImageResource(R.drawable.baseline_map_24)
             eventName.text = event.eventName
-            eventLocation.text = setAddress(event.eventLocation?.latitude ?: 0.0, event.eventLocation?.longitude ?: 0.0)
+            eventLocation.text = event.eventLocation?.address
             eventDate.text = event.startDate.toString()
             eventType.text = event.eventType
             eventDescription.text = event.eventDescription
@@ -67,7 +67,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
             if(currentUserUid == eventUserId) {
                 editButton?.visibility = View.VISIBLE
                 editButton?.setOnClickListener {
-                    UpdateEventDialogFragment(event, position, getId(position)).apply {
+                    UpdateEventDialogFragment(event, position, this@EventAdapter).apply {
                         isCancelable = false
                     }.show(fragmentManager, "UpdateEventFragment")
                 }
@@ -83,14 +83,6 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
                 deleteButton?.visibility = View.GONE
             }
         }
-    }
-
-    private fun setAddress(latitude: Double, longitude: Double) : String?{
-        val geocoder = Geocoder(context, Locale.getDefault())
-        val addresses = geocoder.getFromLocation(latitude, longitude, 1)
-        val address = addresses?.firstOrNull()?.toAddressString()
-        // Assuming you have a TextView named addressTextField in your event_row_item layout
-return address
     }
 
 

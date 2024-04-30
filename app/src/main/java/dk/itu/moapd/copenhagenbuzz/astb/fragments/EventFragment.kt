@@ -26,6 +26,11 @@ import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.astb.GeocodingHelper
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.models.EventLocation
+import io.github.cdimascio.dotenv.dotenv
+import com.android.volley.Request
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.JsonArrayRequest
+import com.android.volley.toolbox.Volley
 
 
 /**
@@ -38,7 +43,7 @@ class EventFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
     private lateinit var geocodingHelper: GeocodingHelper
-
+    private lateinit var eventLocation: EventLocation
 
     // A set of private constants used in this class .
     companion object {
@@ -160,10 +165,13 @@ class EventFragment : Fragment() {
         return format.format(date)
     }
 
-    private fun setAddress(latitude: Double, longitude: Double, eventLocation: EditText?) {
-        geocodingHelper.setAddress(latitude, longitude, eventLocation)
-    }
+    private fun formatAddress(address: String) : String{
+        val list = address
+            .split(", ")
 
+        // house number, street name, city name
+        return "${list[1]} ${list[0]}, ${list[list.size - 6]}"
+    }
 
     /**
      * Handle when the eventButton gets clicked.
@@ -183,37 +191,44 @@ class EventFragment : Fragment() {
 
             val userId = auth.currentUser?.uid
             val eventName = binding.editTextEventName.text.toString().trim()
-            val eventLocationStr = binding.editTextEventLocation.text.toString().trim()
+            val eventLocationStr = binding.editTextEventLocation.text.toString()
+                .replace(' ', '+')
             val eventDate = binding.editTextEventDate.text.toString().trim()
             val eventType = binding.editTextEventType.text.toString().trim()
             val eventDescription = binding.editTextEventDescription.text.toString().trim()
 
             // Geocode the event location
-            geocodingHelper.getLocationFromAddress(eventLocationStr) { latitude, longitude ->
-                if (latitude != null && longitude != null) {
-                    // Set the latitude and longitude in the EventLocation object
-                    val eventLocation = EventLocation(latitude, longitude, eventLocationStr)
+            val key: String = "6630a5d972d20365148401gdsd0bcd5"
 
-                    // Set the address in the EditText field
-                    setAddress(latitude, longitude, binding.editTextEventLocation)
+            val url = "https://geocode.maps.co/search?q=${eventLocationStr}+Copenhagen&api_key=${key}"
 
-                    // Save the event
-                    saveEvent(
-                        userId!!,
-                        eventName,
-                        eventLocation,
-                        eventDate,
-                        eventType,
-                        eventDescription
-                    )
-                } else {
-                    Snackbar.make(
-                        requireView(),
-                        "Invalid location",
-                        Snackbar.LENGTH_SHORT
-                    ).show()
-                }
-            }
+            val queue = Volley.newRequestQueue(activity?.applicationContext)
+
+
+            val request = JsonArrayRequest(Request.Method.GET, url, null, { response ->
+                response.toString()
+
+                val data = response.getJSONObject(0)
+                val lat = data.getDouble("lat")
+                val lon = data.getDouble("lon")
+                val prettyAddress = formatAddress(data.getString("display_name"))
+
+
+                eventLocation = EventLocation(lat, lon, prettyAddress)
+
+                // Save the event
+                saveEvent(
+                    userId!!,
+                    eventName,
+                    eventLocation,
+                    eventDate,
+                    eventType,
+                    eventDescription
+                )
+            }, {error ->
+                handleFailureVolley(error)
+            })
+            queue.add(request)
         } else {
             Snackbar.make(
                 requireView(),
@@ -221,6 +236,14 @@ class EventFragment : Fragment() {
                 Snackbar.LENGTH_SHORT
             ).show()
         }
+    }
+
+    private fun handleFailureVolley(error: VolleyError?) {
+        Snackbar.make(
+            requireView(),
+            "VolleyError",
+            Snackbar.LENGTH_SHORT
+        ).show()
     }
 
     private fun saveEvent(
