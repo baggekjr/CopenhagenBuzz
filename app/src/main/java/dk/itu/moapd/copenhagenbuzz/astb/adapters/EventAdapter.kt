@@ -1,19 +1,13 @@
 package dk.itu.moapd.copenhagenbuzz.astb.adapters
 
 import DeleteEventDialogFragment
-import com.squareup.picasso.Callback
-import android.content.ContentValues.TAG
 import android.content.Context
-import android.location.Address
-import android.location.Geocoder
-import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.TextView
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.FragmentManager
 import com.firebase.ui.database.FirebaseListAdapter
 import com.firebase.ui.database.FirebaseListOptions
@@ -26,8 +20,6 @@ import dk.itu.moapd.copenhagenbuzz.astb.BUCKET_URL
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.fragments.UpdateEventDialogFragment
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
-import java.io.File
-import java.util.Locale
 
 class EventAdapter(private val fragmentManager: FragmentManager, private val context: Context, private val options: FirebaseListOptions<Event>) :
     FirebaseListAdapter<Event>(options) {
@@ -42,7 +34,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
 
         getItem(position)?.let { event ->
             populateViewHolder(viewHolder, event, position)
-            loadImageToView(event, viewHolder.eventIcon)
+            //loadImageToView(event, viewHolder.eventIcon)
         }
 
         view.tag = viewHolder
@@ -71,11 +63,6 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
             eventDate.text = event.startDate.toString()
             eventType.text = event.eventType
             eventDescription.text = event.eventDescription
-            eventIcon.setImageResource(R.drawable.baseline_hail_24)
-
-            val j = event.eventIcon
-            Log.e(TAG, "Måske: $j")
-
             loadImageToView(event, eventIcon)
 
             val currentUser = auth.currentUser
@@ -119,7 +106,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
 
     }
 
-
+/*
     private fun loadImageToView(event: Event, eventImage: ImageView) {
         val placeholderImage = R.drawable.baseline_hail_24 // Placeholder image resource
 
@@ -138,7 +125,24 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
             Log.e(TAG, "PLACEHOLDER")
             Picasso.get().load(placeholderImage).into(eventImage)
         }
+    }*/
+
+
+    private fun loadImageToView(event: Event, eventImage: ImageView) {
+        val placeholderImage = R.drawable.baseline_hail_24
+
+        event.eventIcon?.let { imgUrl ->
+            Firebase.storage(BUCKET_URL).reference
+                .child(imgUrl).downloadUrl.addOnSuccessListener { uri ->
+                    Picasso.get()
+                        .load(uri)
+                        .placeholder(placeholderImage).error(placeholderImage)
+                        .into(eventImage)
+                }
+        }
+
     }
+
 
 
 

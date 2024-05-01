@@ -89,6 +89,9 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+
+
+
             <ImageView
                 android:id="@+id/event_photo"
                 android:layout_width="150dp"
