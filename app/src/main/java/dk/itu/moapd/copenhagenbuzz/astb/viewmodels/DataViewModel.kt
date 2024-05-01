@@ -8,11 +8,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.javafaker.Faker
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +25,11 @@ import kotlinx.coroutines.launch
 class DataViewModel : ViewModel() {
 
     private val databaseReference = FirebaseDatabase.getInstance().getReference("events")
+    private val FAVORITES = "favorites"
+
+
+    private var auth = FirebaseAuth.getInstance()
+    private var database = Firebase.database(DATABASE_URL).reference.child("CopenhagenBuzz")
 
 
     private val _events: MutableLiveData<List<Event>> by lazy {
@@ -36,9 +45,11 @@ class DataViewModel : ViewModel() {
     val favorites: LiveData<List<Event>>
         get() = _favorites
 
-    init {
+    /*init {
         getEventsAndFavorites()
     }
+
+     */
 
     fun editEvent(id: DatabaseReference, event: Event) {
         viewModelScope.launch {
@@ -73,55 +84,69 @@ class DataViewModel : ViewModel() {
         return mutableLiveData
     }
 
+    fun isFavorite(eventId: String, onResult: (isFavorite: Boolean) -> Unit) {
 
-
-    private fun getEventsAndFavorites() {
         viewModelScope.launch {
-            //_events.value = makeEvents()
-            _events.value?.let { events -> _favorites.value = generateRandomFavorites(events) }
+            auth.currentUser?.uid?.let { userId ->
+                database.child(FAVORITES).child(userId).child(eventId).addListenerForSingleValueEvent(object: ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (snapshot.exists()){
+                            onResult(true)
+                        } else {
+                            onResult(false)
+                        }
+                    }
+                    override fun onCancelled(error: DatabaseError){
+                        Log.d(TAG, error.message)
+                        onResult(false)
+                    }
+                })
+            }
+        }
+
+    }
+
+    fun updateFavorite(ref: DatabaseReference, isChecked: Boolean) {
+        if (isChecked) {
+            addFavorite(ref)
+        } else {
+            removeFavorite(ref)
+        }
+
+    }
+
+    private fun addFavorite(ref: DatabaseReference) {
+        viewModelScope.launch {
+            auth.currentUser?.uid?.let { userId ->
+
+                ref.key?.let {
+                    database.child(FAVORITES).child(userId).child(it).setValue(true).addOnSuccessListener {
+                        Log.d(TAG, "Favorited event succesfully")
+                    }.addOnFailureListener {
+                        Log.d(TAG, "An error occurred: " + it)
+                    }
+                }
+
+            }
         }
     }
 
-    /*
-    private fun makeEvents() : List<Event> {
-            val faker = Faker()
-            val eventList = mutableListOf<Event>()
-            for (i in 1..10) {
-                val event = Event(
-                    userId = faker.number().digit(),
-                    eventIcon = faker.avatar().image(),
-                    eventName = faker.lorem().word(),
-                    eventLocation = faker.address().fullAddress(),
-                    startDate = faker.number().randomNumber(),
-                    eventType = faker.lorem().word(),
-                    eventDescription = faker.lorem().paragraph()
+    private fun removeFavorite(ref: DatabaseReference) {
+        viewModelScope.launch {
+            auth.currentUser?.uid?.let { userId ->
+                ref.key?.let {
+                    database.child(FAVORITES).child(userId).child(it).removeValue()
+                        .addOnSuccessListener {
+                            Log.d(TAG, "Removed event succesfully")
+                        }.addOnFailureListener {
+                        Log.d(TAG, "An error occurred: " + it)
+                    }
+                }
 
-                )
-                eventList.add(event)
-                println(eventList)
             }
-        return eventList
+        }
+
     }
-
-     */
-    private fun generateRandomFavorites(events: List<Event>): List<Event> {
-        val shuffledIndices = (events.indices).shuffled().take(25).sorted()
-        return shuffledIndices.mapNotNull { index -> events.getOrNull(index) }
-    }
-
-
-    fun addToFavorites(event: Event) {
-        val favoriteList = _favorites.value?.toMutableList() ?: mutableListOf()
-        favoriteList.add(event)
-        _favorites.postValue(favoriteList)
-    }
-
-    // Method to remove an event from favorites
-    fun removeFromFavorites(event: Event) {
-        val favoriteList = _favorites.value?.toMutableList() ?: mutableListOf()
-        favoriteList.remove(event)
-        _favorites.postValue(favoriteList)
-    }
-
 
 }
+
