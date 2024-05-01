@@ -2,17 +2,14 @@ package dk.itu.moapd.copenhagenbuzz.astb.adapters
 
 import DeleteEventDialogFragment
 import android.content.Context
-import android.location.Address
-import android.location.Geocoder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
-import android.widget.TextView
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.FragmentManager
-import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.database.FirebaseListAdapter
 import com.firebase.ui.database.FirebaseListOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -20,14 +17,10 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.storage.storage
 import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.astb.BUCKET_URL
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.fragments.UpdateEventDialogFragment
 import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnFavoriteClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
-import java.util.Locale
 
 class EventAdapter(private val fragmentManager: FragmentManager, private val context: Context, private val options: FirebaseListOptions<Event>, private val  onFavoriteClickListener: OnFavoriteClickListener) :
     FirebaseListAdapter<Event>(options) {
@@ -102,12 +95,13 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
     }
     private fun bindEvent(viewHolder: ViewHolder, event: Event) {
         with(viewHolder){
-            eventIcon.setImageResource(R.drawable.baseline_map_24)
+            //eventIcon.setImageResource(R.drawable.baseline_map_24)
             eventName.text = event.eventName
             eventLocation.text = event.eventLocation?.address
             eventDate.text = event.startDate.toString()
             eventType.text = event.eventType
             eventDescription.text = event.eventDescription
+            loadImageToView(event, eventIcon)
         }
     }
 
@@ -146,6 +140,22 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
         val editButton = view.findViewById<Button>(R.id.edit_button)
         val deleteButton = view.findViewById<Button>(R.id.delete_button)
 
+
+    }
+
+    private fun loadImageToView(event: Event, eventImage: ImageView) {
+        val placeholderImage = R.drawable.baseline_find_replace_24
+
+        event.eventIcon?.let { imgUrl ->
+            com.google.firebase.Firebase.storage(BUCKET_URL).reference
+                .child(imgUrl).downloadUrl.addOnSuccessListener { uri ->
+                    Picasso.get()
+                        .load(uri)
+                        .placeholder(placeholderImage)
+                        .error(placeholderImage)
+                        .into(eventImage)
+                }
+        }
 
     }
 
