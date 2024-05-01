@@ -1,4 +1,3 @@
-package dk.itu.moapd.copenhagenbuzz.astb.fragments
 
 import android.app.Dialog
 import android.content.DialogInterface
@@ -6,35 +5,31 @@ import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.ktx.Firebase
-import dk.itu.moapd.copenhagenbuzz.astb.models.Event
-
 import com.google.firebase.storage.ktx.storage
+import dk.itu.moapd.copenhagenbuzz.astb.BUCKET_URL
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
+import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 
-
-class DeleteEventDialogFragment(private val event: Event,
-                                private val position: Int,
-                                private val adapter: EventAdapter
+class DeleteEventDialogFragment(
+    private val event: Event,
+    private val position: Int,
+    private val adapter: EventAdapter
 ) : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         super.onCreateDialog(savedInstanceState)
+        val storage = Firebase.storage(BUCKET_URL).reference
 
-        // Create a lambda for positive button click handling.
         val onPositiveButtonClick: (DialogInterface, Int) -> Unit = { dialog, _ ->
-            // Remove an item from the Firebase Realtime database.
             adapter.getRef(position)
                 .removeValue()
-                .addOnSuccessListener {
-                    // Remove the original image.
-                    Firebase.storage.reference
-                        .child("event")
-                        .delete()
+                .addOnSuccessListener { //TODO: HANDLE FAILURE AND SUCCESS
+                            println(storage.child(event.eventIcon!!).toString())
+                            storage.child(event.eventIcon!!).delete()
+                        }
+                    dialog.dismiss()
                 }
-
-            dialog.dismiss()
-        }
 
         // Create and return a new instance of MaterialAlertDialogBuilder.
         return MaterialAlertDialogBuilder(requireContext()).apply {

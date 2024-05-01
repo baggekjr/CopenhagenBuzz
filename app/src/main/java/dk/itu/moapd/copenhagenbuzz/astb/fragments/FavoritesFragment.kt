@@ -6,13 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import dk.itu.moapd.copenhagenbuzz.astb.R
+import com.firebase.ui.database.FirebaseRecyclerOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
+import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
 import dk.itu.moapd.copenhagenbuzz.astb.adapters.FavoriteAdapter
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentFavoritesBinding
-import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentTimelineBinding
+import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 
 
@@ -28,7 +32,7 @@ class FavoritesFragment : Fragment() {
 
 
 
-   private val binding
+    private val binding
         get() = requireNotNull(_binding) {
             "Cannot access binding because it is null. Is the view visible?"
         }
@@ -43,20 +47,61 @@ class FavoritesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        _binding?.recyclerView?.layoutManager = LinearLayoutManager(requireContext())
 
-        with (binding){
-            viewModel.favorites.observe(viewLifecycleOwner) {
-                recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-                val adapter = FavoriteAdapter(it)
+
+        FirebaseAuth.getInstance().currentUser?.uid?.let { userId ->
+            val query = Firebase.database(DATABASE_URL).reference
+                .child("CopenhagenBuzz")
+                .child("favorites")
+                .child(userId)
+
+
+
+            val databaseReference = Firebase.database(DATABASE_URL).reference
+                .child("CopenhagenBuzz")
+                .child("events")
+
+
+            val options = FirebaseRecyclerOptions.Builder<Event>()
+                .setIndexedQuery(query, databaseReference, Event::class.java)
+                .setLifecycleOwner(this)
+                .build()
+
+
+            binding.recyclerView.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+
+            }
+            val adapter = FavoriteAdapter(options)
+
+
+            with(binding) {
+                viewModel.favorites.observe(viewLifecycleOwner) {}
                 recyclerView.adapter = adapter
             }
         }
+
     }
 
+
+    /*
+
+    private fun handleFavorites(event: Event, isChecked: Boolean) {
+        if (isChecked) {
+            viewModel.removeFromFavorites(event)
+        } else {
+            viewModel.addToFavorites(event)
+
+        }
+    }
+
+     */
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
 }

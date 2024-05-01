@@ -26,7 +26,7 @@
             <!-- Title, secondary and supporting text -->
 
             <ImageView
-                android:id="@+id/event_icon"
+                android:id="@+id/event_pic"
                 android:layout_width="30dp"
                 android:layout_height="50dp"
                 app:layout_constraintEnd_toStartOf="@id/event_name"
@@ -40,7 +40,7 @@
                     android:id="@+id/event_name"
                     style="@style/textView_style"
                     android:text="@string/event_name"
-                    app:layout_constraintStart_toEndOf="@id/event_icon"
+                    app:layout_constraintStart_toEndOf="@id/event_pic"
                     app:layout_constraintBottom_toTopOf="@+id/event_type"
                     android:textAppearance="?attr/textAppearanceTitleMedium"
                     android:textSize="32sp"
@@ -56,12 +56,13 @@
                 app:layout_constraintStart_toStartOf="@+id/event_name"
                 />
 
-            <com.google.android.material.button.MaterialButton
-                style="@style/Widget.Material3.Button.IconButton"
+            <CheckBox
+                android:id="@+id/favorite_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                app:icon="@drawable/baseline_favorite_24"
+                android:clickable="true"
+                android:button="@drawable/favorite_checkbox"
                 app:layout_constraintEnd_toEndOf="parent" />
 
 
@@ -73,13 +74,11 @@
             android:padding="16dp">
 
 
-
             <ImageView
+                android:id="@+id/event_icon"
                 android:layout_width="match_parent"
                 android:layout_height="194dp"
-                android:scaleType="centerCrop"
-                app:srcCompat="@drawable/baseline_map_24"
-
+                android:scaleType="centerInside"
                 />
 
             <TextView
@@ -119,7 +118,7 @@
                 android:id="@+id/delete_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_marginEnd="8dp"
                 android:text="@string/Delete"
                 android:clickable="true"
                 style="?attr/materialButtonOutlinedStyle"
