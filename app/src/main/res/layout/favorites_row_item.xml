@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
+        android:checked="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -27,20 +28,6 @@
                 android:orientation="horizontal"
                 android:padding="10dp">
 
-                <ImageView
-                    android:id="@+id/event_icon"
-                    android:layout_width="30dp"
-                    android:layout_height="50dp"
-                    android:layout_marginStart="8dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/event_name"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/baseline_home_24"
-
-                    />
-
-
                 <TextView
                     android:id="@+id/event_name"
                     android:layout_width="wrap_content"
@@ -51,7 +38,7 @@
                     android:textAppearance="?attr/textAppearanceTitleMedium"
                     android:textSize="32dp"
                     app:layout_constraintBottom_toTopOf="@+id/event_type"
-                    app:layout_constraintStart_toEndOf="@id/event_icon"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
 
                     />

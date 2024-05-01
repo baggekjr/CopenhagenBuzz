@@ -95,9 +95,8 @@ class EventFragment : Fragment() {
 
             setupDatePicker()
         }
-
-
     }
+
 
 
     override fun onDestroyView() {
@@ -146,6 +145,7 @@ class EventFragment : Fragment() {
             }
         }
     }
+
 
 
     /**
@@ -320,7 +320,10 @@ class EventFragment : Fragment() {
         }
     }
 
+
 }
+
+
 
 
 

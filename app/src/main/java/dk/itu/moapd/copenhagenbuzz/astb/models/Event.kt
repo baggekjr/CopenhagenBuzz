@@ -1,6 +1,5 @@
 package dk.itu.moapd.copenhagenbuzz.astb.models
 
-import android.graphics.drawable.Icon
 import com.google.firebase.database.IgnoreExtraProperties
 
 
@@ -9,6 +8,7 @@ import com.google.firebase.database.IgnoreExtraProperties
  */
 @IgnoreExtraProperties
 data class Event(
+
     val userId: String? = null,
     val eventIcon: String? = null,
     val eventName: String? = null,
@@ -16,5 +16,7 @@ data class Event(
     val startDate: Long? = null,
     val eventType: String? = null,
     var eventDescription: String? = null,
+    //val favoritedBy: MutableList<String>? = null
+
 )
 
