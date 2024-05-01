@@ -98,7 +98,7 @@ class UpdateEventDialogFragment(private val event: Event,
                 }
             }
             eventPhotoLibrary.setOnClickListener {
-                handleSelectPhotoButtonOnClick()
+                handlePhotoLibraryButtonOnClick()
             }
 
             setupDatePicker()
@@ -171,10 +171,13 @@ class UpdateEventDialogFragment(private val event: Event,
         }
     }
 
-    private fun handleSelectPhotoButtonOnClick() {
 
-        pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+    private fun handlePhotoLibraryButtonOnClick() {
+
+            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+
     }
+
 
     private fun handleEventButtonOnClick() {
             val eventName = binding.editTextEventName.text.toString().trim()
@@ -309,18 +312,6 @@ class UpdateEventDialogFragment(private val event: Event,
             Snackbar.make(requireView(), "Camera permission denied", Snackbar.LENGTH_SHORT).show()
         }
     }
-
-
-    /*override fun onStart() {
-        super.onStart()
-        val dialog = dialog
-        if (dialog != null) {
-            val width = ViewGroup.LayoutParams.WRAP_CONTENT
-            val height = ViewGroup.LayoutParams.WRAP_CONTENT
-            dialog.window!!.setLayout(width, height)
-        }
-    }*/
-
 
     private fun handleFailure(exception: Exception) {
         println("Database save failure with following exception: $exception")

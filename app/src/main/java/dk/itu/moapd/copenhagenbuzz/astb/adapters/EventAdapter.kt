@@ -129,14 +129,15 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
 
 
     private fun loadImageToView(event: Event, eventImage: ImageView) {
-        val placeholderImage = R.drawable.baseline_hail_24
+        val placeholderImage = R.drawable.baseline_find_replace_24
 
         event.eventIcon?.let { imgUrl ->
             Firebase.storage(BUCKET_URL).reference
                 .child(imgUrl).downloadUrl.addOnSuccessListener { uri ->
                     Picasso.get()
                         .load(uri)
-                        .placeholder(placeholderImage).error(placeholderImage)
+                        .placeholder(placeholderImage)
+                        .error(placeholderImage)
                         .into(eventImage)
                 }
         }

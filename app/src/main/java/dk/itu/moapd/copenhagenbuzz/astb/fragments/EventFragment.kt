@@ -86,7 +86,7 @@ class EventFragment : Fragment() {
                 }
             }
             eventPhotoLibrary.setOnClickListener {
-                handleSelectPhotoButtonOnClick()
+                handlePhotoLibraryButtonOnClick()
             }
             setupDatePicker()
         }
@@ -127,7 +127,7 @@ class EventFragment : Fragment() {
         }
     }
 
-    private fun handleSelectPhotoButtonOnClick() {
+    private fun handlePhotoLibraryButtonOnClick() {
 
         pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
@@ -322,11 +322,15 @@ class EventFragment : Fragment() {
             editTextEventDate.text?.clear()
             editTextEventType.text?.clear()
             editTextEventDescription.text?.clear()
+
             editTextEventName.clearFocus()
             editTextEventLocation.clearFocus()
             editTextEventDate.clearFocus()
             editTextEventType.clearFocus()
             editTextEventDescription.clearFocus()
+
+            eventPhotoPreview.setImageDrawable(null)
+
         }
     }
 
