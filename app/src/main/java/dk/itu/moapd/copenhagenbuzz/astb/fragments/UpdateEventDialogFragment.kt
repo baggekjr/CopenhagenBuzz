@@ -1,12 +1,20 @@
 package dk.itu.moapd.copenhagenbuzz.astb.fragments
 
+import android.Manifest
+import android.app.Activity
 import android.app.Dialog
 import android.content.DialogInterface
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.icu.text.SimpleDateFormat
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.core.content.FileProvider
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.android.volley.Request
@@ -16,22 +24,25 @@ import com.android.volley.toolbox.Volley
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
+import com.squareup.picasso.Picasso
+import dk.itu.moapd.copenhagenbuzz.astb.BUCKET_URL
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
+import dk.itu.moapd.copenhagenbuzz.astb.GeocodingHelper
 import dk.itu.moapd.copenhagenbuzz.astb.R
+import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentUpdateEventBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.models.EventLocation
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
+import java.io.File
 import java.util.Date
 import java.util.Locale
-import dk.itu.moapd.copenhagenbuzz.astb.GeocodingHelper
-import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
-import io.github.cdimascio.dotenv.dotenv
+import java.util.UUID
 
 
 class UpdateEventDialogFragment(private val event: Event,
@@ -44,7 +55,9 @@ class UpdateEventDialogFragment(private val event: Event,
     private lateinit var geocodingHelper: GeocodingHelper
     private lateinit var updatedEvent: Event
     private var eventLocation: EventLocation? = event.eventLocation
-
+    private val storageReference = Firebase.storage(BUCKET_URL).reference
+    private var photoName: String? = null
+    private var photoUri: Uri? = null
     private val binding
         get() = requireNotNull(_binding) {
             "Cannot access binding because it is null. Is the view visible?"
@@ -69,25 +82,47 @@ class UpdateEventDialogFragment(private val event: Event,
             editTextEventLocation.setText(event.eventLocation?.address)
             editTextEventDescription.setText(event.eventDescription)
             editTextEventType.setText(event.eventType)
-
             editTextEventDate.setText(event.startDate.toString())
             // Listener for user interaction in the "Add event date" textfield
+            photoName = event.eventIcon
+
             editTextEventDate.setOnClickListener {
                 handleDateOnClick()
             }
 
+            eventCamera.setOnClickListener {
+                if (checkCameraPermission()) {
+                    launchCamera()
+                } else {
+                    requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+                }
+            }
+            eventPhotoLibrary.setOnClickListener {
+                handleSelectPhotoButtonOnClick()
+            }
+
             setupDatePicker()
+
+            storageReference.child(event.eventIcon!!).downloadUrl
+                .addOnSuccessListener { uri ->
+                    Picasso.get().load(uri).into(eventPhotoPreview)
+                    photoUri = uri
+                }
+                .addOnFailureListener { ex ->
+                    handleFailure(ex)
+                }
         }
 
 
         return MaterialAlertDialogBuilder(requireContext()).apply {
             setView(binding.root)
             setTitle(getString(R.string.dialog_update_eventName))
-            setMessage(getString(R.string.dialog_update_eventLocation))
             setPositiveButton(getString(R.string.button_update), onPositiveButtonClick)
             setNegativeButton(getString(R.string.button_cancel)) { dialog, _ -> dialog.dismiss() }
+
         }.create()
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -99,6 +134,46 @@ class UpdateEventDialogFragment(private val event: Event,
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun launchCamera() {
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        photoName = "IMG_${UUID.randomUUID()}.JPG"
+        val photoFile = File(requireContext().applicationContext.filesDir, photoName)
+        photoUri = FileProvider.getUriForFile(requireContext(), "dk.itu.moapd.copenhagenbuzz.astb.fileprovider", photoFile)
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+        takePhoto.launch(cameraIntent)
+    }
+
+
+
+    private val takePhoto = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult())
+    { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
+        }
+    }
+
+    private val pickMedia = registerForActivityResult(
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri -> // Callback is invoked after the user selects a media item or closes the photo picker.
+        if (uri != null) {
+            //showMessage("Photo selected!")
+
+            photoUri = uri
+            photoName = "IMG_${UUID.randomUUID()}.JPG"
+
+            // Show the user a preview of the photo they just selected
+            Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
+        } else {
+            //showMessage("PhotoPicker: No media selected")
+        }
+    }
+
+    private fun handleSelectPhotoButtonOnClick() {
+
+        pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
 
     private fun handleEventButtonOnClick() {
@@ -223,15 +298,33 @@ class UpdateEventDialogFragment(private val event: Event,
         ).show()
     }
 
+    private fun checkCameraPermission(): Boolean {
+        return ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            launchCamera()
+        } else {
+            Snackbar.make(requireView(), "Camera permission denied", Snackbar.LENGTH_SHORT).show()
+        }
+    }
 
 
-    override fun onStart() {
+    /*override fun onStart() {
         super.onStart()
         val dialog = dialog
         if (dialog != null) {
-            val width = ViewGroup.LayoutParams.MATCH_PARENT
-            val height = ViewGroup.LayoutParams.MATCH_PARENT
+            val width = ViewGroup.LayoutParams.WRAP_CONTENT
+            val height = ViewGroup.LayoutParams.WRAP_CONTENT
             dialog.window!!.setLayout(width, height)
         }
+    }*/
+
+
+    private fun handleFailure(exception: Exception) {
+        println("Database save failure with following exception: $exception")
+
     }
+
 }
