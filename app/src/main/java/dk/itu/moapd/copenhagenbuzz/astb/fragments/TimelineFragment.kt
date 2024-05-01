@@ -140,13 +140,12 @@ class TimelineFragment : Fragment(), OnFavoriteClickListener {
 
 
     private fun performSearch(query: String) {
-        val lowerCaseQuery = query.lowercase()
         val db = Firebase.database(DATABASE_URL).reference.child(BUZZ)
         val search = db
             .child(EVENTS)
             .orderByChild("eventName")
-            .startAt(lowerCaseQuery)
-            .endAt(lowerCaseQuery + "\uf8ff")
+            .startAt(query)
+            .endAt(query + "\uf8ff")
 
         val searchOption = FirebaseListOptions.Builder<Event>()
             .setQuery(search, Event::class.java)

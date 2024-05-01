@@ -45,6 +45,9 @@ class EventFragment : Fragment() {
     private lateinit var storageReference: StorageReference
     private var photoName: String? = null
     private var photoUri: Uri? = null
+
+    private val EVENTS = "events"
+    private val BUZZ = "CopenhagenBuzz"
     companion object {
         private const val CAMERA_REQUEST_CODE = 1888
     }
@@ -66,7 +69,7 @@ class EventFragment : Fragment() {
 
     private fun init() {
         auth = FirebaseAuth.getInstance()
-        database = Firebase.database(DATABASE_URL).reference.child("CopenhagenBuzz")
+        database = Firebase.database(DATABASE_URL).reference.child(BUZZ)
         storageReference = Firebase.storage(BUCKET_URL).reference
     }
 
@@ -279,11 +282,11 @@ class EventFragment : Fragment() {
 
                         // Save the event to Firebase Realtime Database
                         userId.let { uid ->
-                            database.child("events")
+                            database.child(EVENTS)
                                 .child(uid)
                                 .push()
                                 .key?.let { eventKey ->
-                                    database.child("events")
+                                    database.child(EVENTS)
                                         .child(eventKey)
                                         .setValue(newEvent)
                                         .addOnSuccessListener {
