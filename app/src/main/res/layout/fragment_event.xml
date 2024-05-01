@@ -104,6 +104,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:src="@drawable/baseline_add_a_photo_24"/>
+            <ImageButton
+                android:id="@+id/event_photo_library"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_add_a_photo_24"/>
 
             <ImageView
                 android:id="@+id/event_photo_preview"

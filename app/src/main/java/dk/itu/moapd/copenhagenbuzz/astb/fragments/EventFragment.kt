@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
@@ -84,6 +85,9 @@ class EventFragment : Fragment() {
                     requestPermissionLauncher.launch(Manifest.permission.CAMERA)
                 }
             }
+            eventPhotoLibrary.setOnClickListener {
+                handleSelectPhotoButtonOnClick()
+            }
             setupDatePicker()
         }
     }
@@ -105,6 +109,27 @@ class EventFragment : Fragment() {
         if (result.resultCode == Activity.RESULT_OK) {
             Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
         }
+    }
+
+    private val pickMedia = registerForActivityResult(
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri -> // Callback is invoked after the user selects a media item or closes the photo picker.
+        if (uri != null) {
+            //showMessage("Photo selected!")
+
+            photoUri = uri
+            photoName = "IMG_${UUID.randomUUID()}.JPG"
+
+            // Show the user a preview of the photo they just selected
+            Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
+        } else {
+            //showMessage("PhotoPicker: No media selected")
+        }
+    }
+
+    private fun handleSelectPhotoButtonOnClick() {
+
+        pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
 
     private fun setupDatePicker() {
