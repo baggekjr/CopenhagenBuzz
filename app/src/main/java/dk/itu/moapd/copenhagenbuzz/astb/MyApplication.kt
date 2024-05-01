@@ -15,6 +15,10 @@ val DATABASE_URL: String = dotenv {
     filename = "env"
 }["DATABASE_URL"]
 
+
+//TODO: save like database in the assets
+val BUCKET_URL: String="gs://copenhagenbuzz-b8a16.appspot.com"
+
 class MyApplication: Application() {
     override fun onCreate() {
         super.onCreate()

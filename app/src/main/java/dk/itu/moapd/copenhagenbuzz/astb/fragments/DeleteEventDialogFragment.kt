@@ -1,14 +1,12 @@
+
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
-import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.firebase.FirebaseNetworkException
-import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.StorageException
 import com.google.firebase.storage.ktx.storage
+import dk.itu.moapd.copenhagenbuzz.astb.BUCKET_URL
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
@@ -21,25 +19,17 @@ class DeleteEventDialogFragment(
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         super.onCreateDialog(savedInstanceState)
+        val storage = Firebase.storage(BUCKET_URL).reference
 
         val onPositiveButtonClick: (DialogInterface, Int) -> Unit = { dialog, _ ->
             adapter.getRef(position)
                 .removeValue()
-                .addOnSuccessListener {
-                    Firebase.storage.reference
-                        .child("event")
-                        .delete()
-                        .addOnSuccessListener {
-                            Toast.makeText(
-                                requireContext(),
-                                getString(R.string.event_deleted),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                .addOnSuccessListener { //TODO: HANDLE FAILURE AND SUCCESS
+                            println(storage.child(event.eventIcon!!).toString())
+                            storage.child(event.eventIcon!!).delete()
                         }
-
                     dialog.dismiss()
                 }
-        }
 
         // Create and return a new instance of MaterialAlertDialogBuilder.
         return MaterialAlertDialogBuilder(requireContext()).apply {

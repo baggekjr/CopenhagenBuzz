@@ -26,7 +26,7 @@
             <!-- Title, secondary and supporting text -->
 
             <ImageView
-                android:id="@+id/event_icon"
+                android:id="@+id/event_pic"
                 android:layout_width="30dp"
                 android:layout_height="50dp"
                 app:layout_constraintEnd_toStartOf="@id/event_name"
@@ -40,7 +40,7 @@
                     android:id="@+id/event_name"
                     style="@style/textView_style"
                     android:text="@string/event_name"
-                    app:layout_constraintStart_toEndOf="@id/event_icon"
+                    app:layout_constraintStart_toEndOf="@id/event_pic"
                     app:layout_constraintBottom_toTopOf="@+id/event_type"
                     android:textAppearance="?attr/textAppearanceTitleMedium"
                     android:textSize="32sp"
@@ -74,13 +74,11 @@
             android:padding="16dp">
 
 
-
             <ImageView
+                android:id="@+id/event_icon"
                 android:layout_width="match_parent"
                 android:layout_height="194dp"
-                android:scaleType="centerCrop"
-                app:srcCompat="@drawable/baseline_map_24"
-
+                android:scaleType="centerInside"
                 />
 
             <TextView

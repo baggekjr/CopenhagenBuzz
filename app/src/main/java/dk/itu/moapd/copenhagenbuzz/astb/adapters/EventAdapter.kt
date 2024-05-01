@@ -12,10 +12,14 @@ import android.widget.CheckBox
 import android.widget.TextView
 import android.widget.ImageView
 import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.database.FirebaseListAdapter
 import com.firebase.ui.database.FirebaseListOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.storage.storage
+import com.squareup.picasso.Picasso
+import dk.itu.moapd.copenhagenbuzz.astb.BUCKET_URL
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
@@ -61,7 +65,17 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
             bindEvent(viewHolder, event)
 
             bindFavorites(viewHolder, event, position)
+            /*
+            //eventIcon.setImageResource(R.drawable.baseline_map_24)
+            eventName.text = event.eventName
+            eventLocation.text = event.eventLocation?.address
+            eventDate.text = event.startDate.toString()
+            eventType.text = event.eventType
+            eventDescription.text = event.eventDescription
+            loadImageToView(event, eventIcon)
 
+
+             */
             val currentUser = auth.currentUser
             val currentUserUid = currentUser?.uid
             val eventUserId = event.userId
@@ -139,6 +153,5 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
         return getRef(position)
     }
 }
-
 
 
