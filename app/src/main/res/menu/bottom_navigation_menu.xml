@@ -18,6 +18,7 @@
         android:id="@+id/fragment_favorites"
         android:icon="@drawable/baseline_favorite_24"
         android:title="@string/favorites"
+        android:visible="false"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/fragment_maps"

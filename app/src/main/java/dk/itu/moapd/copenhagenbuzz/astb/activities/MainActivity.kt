@@ -69,9 +69,12 @@ class MainActivity : AppCompatActivity() {
         if (currentUser != null) {
             // User is authenticated, make "Add Event" menu item visible
             binding.contentMain.bottomNavigation.menu.findItem(R.id.fragment_event)?.isVisible = true
+            binding.contentMain.bottomNavigation.menu.findItem(R.id.fragment_favorites)?.isVisible = true
+
         } else {
             // User is not authenticated, hide "Add Event" menu item
             binding.contentMain.bottomNavigation.menu.findItem(R.id.fragment_event)?.isVisible = false
+            binding.contentMain.bottomNavigation.menu.findItem(R.id.fragment_favorites)?.isVisible = false
         }
 
 

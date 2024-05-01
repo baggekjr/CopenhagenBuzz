@@ -39,17 +39,9 @@ class DataViewModel : ViewModel() {
         MutableLiveData<List<Event>>()
     }
 
-    /*val events: LiveData<List<Event>>
-        get() = _events*/
-
     val favorites: LiveData<List<Event>>
         get() = _favorites
 
-    /*init {
-        getEventsAndFavorites()
-    }
-
-     */
 
     fun editEvent(id: DatabaseReference, event: Event) {
         viewModelScope.launch {
@@ -123,7 +115,7 @@ class DataViewModel : ViewModel() {
                     database.child(FAVORITES).child(userId).child(it).setValue(true).addOnSuccessListener {
                         Log.d(TAG, "Favorited event succesfully")
                     }.addOnFailureListener {
-                        Log.d(TAG, "An error occurred: " + it)
+                        Log.d(TAG, "An error occurred: $it")
                     }
                 }
 
@@ -137,9 +129,9 @@ class DataViewModel : ViewModel() {
                 ref.key?.let {
                     database.child(FAVORITES).child(userId).child(it).removeValue()
                         .addOnSuccessListener {
-                            Log.d(TAG, "Removed event succesfully")
+                            Log.d(TAG, "Unfavorited event succesfully")
                         }.addOnFailureListener {
-                        Log.d(TAG, "An error occurred: " + it)
+                        Log.d(TAG, "An error occurred: $it")
                     }
                 }
 
@@ -147,6 +139,8 @@ class DataViewModel : ViewModel() {
         }
 
     }
+
+
 
 }
 

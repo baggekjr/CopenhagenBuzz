@@ -39,6 +39,8 @@
     <string name="button_start">start</string>
     <string name="dialog_details_title">Event details</string>
     <string name="dialog_close">Close</string>
+    <string name="search_bar">Search</string>
+
 
 
 </resources>

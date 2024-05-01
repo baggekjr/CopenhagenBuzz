@@ -120,6 +120,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
     }
 
 
+
     private class ViewHolder(view: View) {
         val favoriteCheckbox= view.findViewById<CheckBox>(R.id.favorite_button)
         val eventIcon= view.findViewById<ImageView>(R.id.event_icon)
