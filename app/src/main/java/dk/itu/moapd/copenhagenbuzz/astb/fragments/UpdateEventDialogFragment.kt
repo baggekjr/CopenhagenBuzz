@@ -58,6 +58,7 @@ class UpdateEventDialogFragment(private val event: Event,
     private val storageReference = Firebase.storage(BUCKET_URL).reference
     private var photoName: String? = null
     private var photoUri: Uri? = null
+    private val BUZZ = "CopenhagenBuzz"
     private val binding
         get() = requireNotNull(_binding) {
             "Cannot access binding because it is null. Is the view visible?"
@@ -69,7 +70,7 @@ class UpdateEventDialogFragment(private val event: Event,
         _binding = FragmentUpdateEventBinding.inflate(layoutInflater)
         //binding.editTextName.setText(dummy.name)
         //auth = FirebaseAuth.getInstance()
-        database = Firebase.database(DATABASE_URL).reference.child("CopenhagenBuzz")
+        database = Firebase.database(DATABASE_URL).reference.child(BUZZ)
         geocodingHelper = GeocodingHelper(requireContext())
 
         val onPositiveButtonClick: (DialogInterface, Int) -> Unit = { dialog, _ ->

@@ -30,6 +30,9 @@ class FavoritesFragment : Fragment() {
     private var _binding: FragmentFavoritesBinding? = null
     private val viewModel: DataViewModel by activityViewModels()
 
+    private val EVENTS = "events"
+    private val BUZZ = "CopenhagenBuzz"
+    private val FAVORITES = "favorites"
 
 
     private val binding
@@ -53,15 +56,15 @@ class FavoritesFragment : Fragment() {
 
         FirebaseAuth.getInstance().currentUser?.uid?.let { userId ->
             val query = Firebase.database(DATABASE_URL).reference
-                .child("CopenhagenBuzz")
-                .child("favorites")
+                .child(BUZZ)
+                .child(FAVORITES)
                 .child(userId)
 
 
 
             val databaseReference = Firebase.database(DATABASE_URL).reference
-                .child("CopenhagenBuzz")
-                .child("events")
+                .child(BUZZ)
+                .child(EVENTS)
 
 
             val options = FirebaseRecyclerOptions.Builder<Event>()
@@ -84,20 +87,6 @@ class FavoritesFragment : Fragment() {
         }
 
     }
-
-
-    /*
-
-    private fun handleFavorites(event: Event, isChecked: Boolean) {
-        if (isChecked) {
-            viewModel.removeFromFavorites(event)
-        } else {
-            viewModel.addToFavorites(event)
-
-        }
-    }
-
-     */
 
     override fun onDestroyView() {
         super.onDestroyView()

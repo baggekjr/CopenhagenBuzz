@@ -3,9 +3,18 @@ package dk.itu.moapd.copenhagenbuzz.astb.fragments
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
+import androidx.compose.ui.text.toLowerCase
+
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import com.firebase.ui.database.FirebaseListOptions
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -31,6 +40,10 @@ class TimelineFragment : Fragment(), OnFavoriteClickListener {
     private val dataViewModel: DataViewModel by activityViewModels()
     private lateinit var eventAdapter: EventAdapter
 
+    private val EVENTS = "events"
+    private val BUZZ = "CopenhagenBuzz"
+
+
     private val binding
         get() = requireNotNull(_binding) {
             "Cannot access binding because it is null. Is the view visible?"
@@ -43,28 +56,110 @@ class TimelineFragment : Fragment(), OnFavoriteClickListener {
         _binding = it
     }.root
 
+
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?
     ) {
         super.onViewCreated(view, savedInstanceState)
+        loadEvents()
 
-            val query = Firebase.database(DATABASE_URL).reference
-                .child("CopenhagenBuzz")
-                .child("events")
-                .orderByChild("startDate")
+        setupSearch()
 
-            val options = FirebaseListOptions.Builder<Event>()
-                .setQuery(query, Event::class.java)
-                .setLayout(R.layout.event_row_item)
-                .setLifecycleOwner(this)
-                .build()
+    }
 
-            eventAdapter = EventAdapter(requireActivity().supportFragmentManager, requireContext(), options, this)
+    /**
+     * Loading standard timeline with all events
+     */
+    private fun loadEvents() {
+        val query = Firebase.database(DATABASE_URL).reference
+            .child(BUZZ)
+            .child(EVENTS)
+            .orderByChild("startDate")
 
-            binding.listView.adapter = eventAdapter
-            // Set up data binding and lifecycle owner.
+        val options = FirebaseListOptions.Builder<Event>()
+            .setQuery(query, Event::class.java)
+            .setLayout(R.layout.event_row_item)
+            .setLifecycleOwner(this)
+            .build()
 
+        eventAdapter =
+            EventAdapter(requireActivity().supportFragmentManager, requireContext(), options, this)
+
+        binding.listView.adapter = eventAdapter
+    }
+
+
+    /**
+     * Ability to search for event via name is added in following methods.
+     */
+    private fun setupSearch() {
+        val menuHost: MenuHost = requireActivity()
+
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.search_bar, menu)
+
+                val searchItem = menu.findItem(R.id.search_bar)
+                val searchView = searchItem?.actionView as SearchView
+
+                searchView.queryHint = "Search event"
+                searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                    override fun onQueryTextSubmit(query: String): Boolean {
+                        if (!query.isNullOrBlank()) {
+                            performSearch(query)
+                        } else {
+                            loadEvents()
+                        }
+                        return true
+                    }
+
+                    override fun onQueryTextChange(newText: String): Boolean {
+                        if (newText.isNullOrBlank()) {
+                            loadEvents()
+                        }
+                        return false
+                    }
+                })
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.search_bar -> {
+                        // Expand or collapse the search view
+                        true
+                    }
+
+                    else -> {
+                        false
+                    }
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+
+    private fun performSearch(query: String) {
+        val db = Firebase.database(DATABASE_URL).reference.child(BUZZ)
+        val search = db
+            .child(EVENTS)
+            .orderByChild("eventName")
+            .startAt(query)
+            .endAt(query + "\uf8ff")
+
+        val searchOption = FirebaseListOptions.Builder<Event>()
+            .setQuery(search, Event::class.java)
+            .setLayout(R.layout.event_row_item)
+            .setLifecycleOwner(this)
+            .build()
+
+        val adapter = EventAdapter(
+            requireActivity().supportFragmentManager,
+            requireContext(),
+            searchOption,
+            this
+        )
+        binding.listView.adapter = adapter
 
     }
 
@@ -78,9 +173,11 @@ class TimelineFragment : Fragment(), OnFavoriteClickListener {
         dataViewModel.updateFavorite(ref, isChecked)
     }
 
-    override fun isFavorite(eventId: String, onResult: (isFavorite: Boolean) -> Unit){
+    override fun isFavorite(eventId: String, onResult: (isFavorite: Boolean) -> Unit) {
         return dataViewModel.isFavorite(eventId, onResult)
     }
 
 
 }
+
+

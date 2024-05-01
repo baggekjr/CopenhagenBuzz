@@ -39,6 +39,8 @@ import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 class MapsFragment : Fragment(),  SharedPreferences.OnSharedPreferenceChangeListener{
 
     private var isFirstMove = true
+
+    private val BUZZ = "CopenhagenBuzz"
     private inner class LocationBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val location = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
@@ -105,7 +107,7 @@ class MapsFragment : Fragment(),  SharedPreferences.OnSharedPreferenceChangeList
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
-        val database = Firebase.database(DATABASE_URL).getReference("CopenhagenBuzz")
+        val database = Firebase.database(DATABASE_URL).getReference(BUZZ)
 
         val eventListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
