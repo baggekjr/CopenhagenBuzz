@@ -260,16 +260,12 @@ class EventFragment : Fragment() {
             ).show()
             return
         }
-
-        // Upload the image to Firebase Storage
-            //val photoName = "IMG_${UUID.randomUUID()}.jpg"
                         with(binding){
                             storageReference.child(photoName!!)
                                 .putFile(photoUri!!)
                                 .addOnSuccessListener {
                                     println("Photo uploaded successfully!")
 
-                        // Creaate new Event object with image URL
                         val newEvent = Event(
                             userId,
                             photoName,
