@@ -9,12 +9,14 @@ import androidx.fragment.app.activityViewModels
 import com.firebase.ui.database.FirebaseListOptions
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.database
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentTimelineBinding
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
+import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnFavoriteClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 
 
@@ -23,7 +25,7 @@ import dk.itu.moapd.copenhagenbuzz.astb.models.Event
  * Use the [TimelineFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class TimelineFragment : Fragment() {
+class TimelineFragment : Fragment(), OnFavoriteClickListener {
 
     private var _binding: FragmentTimelineBinding? = null
     private val dataViewModel: DataViewModel by activityViewModels()
@@ -58,7 +60,7 @@ class TimelineFragment : Fragment() {
                 .setLifecycleOwner(this)
                 .build()
 
-            eventAdapter = EventAdapter(requireActivity().supportFragmentManager, requireContext(), options)
+            eventAdapter = EventAdapter(requireActivity().supportFragmentManager, requireContext(), options, this)
 
             binding.listView.adapter = eventAdapter
             // Set up data binding and lifecycle owner.
@@ -72,6 +74,13 @@ class TimelineFragment : Fragment() {
         _binding = null
     }
 
+    override fun onFavoriteClick(ref: DatabaseReference, event: Event, isChecked: Boolean) {
+        dataViewModel.updateFavorite(ref, isChecked)
+    }
+
+    override fun isFavorite(eventId: String, onResult: (isFavorite: Boolean) -> Unit){
+        return dataViewModel.isFavorite(eventId, onResult)
+    }
 
 
 }

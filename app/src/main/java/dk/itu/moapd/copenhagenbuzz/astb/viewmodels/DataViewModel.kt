@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 class DataViewModel : ViewModel() {
 
     private val databaseReference = FirebaseDatabase.getInstance().getReference("events")
+    private val FAVORITES = "favorites"
 
 
     private var auth = FirebaseAuth.getInstance()
@@ -83,104 +84,69 @@ class DataViewModel : ViewModel() {
         return mutableLiveData
     }
 
-}
+    fun isFavorite(eventId: String, onResult: (isFavorite: Boolean) -> Unit) {
 
-
-
-    /*
-    private fun getEventsAndFavorites() {
         viewModelScope.launch {
-            //_events.value = makeEvents()
-            _events.value?.let { events -> _favorites.value = generateRandomFavorites(events) }
+            auth.currentUser?.uid?.let { userId ->
+                database.child(FAVORITES).child(userId).child(eventId).addListenerForSingleValueEvent(object: ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (snapshot.exists()){
+                            onResult(true)
+                        } else {
+                            onResult(false)
+                        }
+                    }
+                    override fun onCancelled(error: DatabaseError){
+                        Log.d(TAG, error.message)
+                        onResult(false)
+                    }
+                })
+            }
         }
+
     }
 
-     */
+    fun updateFavorite(ref: DatabaseReference, isChecked: Boolean) {
+        if (isChecked) {
+            addFavorite(ref)
+        } else {
+            removeFavorite(ref)
+        }
 
-    /*
-    private fun makeEvents() : List<Event> {
-            val faker = Faker()
-            val eventList = mutableListOf<Event>()
-            for (i in 1..10) {
-                val event = Event(
-                    userId = faker.number().digit(),
-                    eventIcon = faker.avatar().image(),
-                    eventName = faker.lorem().word(),
-                    eventLocation = faker.address().fullAddress(),
-                    startDate = faker.number().randomNumber(),
-                    eventType = faker.lorem().word(),
-                    eventDescription = faker.lorem().paragraph()
-
-                )
-                eventList.add(event)
-                println(eventList)
-            }
-        return eventList
-    }
-    private fun generateRandomFavorites(events: List<Event>): List<Event> {
-        val shuffledIndices = (events.indices).shuffled().take(25).sorted()
-        return shuffledIndices.mapNotNull { index -> events.getOrNull(index) }
     }
 
+    private fun addFavorite(ref: DatabaseReference) {
+        viewModelScope.launch {
+            auth.currentUser?.uid?.let { userId ->
 
-
-
-
-
-
-
-    fun addToFavorites(event: Event) {
-
-        auth.currentUser?.let { user ->
-            val userFavoritesRef = database.child("favorites").child(user.uid)
-
-            // Generate a unique key for the new favorite event
-            val newFavoriteEventRef = userFavoritesRef.push()
-            val favoriteEventKey = newFavoriteEventRef.key
-
-            // Store the favorite event under the user's favorites using the generated key
-            if (favoriteEventKey != null) {
-                newFavoriteEventRef.setValue(event)
-                    .addOnSuccessListener {
-                        // Successfully added the favorite event
-                        Log.d(TAG, "Added favorite event to database")
+                ref.key?.let {
+                    database.child(FAVORITES).child(userId).child(it).setValue(true).addOnSuccessListener {
+                        Log.d(TAG, "Favorited event succesfully")
+                    }.addOnFailureListener {
+                        Log.d(TAG, "An error occurred: " + it)
                     }
-                    .addOnFailureListener { exception ->
-                        // Handle failure to add favorite event
-                        Log.e(TAG, "Failed to add favorite event to database", exception)
-                    }
-            }
-
-            /*
-            database
-                .child("favorites")
-                .child(user.uid)
-                .push()
-                .key?.let { event ->
-                    database.child("favorites")
-                        .child(event)
-                        .setValue(true)
                 }
 
-             */
+            }
+        }
+    }
 
-/*
+    private fun removeFavorite(ref: DatabaseReference) {
+        viewModelScope.launch {
+            auth.currentUser?.uid?.let { userId ->
+                ref.key?.let {
+                    database.child(FAVORITES).child(userId).child(it).removeValue()
+                        .addOnSuccessListener {
+                            Log.d(TAG, "Removed event succesfully")
+                        }.addOnFailureListener {
+                        Log.d(TAG, "An error occurred: " + it)
+                    }
+                }
+
+            }
         }
 
-
-        /*val favoriteList = _favorites.value?.toMutableList() ?: mutableListOf()
-        favoriteList.add(event)
-        _favorites.postValue(favoriteList)
     }
 
-    // Method to remove an event from favorites
-    fun removeFromFavorites(event: Event) {
-        val favoriteList = _favorites.value?.toMutableList() ?: mutableListOf()
-        favoriteList.remove(event)
-        _favorites.postValue(favoriteList)
-    }
+}
 
-
-
-
-     */

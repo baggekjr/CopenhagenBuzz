@@ -21,10 +21,11 @@ import com.google.firebase.ktx.Firebase
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.fragments.UpdateEventDialogFragment
+import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnFavoriteClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import java.util.Locale
 
-class EventAdapter(private val fragmentManager: FragmentManager, private val context: Context, private val options: FirebaseListOptions<Event>) :
+class EventAdapter(private val fragmentManager: FragmentManager, private val context: Context, private val options: FirebaseListOptions<Event>, private val  onFavoriteClickListener: OnFavoriteClickListener) :
     FirebaseListAdapter<Event>(options) {
 
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -57,21 +58,12 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
 
     private fun populateViewHolder(viewHolder: ViewHolder, event: Event, position: Int) {
         with(viewHolder) {
-            eventIcon.setImageResource(R.drawable.baseline_map_24)
-            eventName.text = event.eventName
-            eventLocation.text = event.eventLocation?.address
-            eventDate.text = event.startDate.toString()
-            eventType.text = event.eventType
-            eventDescription.text = event.eventDescription
+            bindEvent(viewHolder, event)
+
+            bindFavorites(viewHolder, event, position)
 
             val currentUser = auth.currentUser
             val currentUserUid = currentUser?.uid
-
-            if (currentUser != null) {
-                favoriteCheckbox.isChecked= event.favoritedBy?.contains(currentUserUid) ?: false
-            }
-
-
             val eventUserId = event.userId
 
             if(currentUserUid == eventUserId) {
@@ -94,89 +86,38 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
             }
         }
     }
+    private fun bindEvent(viewHolder: ViewHolder, event: Event) {
+        with(viewHolder){
+            eventIcon.setImageResource(R.drawable.baseline_map_24)
+            eventName.text = event.eventName
+            eventLocation.text = event.eventLocation?.address
+            eventDate.text = event.startDate.toString()
+            eventType.text = event.eventType
+            eventDescription.text = event.eventDescription
+        }
+    }
 
+    private fun bindFavorites(viewHolder: ViewHolder, event: Event, position: Int){
 
-    private fun setFavoriteListener(viewHolder: ViewHolder, event: Event, position: Int) {
-
-        val currentUserUid = auth.currentUser?.uid ?: return
-            viewHolder.favoriteCheckbox.setOnCheckedChangeListener{ _ , isChecked ->
-
-                val newFavoritedBy = event.favoritedBy?.toMutableList() ?: mutableListOf()
-
-                if (isChecked) {
-                    if (!newFavoritedBy.contains(currentUserUid)) {
-                        newFavoritedBy.add(currentUserUid)
+        auth.currentUser?.uid?.let { userId ->
+            with(viewHolder) {
+                val ref = getId(position)
+                ref.key?.let {
+                    onFavoriteClickListener.isFavorite(it) { exists ->
+                        favoriteCheckbox.isChecked = exists
                     }
-                } else {
-                    newFavoritedBy.remove(currentUserUid)
-
                 }
 
+                favoriteCheckbox.setOnCheckedChangeListener { _, isChecked ->
 
-                val updatedEvent = Event (
-                    userId = event.userId,
-                    eventName = event.eventName,
-                    eventLocation = event.eventLocation,
-                    eventType = event.eventType,
-                    eventDescription = event.eventDescription,
-                    eventIcon = event.eventIcon,
-                    startDate = event.startDate,
-                    favoritedBy = newFavoritedBy
-                )
-
-                val ref = getRef(position)
-                try {
-                    updateEventFavorite(ref, updatedEvent)
-                    updateFavoriteList(ref, updatedEvent, isChecked)
-
-
-                    println("Save successfull")
-
-                } catch (exception : Exception){
-                    println("Database save failure with following exception: $exception")
-
+                    onFavoriteClickListener.onFavoriteClick(ref, event ,isChecked)
 
                 }
-
             }
 
-    }
-
-    private fun updateEventFavorite(ref: DatabaseReference, updatedEvent: Event) {
-        ref.setValue(updatedEvent)
+        }
 
     }
-
-    private fun updateFavoriteList(ref: DatabaseReference, updatedEvent: Event, isFavorited: Boolean) {
-        val user = FirebaseAuth.getInstance().currentUser
-        val db = Firebase.database(DATABASE_URL).reference.child("CopenhagenBuzz")
-
-        db.child("favorites").child(user!!.uid).get()
-            .addOnSuccessListener {
-                val eventId = ref.key
-
-                val currentEvent = db.child("favorites")
-                    .child(user.uid).child(eventId!!)
-
-                if (isFavorited) {
-                    currentEvent
-                        .setValue(true)
-                        .addOnFailureListener {
-                            throw it
-                        }
-                } else {
-                    currentEvent
-                        .removeValue()
-                        .addOnFailureListener {
-                            throw it
-                        }
-                }
-            }.addOnFailureListener {
-                throw it
-            }
-
-    }
-
 
 
     private class ViewHolder(view: View) {

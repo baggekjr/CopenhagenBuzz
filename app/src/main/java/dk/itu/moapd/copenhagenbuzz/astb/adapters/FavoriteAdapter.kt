@@ -16,30 +16,14 @@ class FavoriteAdapter(options: FirebaseRecyclerOptions<Event>) : FirebaseRecycle
 
     inner class ViewHolder(private val binding: FavoritesRowItemBinding) : RecyclerView.ViewHolder(binding.root)
     {
-        val favoriteCheckbox = binding.favoriteButton
+
         fun bind(favorite: Event) {
             with(binding) {
                 eventName.text = favorite.eventName
                 eventType.text = favorite.eventType
 
-                /*
-                //favoriteCheckbox.isChecked = favorite.isFavorite
-
-                if (favorite.isFavorite) {
-                    favoriteCheckbox.setButtonDrawable(R.drawable.baseline_favorite_24)
-                    favoriteCheckbox.isChecked= true
-                } else {
-                    favoriteCheckbox.setButtonDrawable(R.drawable.baseline_favorite_border_24)
-                    favoriteCheckbox.isChecked=false
-                }
-                favoriteCheckbox.setOnCheckedChangeListener{ _, isChecked ->
-                    onFavoriteCheckedChanged(favorite, isChecked)
-                }
-
-                 */
             }
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder = FavoritesRowItemBinding
@@ -50,9 +34,4 @@ class FavoriteAdapter(options: FirebaseRecyclerOptions<Event>) : FirebaseRecycle
         Log.d(TAG, "Populate at position: $position")
         model.let(holder::bind)
     }
-
-
-
-
-
 }

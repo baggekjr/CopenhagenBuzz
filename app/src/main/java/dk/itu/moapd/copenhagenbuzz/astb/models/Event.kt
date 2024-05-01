@@ -16,7 +16,7 @@ data class Event(
     val startDate: Long? = null,
     val eventType: String? = null,
     var eventDescription: String? = null,
-    val favoritedBy: MutableList<String>? = null
-    //var isFavorite: Boolean = false
+    //val favoritedBy: MutableList<String>? = null
+
 )
 
