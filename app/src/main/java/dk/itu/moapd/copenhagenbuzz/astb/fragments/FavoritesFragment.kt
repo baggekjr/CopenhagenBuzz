@@ -17,7 +17,6 @@ import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
 import dk.itu.moapd.copenhagenbuzz.astb.adapters.FavoriteAdapter
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentFavoritesBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
-import dk.itu.moapd.copenhagenbuzz.astb.models.Favorite
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 
 
