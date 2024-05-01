@@ -25,7 +25,7 @@ import com.google.firebase.ktx.Firebase
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.fragments.UpdateEventDialogFragment
-//import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnFavoriteClickListener
+import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnFavoriteClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import java.util.Locale
 
