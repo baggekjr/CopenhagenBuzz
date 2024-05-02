@@ -58,17 +58,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
             bindEvent(viewHolder, event)
 
             bindFavorites(viewHolder, event, position)
-            /*
-            //eventIcon.setImageResource(R.drawable.baseline_map_24)
-            eventName.text = event.eventName
-            eventLocation.text = event.eventLocation?.address
-            eventDate.text = event.startDate.toString()
-            eventType.text = event.eventType
-            eventDescription.text = event.eventDescription
-            loadImageToView(event, eventIcon)
 
-
-             */
             val currentUser = auth.currentUser
             val currentUserUid = currentUser?.uid
             val eventUserId = event.userId
@@ -95,7 +85,6 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
     }
     private fun bindEvent(viewHolder: ViewHolder, event: Event) {
         with(viewHolder){
-            //eventIcon.setImageResource(R.drawable.baseline_map_24)
             eventName.text = event.eventName
             eventLocation.text = event.eventLocation?.address
             eventDate.text = event.startDate.toString()
