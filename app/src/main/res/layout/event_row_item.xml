@@ -25,26 +25,17 @@
 
             <!-- Title, secondary and supporting text -->
 
-            <ImageView
-                android:id="@+id/event_pic"
-                android:layout_width="30dp"
-                android:layout_height="50dp"
-                app:layout_constraintEnd_toStartOf="@id/event_name"
-                app:layout_constraintStart_toStartOf="parent"
-                app:srcCompat="@drawable/baseline_home_24"
-                android:layout_marginStart="8dp"
 
-                />
 
             <TextView
                     android:id="@+id/event_name"
                     style="@style/textView_style"
                     android:text="@string/event_name"
-                    app:layout_constraintStart_toEndOf="@id/event_pic"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintBottom_toTopOf="@+id/event_type"
                     android:textAppearance="?attr/textAppearanceTitleMedium"
                     android:textSize="32sp"
-                    android:layout_marginStart="30dp"
+                    android:layout_marginStart="15dp"
                      />
 
 
