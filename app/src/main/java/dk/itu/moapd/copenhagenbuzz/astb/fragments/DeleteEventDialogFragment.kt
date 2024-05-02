@@ -25,16 +25,19 @@ class DeleteEventDialogFragment(
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         super.onCreateDialog(savedInstanceState)
         val storage = Firebase.storage(BUCKET_URL).reference
+        val ref = adapter.getRef(position)
 
         val onPositiveButtonClick: (DialogInterface, Int) -> Unit = { dialog, _ ->
-            adapter.getRef(position)
+            ref
                 .removeValue()
                 .addOnSuccessListener { //TODO: HANDLE FAILURE AND SUCCESS
                             println(storage.child(event.eventIcon!!).toString())
                             storage.child(event.eventIcon!!).delete()
                         }
+                    dataViewModel.removeFavorite(ref)
                     dialog.dismiss()
                 }
+
 
         // Create and return a new instance of MaterialAlertDialogBuilder.
         return MaterialAlertDialogBuilder(requireContext()).apply {

@@ -123,7 +123,7 @@ class DataViewModel : ViewModel() {
         }
     }
 
-    private fun removeFavorite(ref: DatabaseReference) {
+    fun removeFavorite(ref: DatabaseReference) {
         viewModelScope.launch {
             auth.currentUser?.uid?.let { userId ->
                 ref.key?.let {
