@@ -66,6 +66,8 @@ class TimelineFragment : Fragment(), OnFavoriteClickListener {
 
         setupSearch()
 
+        //dataViewModel.removeEventFromFavorites(eventAdapter.getRef())
+
     }
 
     /**
@@ -176,6 +178,7 @@ class TimelineFragment : Fragment(), OnFavoriteClickListener {
     override fun isFavorite(eventId: String, onResult: (isFavorite: Boolean) -> Unit) {
         return dataViewModel.isFavorite(eventId, onResult)
     }
+
 
 
 }

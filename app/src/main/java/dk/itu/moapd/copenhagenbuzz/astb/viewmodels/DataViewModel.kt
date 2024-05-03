@@ -1,5 +1,6 @@
 package dk.itu.moapd.copenhagenbuzz.astb.viewmodels
 
+import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.core.graphics.convertTo
@@ -9,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.javafaker.Faker
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -98,6 +100,80 @@ class DataViewModel : ViewModel() {
 
     }
 
+/*
+    fun listenForEventDeletions(ref: DatabaseReference) {
+        val eventReference =
+            Firebase.database(DATABASE_URL).getReference("CopenhagenBuzz").child("events")
+
+        ref.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                // No
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                // No
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                val eventId = snapshot.key ?: return
+                removeEventFromFavorites(eventId)
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                // No
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // No
+            }
+
+        })
+
+    }
+
+ */
+
+
+
+
+    fun removeEventFromFavorites(eventId: DatabaseReference) {
+        viewModelScope.launch {
+            val favoritesReference = database.child(FAVORITES)
+
+            favoritesReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (userSnapshot in snapshot.children) {
+                        val userId = userSnapshot.key ?: continue
+
+                        // Remove the event from the user's favorites
+
+                        eventId.key?.let {
+                            favoritesReference.child(userId).child(it).removeValue()
+                                .addOnSuccessListener {
+                                    Log.d(TAG, "Removed event $eventId from user $userId favorites")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e(TAG, "Failed to remove event $eventId from user $userId favorites: $e")
+                                }
+                        }
+
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    // Handle error
+                }
+            })
+        }
+
+
+
+    }
+
+
+
+
+
     fun updateFavorite(ref: DatabaseReference, isChecked: Boolean) {
         if (isChecked) {
             addFavorite(ref)
@@ -123,7 +199,7 @@ class DataViewModel : ViewModel() {
         }
     }
 
-    fun removeFavorite(ref: DatabaseReference) {
+    private fun removeFavorite(ref: DatabaseReference) {
         viewModelScope.launch {
             auth.currentUser?.uid?.let { userId ->
                 ref.key?.let {
