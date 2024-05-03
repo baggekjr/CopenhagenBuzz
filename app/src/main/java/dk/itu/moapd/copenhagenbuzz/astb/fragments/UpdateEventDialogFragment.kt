@@ -3,6 +3,7 @@ package dk.itu.moapd.copenhagenbuzz.astb.fragments
 import android.Manifest
 import android.app.Activity
 import android.app.Dialog
+import android.content.ContentValues.TAG
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -10,6 +11,7 @@ import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -213,20 +215,44 @@ class UpdateEventDialogFragment(private val event: Event,
                 // Save the updated event
                 updatedEvent = Event(
                     userId = event.userId,
-                    eventIcon = event.eventIcon,
+                    eventIcon = photoName,
                     eventName = eventName,
                     eventLocation = eventLocation,
                     startDate = eventDate.toLong(),
                     eventType = eventType,
                     eventDescription = eventDescription
                 )
-                adapter.getRef(position).setValue(updatedEvent).addOnSuccessListener {
-                    "Succes"         }.addOnFailureListener {
-                    "Error"
+                Log.d(TAG, "Updated event: $updatedEvent")
+
+                if (photoName != event.eventIcon){
+                    storageReference.child(photoName!!)
+                        .putFile(photoUri!!)
+                        .addOnSuccessListener {
+                            println("Photo uploaded successfully!")
+                        }.addOnFailureListener {
+                            println("Photo upload failed with exception: $it")
+                            handleFailure(it)
+                        }
+
+                    storageReference.child(event.eventIcon!!).delete()
+                        .addOnSuccessListener { ex ->
+                            println("Successfully deleted old photo!")
+                        }
+                        .addOnFailureListener { ex ->
+                            handleFailure(ex)
+                        }
                 }
-
-
-            }, { error ->
+                    adapter.getRef(position).setValue(updatedEvent)
+                        .addOnSuccessListener {
+                            // Event updated successfully
+                            Log.d(TAG, "Event updated successfully!")
+                        }
+                        .addOnFailureListener {
+                            // Error updating event
+                            Log.e(TAG, "Error updating event: $it")
+                            handleFailure(it)
+                        }
+                }, { error ->
                 handleFailureVolley(error)
             })
             queue.add(request)
