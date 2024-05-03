@@ -22,7 +22,7 @@ import dk.itu.moapd.copenhagenbuzz.astb.fragments.UpdateEventDialogFragment
 import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnFavoriteClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 
-class EventAdapter(private val fragmentManager: FragmentManager, private val context: Context, private val options: FirebaseListOptions<Event>, private val  onFavoriteClickListener: OnFavoriteClickListener) :
+class EventAdapter(private val fragmentManager: FragmentManager,private val parentView: View, private val context: Context, private val options: FirebaseListOptions<Event>, private val  onFavoriteClickListener: OnFavoriteClickListener) :
     FirebaseListAdapter<Event>(options) {
 
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -71,7 +71,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
             if(currentUserUid == eventUserId) {
                 editButton?.visibility = View.VISIBLE
                 editButton?.setOnClickListener {
-                    UpdateEventDialogFragment(event, position, this@EventAdapter).apply {
+                    UpdateEventDialogFragment(event, position, this@EventAdapter, parentView).apply {
                         isCancelable = false
                     }.show(fragmentManager, "UpdateEventFragment")
                 }
