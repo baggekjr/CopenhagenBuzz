@@ -118,7 +118,7 @@ class EventFragment : Fragment() {
         ActivityResultContracts.PickVisualMedia()
     ) { uri -> // Callback is invoked after the user selects a media item or closes the photo picker.
         if (uri != null) {
-            //showMessage("Photo selected!")
+            showMessage("Photo selected!")
 
             photoUri = uri
             photoName = "IMG_${UUID.randomUUID()}.JPG"
@@ -126,7 +126,7 @@ class EventFragment : Fragment() {
             // Show the user a preview of the photo they just selected
             Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
         } else {
-            //showMessage("PhotoPicker: No media selected")
+            showMessage("PhotoPicker: No media selected")
         }
     }
 
@@ -171,48 +171,42 @@ class EventFragment : Fragment() {
                 val request = JsonArrayRequest(Request.Method.GET, url, null, { response ->
                     response.toString()
 
-                    val data = response.getJSONObject(0)
-                    val lat = data.getDouble("lat")
-                    val lon = data.getDouble("lon")
-                    val prettyAddress = formatAddress(data.getString("display_name"))
+                    try {
+                        val data = response.getJSONObject(0)
+                        val lat = data.getDouble("lat")
+                        val lon = data.getDouble("lon")
+                        val prettyAddress = formatAddress(data.getString("display_name"))
 
-                    val eventLocation = EventLocation(lat, lon, prettyAddress)
+                        val eventLocation = EventLocation(lat, lon, prettyAddress)
 
-                    // Save the event
-                    saveEventWithImage(
-                        userId,
-                        photoName,
-                        eventName,
-                        eventLocation,
-                        eventDate,
-                        eventType,
-                        eventDescription
-                    )
+                        // Save the event
+                        saveEvent(
+                            userId,
+                            photoName,
+                            eventName,
+                            eventLocation,
+                            eventDate,
+                            eventType,
+                            eventDescription
+                        )
+                    } catch (e: Exception){
+                        showMessage("Address not valid. Should be written in format'Street House, City'")
+                    }
                 }, { error ->
                     handleFailureVolley(error)
                 })
                 queue.add(request)
             } ?: run {//TODO: this should not be able to happen so do we event need it?
-                Snackbar.make(
-                    requireView(),
-                    "User is not logged in",
-                    Snackbar.LENGTH_SHORT
-                ).show()
+                showMessage("User is not logged in")
             }
         } else {
-            Snackbar.make(
-                requireView(),
-                "SPlease fill out all fields",
-                Snackbar.LENGTH_SHORT
-            ).show()
+            showMessage("Please fill out all fields")
+
         }
     }
     private fun handleFailureVolley(error: VolleyError?) {
-        Snackbar.make(
-            requireView(),
-            "error {$error.message}",
-            Snackbar.LENGTH_SHORT
-        ).show()
+        Log.e(TAG, "error {$error.message}")
+       //TODO: WHAT KIND OF ERRORMESSAGE TO THE USER??
     }
 
     private fun formatAddress(address: String) : String{
@@ -231,7 +225,7 @@ class EventFragment : Fragment() {
         if (isGranted) {
             launchCamera()
         } else {
-            Snackbar.make(requireView(), "Camera permission denied", Snackbar.LENGTH_SHORT).show()
+            showMessage("Camera permission denied")
         }
     }
 
@@ -240,7 +234,7 @@ class EventFragment : Fragment() {
         _binding = null
     }
 
-    private fun saveEventWithImage(
+    private fun saveEvent(
         userId: String,
         eventIcon: String?, // Image URI to upload
         eventName: String,
@@ -253,11 +247,7 @@ class EventFragment : Fragment() {
             eventDate.toLong()
         } catch (e: NumberFormatException) {
             Log.e(TAG, "Error parsing event date: ${e.message}")
-            Snackbar.make(
-                requireView(),
-                "Error parsing event date",
-                Snackbar.LENGTH_SHORT
-            ).show()
+            showMessage("Error parsing event date")
             return
         }
                         with(binding){
@@ -268,7 +258,7 @@ class EventFragment : Fragment() {
 
                         val newEvent = Event(
                             userId,
-                            photoName,
+                            eventIcon,
                             eventName,
                             eventLocation,
                             eventDateLong,
@@ -286,20 +276,12 @@ class EventFragment : Fragment() {
                                         .child(eventKey)
                                         .setValue(newEvent)
                                         .addOnSuccessListener {
-                                            Snackbar.make(
-                                                requireView(),
-                                                "Saved event successfully",
-                                                Snackbar.LENGTH_SHORT
-                                            ).show()
+                                            showMessage("Saved event successfully")
                                             clearInputFields()
                                         }
                                         .addOnFailureListener { exception ->
                                             Log.e(TAG, "Error saving event: ${exception.message}")
-                                            Snackbar.make(
-                                                requireView(),
-                                                "Failed to save event: ${exception.message}",
-                                                Snackbar.LENGTH_SHORT
-                                            ).show()
+                                            showMessage("Failed to save event: ${exception.message}")
                                         }
                                 }
                         }
@@ -307,11 +289,7 @@ class EventFragment : Fragment() {
                 }
                 .addOnFailureListener { exception ->
                     Log.e(TAG, "Error uploading image: ${exception.message}")
-                    Snackbar.make(
-                        requireView(),
-                        "Failed to upload image: ${exception.message}",
-                        Snackbar.LENGTH_SHORT
-                    ).show()
+                    showMessage("Failed to upload image: ${exception.message}")
                 }
     }
     private fun clearInputFields() {
@@ -333,4 +311,8 @@ class EventFragment : Fragment() {
         }
     }
 
+
+    private fun showMessage(s: String){
+        Snackbar.make(requireView(), s, Snackbar.LENGTH_SHORT).show()
+    }
 }
