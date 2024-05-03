@@ -190,7 +190,7 @@ class EventFragment : Fragment() {
                             eventDescription
                         )
                     } catch (e: Exception){
-                        showMessage("Address not valid. Should be written in format'Street House, City'")
+                        showMessage("Address not valid. Try again with an address in Copenhagen")
                     }
                 }, { error ->
                     handleFailureVolley(error)
