@@ -242,6 +242,7 @@ class UpdateEventDialogFragment(private val event: Event,
                             .putFile(photoUri!!)
                             .addOnSuccessListener {
                                 println("Photo uploaded successfully!")
+                                //Makes picture get updated without having to reload page
                                 adapter.notifyDataSetChanged()
 
                             }.addOnFailureListener {
