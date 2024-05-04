@@ -36,6 +36,7 @@ class DataViewModel : ViewModel() {
 
     private val _events: MutableLiveData<List<Event>> by lazy {
         MutableLiveData<List<Event>>()
+
     }
     private val _favorites: MutableLiveData<List<Event>> by lazy {
         MutableLiveData<List<Event>>()
@@ -43,6 +44,8 @@ class DataViewModel : ViewModel() {
 
     val favorites: LiveData<List<Event>>
         get() = _favorites
+
+
 
 
     fun editEvent(id: DatabaseReference, event: Event) {
@@ -100,73 +103,34 @@ class DataViewModel : ViewModel() {
 
     }
 
-/*
-    fun listenForEventDeletions(ref: DatabaseReference) {
-        val eventReference =
-            Firebase.database(DATABASE_URL).getReference("CopenhagenBuzz").child("events")
 
-        ref.addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                // No
-            }
+    fun removeEventFromFavorites(deletedEvent: String) {
+        val favoritesReference = database.child(FAVORITES)
 
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                // No
-            }
 
-            override fun onChildRemoved(snapshot: DataSnapshot) {
-                val eventId = snapshot.key ?: return
-                removeEventFromFavorites(eventId)
-            }
+        favoritesReference.addListenerForSingleValueEvent(object : ValueEventListener {
 
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                // No
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (userSnapshot in snapshot.children) {
+
+                    userSnapshot.child(deletedEvent).ref.removeValue()
+                        .addOnSuccessListener {
+                            // Event successfully removed from user's favorites
+                            Log.d(TAG, "Event $deletedEvent removed from user ${userSnapshot.key}'s favorites")
+                        }
+                        .addOnFailureListener { error ->
+                            // Handle failure to remove event from user's favorites
+                            Log.e(TAG, "Failed to remove event $deletedEvent from user ${userSnapshot.key}'s favorites", error)
+                        }
+
+                }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                // No
+                // Handle error
+                Log.e(TAG, "Database operation cancelled", error.toException())
             }
-
         })
-
-    }
-
- */
-
-
-
-
-    fun removeEventFromFavorites(eventId: DatabaseReference) {
-        viewModelScope.launch {
-            val favoritesReference = database.child(FAVORITES)
-
-            favoritesReference.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    for (userSnapshot in snapshot.children) {
-                        val userId = userSnapshot.key ?: continue
-
-                        // Remove the event from the user's favorites
-
-                        eventId.key?.let {
-                            favoritesReference.child(userId).child(it).removeValue()
-                                .addOnSuccessListener {
-                                    Log.d(TAG, "Removed event $eventId from user $userId favorites")
-                                }
-                                .addOnFailureListener { e ->
-                                    Log.e(TAG, "Failed to remove event $eventId from user $userId favorites: $e")
-                                }
-                        }
-
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    // Handle error
-                }
-            })
-        }
-
-
 
     }
 

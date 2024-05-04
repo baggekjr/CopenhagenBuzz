@@ -9,8 +9,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
-import androidx.compose.ui.text.toLowerCase
-
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
@@ -65,9 +63,6 @@ class TimelineFragment : Fragment(), OnFavoriteClickListener {
         loadEvents()
 
         setupSearch()
-
-        //dataViewModel.removeEventFromFavorites(eventAdapter.getRef())
-
     }
 
     /**

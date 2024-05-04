@@ -42,11 +42,10 @@ class DeleteEventDialogFragment(
                             println(storage.child(event.eventIcon!!).toString())
                             storage.child(event.eventIcon!!).delete()
                         }
-
-
-                    dataViewModel.removeEventFromFavorites(ref)
+                    ref.key?.let { dataViewModel.removeEventFromFavorites(it) }
                     dialog.dismiss()
                 }
+
 
 
         // Create and return a new instance of MaterialAlertDialogBuilder.
