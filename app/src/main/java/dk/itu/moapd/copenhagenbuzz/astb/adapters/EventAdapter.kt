@@ -26,6 +26,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
 
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
 
+
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view = convertView ?: LayoutInflater.from(context).inflate(
             R.layout.event_row_item, parent, false)
@@ -112,6 +113,8 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
                     onFavoriteClickListener.onFavoriteClick(ref, event ,isChecked)
 
                 }
+
+
             }
 
         }

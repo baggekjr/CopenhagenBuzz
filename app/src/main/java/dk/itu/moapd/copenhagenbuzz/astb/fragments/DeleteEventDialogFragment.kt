@@ -5,9 +5,17 @@ import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.database
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import dk.itu.moapd.copenhagenbuzz.astb.BUCKET_URL
+import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
@@ -34,9 +42,10 @@ class DeleteEventDialogFragment(
                             println(storage.child(event.eventIcon!!).toString())
                             storage.child(event.eventIcon!!).delete()
                         }
-                    dataViewModel.removeFavorite(ref)
+                    ref.key?.let { dataViewModel.removeEventFromFavorites(it) }
                     dialog.dismiss()
                 }
+
 
 
         // Create and return a new instance of MaterialAlertDialogBuilder.

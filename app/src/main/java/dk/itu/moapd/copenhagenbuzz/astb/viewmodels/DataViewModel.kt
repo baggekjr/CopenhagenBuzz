@@ -1,5 +1,6 @@
 package dk.itu.moapd.copenhagenbuzz.astb.viewmodels
 
+import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.core.graphics.convertTo
@@ -9,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.javafaker.Faker
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -34,6 +36,7 @@ class DataViewModel : ViewModel() {
 
     private val _events: MutableLiveData<List<Event>> by lazy {
         MutableLiveData<List<Event>>()
+
     }
     private val _favorites: MutableLiveData<List<Event>> by lazy {
         MutableLiveData<List<Event>>()
@@ -41,6 +44,8 @@ class DataViewModel : ViewModel() {
 
     val favorites: LiveData<List<Event>>
         get() = _favorites
+
+
 
 
     fun editEvent(id: DatabaseReference, event: Event) {
@@ -98,6 +103,41 @@ class DataViewModel : ViewModel() {
 
     }
 
+
+    fun removeEventFromFavorites(deletedEvent: String) {
+        val favoritesReference = database.child(FAVORITES)
+
+
+        favoritesReference.addListenerForSingleValueEvent(object : ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (userSnapshot in snapshot.children) {
+
+                    userSnapshot.child(deletedEvent).ref.removeValue()
+                        .addOnSuccessListener {
+                            // Event successfully removed from user's favorites
+                            Log.d(TAG, "Event $deletedEvent removed from user ${userSnapshot.key}'s favorites")
+                        }
+                        .addOnFailureListener { error ->
+                            // Handle failure to remove event from user's favorites
+                            Log.e(TAG, "Failed to remove event $deletedEvent from user ${userSnapshot.key}'s favorites", error)
+                        }
+
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Handle error
+                Log.e(TAG, "Database operation cancelled", error.toException())
+            }
+        })
+
+    }
+
+
+
+
+
     fun updateFavorite(ref: DatabaseReference, isChecked: Boolean) {
         if (isChecked) {
             addFavorite(ref)
@@ -123,7 +163,7 @@ class DataViewModel : ViewModel() {
         }
     }
 
-    fun removeFavorite(ref: DatabaseReference) {
+    private fun removeFavorite(ref: DatabaseReference) {
         viewModelScope.launch {
             auth.currentUser?.uid?.let { userId ->
                 ref.key?.let {

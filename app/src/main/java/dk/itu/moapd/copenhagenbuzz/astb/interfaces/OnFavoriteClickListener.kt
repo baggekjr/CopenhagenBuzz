@@ -8,4 +8,6 @@ interface OnFavoriteClickListener {
     fun onFavoriteClick(ref: DatabaseReference, event: Event, isChecked: Boolean)
 
     fun isFavorite(eventId: String, onResult: (isFavorite: Boolean) -> Unit)
+
+
 }
