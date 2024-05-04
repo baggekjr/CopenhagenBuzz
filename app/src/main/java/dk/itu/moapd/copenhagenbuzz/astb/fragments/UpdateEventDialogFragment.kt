@@ -151,36 +151,24 @@ class UpdateEventDialogFragment(private val event: Event,
 
 
     private val takePhoto = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
+        ActivityResultContracts.StartActivityForResult())
+    { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
-            // Update the photo name immediately
-            photoName = "IMG_${UUID.randomUUID()}.JPG"
-            // Update the event with the new photo name
-            updatedEvent = Event(
-                // Update other event properties here
-                eventIcon = photoName,
-                // Update other event properties here
-            )
         }
     }
 
     private val pickMedia = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
-    ) { uri ->
+    ) { uri -> // Callback is invoked after the user selects a media item or closes the photo picker.
         if (uri != null) {
             showMessage("Photo selected!")
+
             photoUri = uri
             photoName = "IMG_${UUID.randomUUID()}.JPG"
+
             // Show the user a preview of the photo they just selected
             Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
-            // Update the event with the new photo name
-            updatedEvent = Event(
-                // Update other event properties here
-                eventIcon = photoName,
-                // Update other event properties here
-            )
         } else {
             showMessage("PhotoPicker: No media selected")
         }
