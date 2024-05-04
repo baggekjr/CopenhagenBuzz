@@ -14,7 +14,6 @@ import androidx.compose.ui.text.toLowerCase
 
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import com.firebase.ui.database.FirebaseListOptions
@@ -27,11 +26,9 @@ import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentTimelineBinding
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
-import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentTimelineBinding
 import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnDialogsClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnFavoriteClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
-import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 
 
 /**
@@ -89,7 +86,7 @@ class TimelineFragment : Fragment(), OnFavoriteClickListener, OnDialogsClickList
             .build()
 
         eventAdapter =
-            EventAdapter(requireActivity().supportFragmentManager, requireContext(), options, this)
+            EventAdapter(requireActivity().supportFragmentManager, requireContext(), options, this, this)
 
         binding.listView.adapter = eventAdapter
     }
@@ -162,7 +159,7 @@ class TimelineFragment : Fragment(), OnFavoriteClickListener, OnDialogsClickList
             requireActivity().supportFragmentManager,
             requireContext(),
             searchOption,
-            this
+            this, this
         )
         binding.listView.adapter = adapter
 
