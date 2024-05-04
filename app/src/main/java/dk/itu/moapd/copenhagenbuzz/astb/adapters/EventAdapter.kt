@@ -150,7 +150,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
 
     }
 
-    private fun getId(position: Int): DatabaseReference{
+    fun getId(position: Int): DatabaseReference{
         return getRef(position)
     }
 }

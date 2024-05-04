@@ -61,6 +61,7 @@ class UpdateEventDialogFragment(private val event: Event,
     private var photoName: String? = null
     private var photoUri: Uri? = null
     private val BUZZ = "CopenhagenBuzz"
+
     private val binding
         get() = requireNotNull(_binding) {
             "Cannot access binding because it is null. Is the view visible?"
@@ -150,28 +151,41 @@ class UpdateEventDialogFragment(private val event: Event,
 
 
     private val takePhoto = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult())
-    { result ->
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
+            // Update the photo name immediately
+            photoName = "IMG_${UUID.randomUUID()}.JPG"
+            // Update the event with the new photo name
+            updatedEvent = Event(
+                // Update other event properties here
+                eventIcon = photoName,
+                // Update other event properties here
+            )
         }
     }
 
     private val pickMedia = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
-    ) { uri -> // Callback is invoked after the user selects a media item or closes the photo picker.
+    ) { uri ->
         if (uri != null) {
             showMessage("Photo selected!")
-
             photoUri = uri
             photoName = "IMG_${UUID.randomUUID()}.JPG"
-
             // Show the user a preview of the photo they just selected
             Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
+            // Update the event with the new photo name
+            updatedEvent = Event(
+                // Update other event properties here
+                eventIcon = photoName,
+                // Update other event properties here
+            )
         } else {
             showMessage("PhotoPicker: No media selected")
         }
     }
+
 
 
     private fun handlePhotoLibraryButtonOnClick() {
@@ -223,13 +237,13 @@ class UpdateEventDialogFragment(private val event: Event,
                         eventType = eventType,
                         eventDescription = eventDescription
                     )
-                    Log.d(TAG, "Updated event: $updatedEvent")
-
                     if (photoName != event.eventIcon) {
                         storageReference.child(photoName!!)
                             .putFile(photoUri!!)
                             .addOnSuccessListener {
                                 println("Photo uploaded successfully!")
+                                adapter.notifyDataSetChanged()
+
                             }.addOnFailureListener {
                                 println("Photo upload failed with exception: $it")
                                 handleFailure(it)
@@ -247,14 +261,18 @@ class UpdateEventDialogFragment(private val event: Event,
                         .addOnSuccessListener {
                             // Event updated successfully
                             Log.d(TAG, "Event updated successfully!")
+
                         }
                         .addOnFailureListener {
                             // Error updating event
                             Log.e(TAG, "Error updating event: $it")
                             handleFailure(it)
                         }
+
+
+
                 }catch(e: Exception){
-                    showMessage( "Address not valid. Should be written in format'Street House, City'")
+                    showMessage( "Address not valid. Try again with an address in Copenhagen.")
                 }
                 }, { error ->
                 handleFailureVolley(error)
