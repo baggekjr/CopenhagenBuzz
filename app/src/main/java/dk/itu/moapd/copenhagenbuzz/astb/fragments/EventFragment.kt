@@ -36,6 +36,8 @@ import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentEventBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.models.EventLocation
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Locale
 import java.util.UUID
 
 class EventFragment : Fragment() {
@@ -45,6 +47,10 @@ class EventFragment : Fragment() {
     private lateinit var storageReference: StorageReference
     private var photoName: String? = null
     private var photoUri: Uri? = null
+    private var startDate: Long? = null
+    private var endDate: Long? = null
+    private val dateFormatter = SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH)
+
 
     private val EVENTS = "events"
     private val BUZZ = "CopenhagenBuzz"
@@ -147,7 +153,14 @@ class EventFragment : Fragment() {
         val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker().setTitleText("Select dates").build()
         dateRangePicker.show(parentFragmentManager, "DatePicker")
         dateRangePicker.addOnPositiveButtonClickListener { datePicked ->
-            binding.editTextEventDate.setText(datePicked.first.toString())
+
+            startDate = datePicked.first
+            endDate = datePicked.second
+
+            val dates =
+                "${dateFormatter.format(startDate)} - ${dateFormatter.format(endDate)}"
+            binding.editTextEventDate.setText(dates)
+
         }
     }
 
@@ -261,7 +274,8 @@ class EventFragment : Fragment() {
                             eventIcon,
                             eventName,
                             eventLocation,
-                            eventDateLong,
+                            startDate,
+                            endDate,
                             eventType,
                             eventDescription
                         )

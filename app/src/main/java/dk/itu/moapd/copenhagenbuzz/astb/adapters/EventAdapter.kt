@@ -20,6 +20,8 @@ import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnDialogsClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnFavoriteClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class EventAdapter(private val fragmentManager: FragmentManager, private val context: Context, private val options: FirebaseListOptions<Event>, private val  onFavoriteClickListener: OnFavoriteClickListener, private val dialogsOnClickListener: OnDialogsClickListener) :
     FirebaseListAdapter<Event>(options) {
@@ -85,11 +87,14 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
         }
     }
     private fun bindEvent(viewHolder: ViewHolder, event: Event) {
+        val dateFormatter = SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH)
+
         with(viewHolder){
             //eventIcon.setImageResource(R.drawable.baseline_map_24)
             eventName.text = event.eventName
             eventLocation.text = event.eventLocation?.address
-            eventDate.text = event.startDate.toString()
+            startDate.text = dateFormatter.format(event.startDate)
+            endDate.text = dateFormatter.format(event.endDate)
             eventType.text = event.eventType
             eventDescription.text = event.eventDescription
             loadImageToView(event, eventIcon)
@@ -125,7 +130,8 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
         val eventIcon= view.findViewById<ImageView>(R.id.event_icon)
         val eventName= view.findViewById<TextView>(R.id.event_name)
         val eventLocation= view.findViewById<TextView>(R.id.event_location)
-        val eventDate = view.findViewById<TextView>(R.id.event_date)
+        val startDate = view.findViewById<TextView>(R.id.start_date)
+        val endDate = view.findViewById<TextView>(R.id.end_date)
         val eventType = view.findViewById<TextView>(R.id.event_type)
         val eventDescription = view.findViewById<TextView>(R.id.event_description)
         val editButton = view.findViewById<Button>(R.id.edit_button)

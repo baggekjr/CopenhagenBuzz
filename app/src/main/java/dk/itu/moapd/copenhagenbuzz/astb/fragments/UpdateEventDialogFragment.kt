@@ -62,6 +62,7 @@ class UpdateEventDialogFragment(private val event: Event,
     private var photoUri: Uri? = null
     private val BUZZ = "CopenhagenBuzz"
 
+
     private val binding
         get() = requireNotNull(_binding) {
             "Cannot access binding because it is null. Is the view visible?"

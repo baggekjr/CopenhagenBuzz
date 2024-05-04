@@ -80,13 +80,29 @@
                 android:textStyle="bold"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
                 android:textColor="?android:attr/textColorSecondary" />
+
+            <LinearLayout
+                style="@style/textView_style"
+                android:orientation="horizontal"
+                android:layout_gravity="start">
+
             <TextView
-                android:id="@+id/event_date"
+                android:id="@+id/start_date"
                 style="@style/textView_style"
                 android:layout_marginTop="5dp"
                 android:text="@string/event_date"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
                 android:textColor="?android:attr/textColorSecondary" />
+
+                <TextView
+                    android:id="@+id/end_date"
+                    style="@style/textView_style"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/event_date"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?android:attr/textColorSecondary" />
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/event_description"
