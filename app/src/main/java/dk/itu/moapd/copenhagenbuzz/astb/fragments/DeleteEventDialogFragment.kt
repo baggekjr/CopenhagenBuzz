@@ -18,7 +18,7 @@ class DeleteEventDialogFragment(
     private val position: Int,
     private val adapter: EventAdapter
 
-) : DialogFragment() {
+) : DialogFragment(){
 
     private val dataViewModel: DataViewModel by activityViewModels()
 
@@ -47,6 +47,8 @@ class DeleteEventDialogFragment(
             setNegativeButton(getString(R.string.button_cancel)) { dialog, _ -> dialog.dismiss() }
         }.create()
     }
+
+
 
 
 }

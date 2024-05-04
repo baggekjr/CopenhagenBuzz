@@ -49,7 +49,7 @@ import java.util.UUID
 
 class UpdateEventDialogFragment(private val event: Event,
                                 private val position: Int,
-                                private val adapter: EventAdapter) : DialogFragment() {
+                                private val adapter: EventAdapter, private val parentView: View) : DialogFragment() {
     private var _binding: FragmentUpdateEventBinding? = null
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
     private lateinit var database: DatabaseReference
@@ -73,6 +73,7 @@ class UpdateEventDialogFragment(private val event: Event,
         //binding.editTextName.setText(dummy.name)
         //auth = FirebaseAuth.getInstance()
         database = Firebase.database(DATABASE_URL).reference.child(BUZZ)
+
 
         val onPositiveButtonClick: (DialogInterface, Int) -> Unit = { dialog, _ ->
             handleEventButtonOnClick()
@@ -160,7 +161,7 @@ class UpdateEventDialogFragment(private val event: Event,
         ActivityResultContracts.PickVisualMedia()
     ) { uri -> // Callback is invoked after the user selects a media item or closes the photo picker.
         if (uri != null) {
-            //showMessage("Photo selected!")
+            showMessage("Photo selected!")
 
             photoUri = uri
             photoName = "IMG_${UUID.randomUUID()}.JPG"
@@ -168,7 +169,7 @@ class UpdateEventDialogFragment(private val event: Event,
             // Show the user a preview of the photo they just selected
             Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
         } else {
-            //showMessage("PhotoPicker: No media selected")
+            showMessage("PhotoPicker: No media selected")
         }
     }
 
@@ -181,6 +182,7 @@ class UpdateEventDialogFragment(private val event: Event,
 
 
     private fun handleEventButtonOnClick() {
+        try{
             val eventName = binding.editTextEventName.text.toString().trim()
         val eventLocationStr = binding.editTextEventLocation.text.toString()
             .replace(' ', '+')
@@ -252,13 +254,21 @@ class UpdateEventDialogFragment(private val event: Event,
                             handleFailure(it)
                         }
                 }catch(e: Exception){
-                    showMessage("Address not valid. Should be written in format'Street House, City'")
+                    showMessage( "Address not valid. Should be written in format'Street House, City'")
                 }
                 }, { error ->
                 handleFailureVolley(error)
             })
             queue.add(request)
 
+        } catch (e: IllegalStateException) {
+            // Handle the IllegalStateException here
+            Log.e(TAG, "IllegalStateException: ${e.message}")
+            // You can show an error message to the user or handle it in any other appropriate way
+        } catch (e: Exception) {
+            // Handle other exceptions here if needed
+            Log.e(TAG, "Exception: ${e.message}")
+        }
 
     }
 
@@ -293,7 +303,7 @@ class UpdateEventDialogFragment(private val event: Event,
             }
 
     private fun handleDateOnClick() {
-        with(binding.editTextEventDate){
+        with(binding.editTextEventDate) {
             val dateRangePicker =
                 MaterialDatePicker.Builder.dateRangePicker().setTitleText("Select dates").build()
             dateRangePicker.show(parentFragmentManager, "DatePicker")
@@ -318,11 +328,7 @@ class UpdateEventDialogFragment(private val event: Event,
     }
 
     private fun handleFailureVolley(error: VolleyError?) {
-        Snackbar.make(
-            requireView(),
-            "VolleyError",
-            Snackbar.LENGTH_SHORT
-        ).show()
+        showMessage("VolleyError")
     }
 
     private fun checkCameraPermission(): Boolean {
@@ -333,7 +339,7 @@ class UpdateEventDialogFragment(private val event: Event,
         if (isGranted) {
             launchCamera()
         } else {
-            Snackbar.make(requireView(), "Camera permission denied", Snackbar.LENGTH_SHORT).show()
+            showMessage("Camera permission denied")
         }
     }
 
@@ -342,8 +348,8 @@ class UpdateEventDialogFragment(private val event: Event,
 
     }
 
-    private fun showMessage(s: String){
-        Snackbar.make(requireView(), "Camera permission denied", Snackbar.LENGTH_SHORT).show()
+    private fun showMessage( s: String){
+        Snackbar.make(parentView, s, Snackbar.LENGTH_SHORT).show()
     }
 
 }

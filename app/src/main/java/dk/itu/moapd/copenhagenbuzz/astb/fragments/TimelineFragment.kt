@@ -1,7 +1,7 @@
 package dk.itu.moapd.copenhagenbuzz.astb.fragments
 
+import DeleteEventDialogFragment
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -9,24 +9,23 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
-import androidx.compose.ui.text.toLowerCase
-
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import com.firebase.ui.database.FirebaseListOptions
 import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.database
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.astb.R
-import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentTimelineBinding
-import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
+import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentTimelineBinding
+import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnDialogsClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnFavoriteClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
+import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 
 
 /**
@@ -34,7 +33,7 @@ import dk.itu.moapd.copenhagenbuzz.astb.models.Event
  * Use the [TimelineFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class TimelineFragment : Fragment(), OnFavoriteClickListener {
+class TimelineFragment : Fragment(), OnFavoriteClickListener, OnDialogsClickListener {
 
     private var _binding: FragmentTimelineBinding? = null
     private val dataViewModel: DataViewModel by activityViewModels()
@@ -84,7 +83,7 @@ class TimelineFragment : Fragment(), OnFavoriteClickListener {
             .build()
 
         eventAdapter =
-            EventAdapter(requireActivity().supportFragmentManager, requireContext(), options, this)
+            EventAdapter(requireActivity().supportFragmentManager, requireContext(), options, this, this)
 
         binding.listView.adapter = eventAdapter
     }
@@ -157,6 +156,7 @@ class TimelineFragment : Fragment(), OnFavoriteClickListener {
             requireActivity().supportFragmentManager,
             requireContext(),
             searchOption,
+            this,
             this
         )
         binding.listView.adapter = adapter
@@ -177,7 +177,22 @@ class TimelineFragment : Fragment(), OnFavoriteClickListener {
         return dataViewModel.isFavorite(eventId, onResult)
     }
 
+    override fun onDeleteEvent(event: Event, position: Int) {
+        binding.listView.adapter.let {
+            DeleteEventDialogFragment(event, position, it as EventAdapter).apply {
+                isCancelable = false
+            }.show(requireFragmentManager(), "DeleteEventDialogFragment")
+        }
 
+
+    }
+
+    override fun onEditEvent(event: Event, position: Int) {
+        binding.listView.adapter.let {
+            UpdateEventDialogFragment(event, position, it as EventAdapter, requireView()).apply {
+                isCancelable = false
+            }.show(requireFragmentManager(), "UpdateEventFragment")
+        }    }
 }
 
 

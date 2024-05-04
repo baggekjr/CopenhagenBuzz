@@ -1,6 +1,5 @@
 package dk.itu.moapd.copenhagenbuzz.astb.adapters
 
-import DeleteEventDialogFragment
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -18,11 +17,11 @@ import com.google.firebase.storage.storage
 import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.astb.BUCKET_URL
 import dk.itu.moapd.copenhagenbuzz.astb.R
-import dk.itu.moapd.copenhagenbuzz.astb.fragments.UpdateEventDialogFragment
+import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnDialogsClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnFavoriteClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 
-class EventAdapter(private val fragmentManager: FragmentManager,private val parentView: View, private val context: Context, private val options: FirebaseListOptions<Event>, private val  onFavoriteClickListener: OnFavoriteClickListener) :
+class EventAdapter(private val fragmentManager: FragmentManager, private val context: Context, private val options: FirebaseListOptions<Event>, private val  onFavoriteClickListener: OnFavoriteClickListener, private val dialogsOnClickListener: OnDialogsClickListener) :
     FirebaseListAdapter<Event>(options) {
 
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -71,17 +70,14 @@ class EventAdapter(private val fragmentManager: FragmentManager,private val pare
             if(currentUserUid == eventUserId) {
                 editButton?.visibility = View.VISIBLE
                 editButton?.setOnClickListener {
-                    UpdateEventDialogFragment(event, position, this@EventAdapter, parentView).apply {
-                        isCancelable = false
-                    }.show(fragmentManager, "UpdateEventFragment")
+                    dialogsOnClickListener.onEditEvent(event, position)
                 }
 
                 deleteButton?.visibility = View.VISIBLE
-                deleteButton?.setOnClickListener { adapter ->
-                    DeleteEventDialogFragment(event, position, this@EventAdapter).apply {
-                        isCancelable = false
-                    }.show(fragmentManager, "DeleteEventDialogFragment")
+                deleteButton?.setOnClickListener {
+                    dialogsOnClickListener.onDeleteEvent(event, position)
                 }
+
             } else {
                 editButton?.visibility = View.GONE
                 deleteButton?.visibility = View.GONE
