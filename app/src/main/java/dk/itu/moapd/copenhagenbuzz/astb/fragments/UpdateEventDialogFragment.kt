@@ -49,7 +49,7 @@ import java.util.UUID
 
 class UpdateEventDialogFragment(private val event: Event,
                                 private val position: Int,
-                                private val adapter: EventAdapter) : DialogFragment() {
+                                private val adapter: EventAdapter, private val parentView: View) : DialogFragment() {
     private var _binding: FragmentUpdateEventBinding? = null
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
     private lateinit var database: DatabaseReference
@@ -61,6 +61,7 @@ class UpdateEventDialogFragment(private val event: Event,
     private var photoName: String? = null
     private var photoUri: Uri? = null
     private val BUZZ = "CopenhagenBuzz"
+
     private val binding
         get() = requireNotNull(_binding) {
             "Cannot access binding because it is null. Is the view visible?"
@@ -73,7 +74,7 @@ class UpdateEventDialogFragment(private val event: Event,
         //binding.editTextName.setText(dummy.name)
         //auth = FirebaseAuth.getInstance()
         database = Firebase.database(DATABASE_URL).reference.child(BUZZ)
-        geocodingHelper = GeocodingHelper(requireContext())
+
 
         val onPositiveButtonClick: (DialogInterface, Int) -> Unit = { dialog, _ ->
             handleEventButtonOnClick()
@@ -86,7 +87,6 @@ class UpdateEventDialogFragment(private val event: Event,
             editTextEventDescription.setText(event.eventDescription)
             editTextEventType.setText(event.eventType)
             editTextEventDate.setText(event.startDate.toString())
-            // Listener for user interaction in the "Add event date" textfield
             photoName = event.eventIcon
 
             editTextEventDate.setOnClickListener {
@@ -162,7 +162,7 @@ class UpdateEventDialogFragment(private val event: Event,
         ActivityResultContracts.PickVisualMedia()
     ) { uri -> // Callback is invoked after the user selects a media item or closes the photo picker.
         if (uri != null) {
-            //showMessage("Photo selected!")
+            showMessage("Photo selected!")
 
             photoUri = uri
             photoName = "IMG_${UUID.randomUUID()}.JPG"
@@ -170,9 +170,10 @@ class UpdateEventDialogFragment(private val event: Event,
             // Show the user a preview of the photo they just selected
             Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
         } else {
-            //showMessage("PhotoPicker: No media selected")
+            showMessage("PhotoPicker: No media selected")
         }
     }
+
 
 
     private fun handlePhotoLibraryButtonOnClick() {
@@ -183,6 +184,7 @@ class UpdateEventDialogFragment(private val event: Event,
 
 
     private fun handleEventButtonOnClick() {
+        try{
             val eventName = binding.editTextEventName.text.toString().trim()
         val eventLocationStr = binding.editTextEventLocation.text.toString()
             .replace(' ', '+')
@@ -204,59 +206,76 @@ class UpdateEventDialogFragment(private val event: Event,
             val request = JsonArrayRequest(Request.Method.GET, url, null, { response ->
                 response.toString()
 
-                val data = response.getJSONObject(0)
-                val lat = data.getDouble("lat")
-                val lon = data.getDouble("lon")
-                val prettyAddress = formatAddress(data.getString("display_name"))
+                try {
+                    val data = response.getJSONObject(0)
+                    val lat = data.getDouble("lat")
+                    val lon = data.getDouble("lon")
+                    val prettyAddress = formatAddress(data.getString("display_name"))
 
 
-                eventLocation = EventLocation(lat, lon, prettyAddress)
+                    eventLocation = EventLocation(lat, lon, prettyAddress)
 
-                // Save the updated event
-                updatedEvent = Event(
-                    userId = event.userId,
-                    eventIcon = photoName,
-                    eventName = eventName,
-                    eventLocation = eventLocation,
-                    startDate = eventDate.toLong(),
-                    eventType = eventType,
-                    eventDescription = eventDescription
-                )
-                Log.d(TAG, "Updated event: $updatedEvent")
+                    // Save the updated event
+                    updatedEvent = Event(
+                        userId = event.userId,
+                        eventIcon = photoName,
+                        eventName = eventName,
+                        eventLocation = eventLocation,
+                        startDate = eventDate.toLong(),
+                        eventType = eventType,
+                        eventDescription = eventDescription
+                    )
+                    if (photoName != event.eventIcon) {
+                        storageReference.child(photoName!!)
+                            .putFile(photoUri!!)
+                            .addOnSuccessListener {
+                                println("Photo uploaded successfully!")
+                                //Makes picture get updated without having to reload page
+                                adapter.notifyDataSetChanged()
 
-                if (photoName != event.eventIcon){
-                    storageReference.child(photoName!!)
-                        .putFile(photoUri!!)
-                        .addOnSuccessListener {
-                            println("Photo uploaded successfully!")
-                        }.addOnFailureListener {
-                            println("Photo upload failed with exception: $it")
-                            handleFailure(it)
-                        }
+                            }.addOnFailureListener {
+                                println("Photo upload failed with exception: $it")
+                                handleFailure(it)
+                            }
 
-                    storageReference.child(event.eventIcon!!).delete()
-                        .addOnSuccessListener { ex ->
-                            println("Successfully deleted old photo!")
-                        }
-                        .addOnFailureListener { ex ->
-                            handleFailure(ex)
-                        }
-                }
+                        storageReference.child(event.eventIcon!!).delete()
+                            .addOnSuccessListener { ex ->
+                                println("Successfully deleted old photo!")
+                            }
+                            .addOnFailureListener { ex ->
+                                handleFailure(ex)
+                            }
+                    }
                     adapter.getRef(position).setValue(updatedEvent)
                         .addOnSuccessListener {
                             // Event updated successfully
                             Log.d(TAG, "Event updated successfully!")
+
                         }
                         .addOnFailureListener {
                             // Error updating event
                             Log.e(TAG, "Error updating event: $it")
                             handleFailure(it)
                         }
+
+
+
+                }catch(e: Exception){
+                    showMessage( "Address not valid. Try again with an address in Copenhagen.")
+                }
                 }, { error ->
                 handleFailureVolley(error)
             })
             queue.add(request)
 
+        } catch (e: IllegalStateException) {
+            // Handle the IllegalStateException here
+            Log.e(TAG, "IllegalStateException: ${e.message}")
+            // You can show an error message to the user or handle it in any other appropriate way
+        } catch (e: Exception) {
+            // Handle other exceptions here if needed
+            Log.e(TAG, "Exception: ${e.message}")
+        }
 
     }
 
@@ -267,11 +286,6 @@ class UpdateEventDialogFragment(private val event: Event,
         // house number, street name, city name
         return "${list[1]} ${list[0]}, ${list[list.size - 6]}"
     }
-
-
-
-
-
 
 
     private fun validateInputs(
@@ -296,7 +310,7 @@ class UpdateEventDialogFragment(private val event: Event,
             }
 
     private fun handleDateOnClick() {
-        with(binding.editTextEventDate){
+        with(binding.editTextEventDate) {
             val dateRangePicker =
                 MaterialDatePicker.Builder.dateRangePicker().setTitleText("Select dates").build()
             dateRangePicker.show(parentFragmentManager, "DatePicker")
@@ -321,11 +335,7 @@ class UpdateEventDialogFragment(private val event: Event,
     }
 
     private fun handleFailureVolley(error: VolleyError?) {
-        Snackbar.make(
-            requireView(),
-            "VolleyError",
-            Snackbar.LENGTH_SHORT
-        ).show()
+        showMessage("VolleyError")
     }
 
     private fun checkCameraPermission(): Boolean {
@@ -336,13 +346,17 @@ class UpdateEventDialogFragment(private val event: Event,
         if (isGranted) {
             launchCamera()
         } else {
-            Snackbar.make(requireView(), "Camera permission denied", Snackbar.LENGTH_SHORT).show()
+            showMessage("Camera permission denied")
         }
     }
 
     private fun handleFailure(exception: Exception) {
         println("Database save failure with following exception: $exception")
 
+    }
+
+    private fun showMessage( s: String){
+        Snackbar.make(parentView, s, Snackbar.LENGTH_SHORT).show()
     }
 
 }

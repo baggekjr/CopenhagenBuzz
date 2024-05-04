@@ -26,7 +26,7 @@ class DeleteEventDialogFragment(
     private val position: Int,
     private val adapter: EventAdapter
 
-) : DialogFragment() {
+) : DialogFragment(){
 
     private val dataViewModel: DataViewModel by activityViewModels()
 
