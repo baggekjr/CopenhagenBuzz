@@ -7,7 +7,6 @@ import android.content.ContentValues.TAG
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -34,6 +33,7 @@ import com.google.firebase.storage.ktx.storage
 import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.astb.BUCKET_URL
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
+import dk.itu.moapd.copenhagenbuzz.astb.Utils.DateFormatter
 import dk.itu.moapd.copenhagenbuzz.astb.GeocodingHelper
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
@@ -42,6 +42,7 @@ import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.models.EventLocation
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 import java.io.File
+import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
@@ -61,6 +62,10 @@ class UpdateEventDialogFragment(private val event: Event,
     private var photoName: String? = null
     private var photoUri: Uri? = null
     private val BUZZ = "CopenhagenBuzz"
+    private var startDate: Long? = null
+    private var endDate: Long? = null
+    private val dateFormatter = SimpleDateFormat("EEE dd/MM/yyyy", Locale.ENGLISH)
+
 
     private val binding
         get() = requireNotNull(_binding) {
@@ -80,13 +85,26 @@ class UpdateEventDialogFragment(private val event: Event,
             handleEventButtonOnClick()
             dialog.dismiss()
         }
+        var dates = ""
+
+        // Check if event's start and end dates are not null
+        event.startDate?.let { startDate ->
+            event.endDate?.let { endDate ->
+                // If both start and end dates are not null, format the dates
+                dates = "${dateFormatter.format(startDate)} - ${dateFormatter.format(endDate)}"
+            }
+        }
 
         binding.apply {
             editTextEventName.setText(event.eventName)
             editTextEventLocation.setText(event.eventLocation?.address)
             editTextEventDescription.setText(event.eventDescription)
             editTextEventType.setText(event.eventType)
-            editTextEventDate.setText(event.startDate.toString())
+            //Check if eithre start or end date is null:
+            val formattedStartDate = startDate?.let { dateFormatter.format(Date(it)) } ?: ""
+            val formattedEndDate = endDate?.let { dateFormatter.format(Date(it)) } ?: ""
+            val formattedDates = "$formattedStartDate - $formattedEndDate"
+            editTextEventDate.setText(formattedDates)
             photoName = event.eventIcon
 
             editTextEventDate.setOnClickListener {
@@ -221,7 +239,8 @@ class UpdateEventDialogFragment(private val event: Event,
                         eventIcon = photoName,
                         eventName = eventName,
                         eventLocation = eventLocation,
-                        startDate = eventDate.toLong(),
+                        startDate = startDate,
+                        endDate = endDate,
                         eventType = eventType,
                         eventDescription = eventDescription
                     )
@@ -310,27 +329,19 @@ class UpdateEventDialogFragment(private val event: Event,
             }
 
     private fun handleDateOnClick() {
-        with(binding.editTextEventDate) {
-            val dateRangePicker =
-                MaterialDatePicker.Builder.dateRangePicker().setTitleText("Select dates").build()
-            dateRangePicker.show(parentFragmentManager, "DatePicker")
+        val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker().setTitleText("Select dates").build()
+        dateRangePicker.show(parentFragmentManager, "DatePicker")
+        dateRangePicker.addOnPositiveButtonClickListener { datePicked ->
 
-            dateRangePicker.addOnPositiveButtonClickListener { datePicked ->
-                val startDate = Date(datePicked.first)
-                val endDate = Date(datePicked.second)
+            startDate = datePicked.first
+            endDate = datePicked.second
 
-                //set event date
-
-                val formatDate = SimpleDateFormat("E, MMM dd yyyy", Locale.US)
-                val date = datePicked.first + datePicked.second
-
-
-                setText(
-                    // Don't do this - use a string resource
-                    date.toString()
-                    //formatDate.format(startDate) + " - " + formatDate.format(endDate)
-                )
+            //Check if dates are not null before setting text
+            if (startDate != null && endDate != null) {
+                val dates = "${DateFormatter.formatDate(startDate!!)} - ${DateFormatter.formatDate(endDate!!)}"
+                binding.editTextEventDate.setText(dates)
             }
+
         }
     }
 

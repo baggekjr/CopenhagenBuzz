@@ -32,6 +32,7 @@ import com.google.firebase.storage.ktx.storage
 import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.astb.BUCKET_URL
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
+import dk.itu.moapd.copenhagenbuzz.astb.Utils.DateFormatter
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentEventBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.models.EventLocation
@@ -45,6 +46,8 @@ class EventFragment : Fragment() {
     private lateinit var storageReference: StorageReference
     private var photoName: String? = null
     private var photoUri: Uri? = null
+    private var startDate: Long? = null
+    private var endDate: Long? = null
 
     private val EVENTS = "events"
     private val BUZZ = "CopenhagenBuzz"
@@ -147,7 +150,16 @@ class EventFragment : Fragment() {
         val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker().setTitleText("Select dates").build()
         dateRangePicker.show(parentFragmentManager, "DatePicker")
         dateRangePicker.addOnPositiveButtonClickListener { datePicked ->
-            binding.editTextEventDate.setText(datePicked.first.toString())
+
+            startDate = datePicked.first
+            endDate = datePicked.second
+
+            //Make sure start and end dates are not null before setting text
+            if (startDate != null && endDate != null) {
+                val dates = "${DateFormatter.formatDate(startDate!!)} - ${DateFormatter.formatDate(endDate!!)}"
+                binding.editTextEventDate.setText(dates)
+            }
+
         }
     }
 
@@ -185,7 +197,8 @@ class EventFragment : Fragment() {
                             photoName,
                             eventName,
                             eventLocation,
-                            eventDate,
+                            startDate,
+                            endDate,
                             eventType,
                             eventDescription
                         )
@@ -239,55 +252,55 @@ class EventFragment : Fragment() {
         eventIcon: String?, // Image URI to upload
         eventName: String,
         eventLocation: EventLocation,
-        eventDate: String,
+        startDate: Long?,
+        endDate: Long?,
         eventType: String,
         eventDescription: String
     ) {
-        val eventDateLong = try {
+        /*val eventDateLong = try {
             eventDate.toLong()
         } catch (e: NumberFormatException) {
             Log.e(TAG, "Error parsing event date: ${e.message}")
             showMessage("Error parsing event date")
             return
-        }
-                        with(binding){
-                            storageReference.child(photoName!!)
-                                .putFile(photoUri!!)
-                                .addOnSuccessListener {
-                                    println("Photo uploaded successfully!")
+        }*/
+                        storageReference.child(photoName!!)
+                            .putFile(photoUri!!)
+                            .addOnSuccessListener {
+                                println("Photo uploaded successfully!")
 
-                        val newEvent = Event(
-                            userId,
-                            eventIcon,
-                            eventName,
-                            eventLocation,
-                            eventDateLong,
-                            eventType,
-                            eventDescription
-                        )
+                    val newEvent = Event(
+                        userId,
+                        eventIcon,
+                        eventName,
+                        eventLocation,
+                        startDate,
+                        endDate,
+                        eventType,
+                        eventDescription
+                    )
 
-                        // Save the event to Firebase Realtime Database
-                        userId.let { uid ->
-                            database.child(EVENTS)
-                                .child(uid)
-                                .push()
-                                .key?.let { eventKey ->
-                                    database.child(EVENTS)
-                                        .child(eventKey)
-                                        .setValue(newEvent)
-                                        .addOnSuccessListener {
-                                            showMessage("Saved event successfully")
-                                            clearInputFields()
-                                        }
-                                        .addOnFailureListener { exception ->
-                                            Log.e(TAG, "Error saving event: ${exception.message}")
-                                            showMessage("Failed to save event: ${exception.message}")
-                                        }
-                                }
-                        }
+                    // Save the event to Firebase Realtime Database
+                    userId.let { uid ->
+                        database.child(EVENTS)
+                            .child(uid)
+                            .push()
+                            .key?.let { eventKey ->
+                                database.child(EVENTS)
+                                    .child(eventKey)
+                                    .setValue(newEvent)
+                                    .addOnSuccessListener {
+                                        showMessage("Saved event successfully")
+                                        clearInputFields()
+                                    }
+                                    .addOnFailureListener { exception ->
+                                        Log.e(TAG, "Error saving event: ${exception.message}")
+                                        showMessage("Failed to save event: ${exception.message}")
+                                    }
+                            }
                     }
                 }
-                .addOnFailureListener { exception ->
+                            .addOnFailureListener { exception ->
                     Log.e(TAG, "Error uploading image: ${exception.message}")
                     showMessage("Failed to upload image: ${exception.message}")
                 }

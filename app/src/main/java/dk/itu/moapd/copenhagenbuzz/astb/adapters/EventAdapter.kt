@@ -16,12 +16,13 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.storage.storage
 import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.astb.BUCKET_URL
+import dk.itu.moapd.copenhagenbuzz.astb.Utils.DateFormatter
 import dk.itu.moapd.copenhagenbuzz.astb.R
-import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnDialogsClickListener
+import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnItemClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnFavoriteClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 
-class EventAdapter(private val fragmentManager: FragmentManager, private val context: Context, private val options: FirebaseListOptions<Event>, private val  onFavoriteClickListener: OnFavoriteClickListener, private val dialogsOnClickListener: OnDialogsClickListener) :
+class EventAdapter(private val fragmentManager: FragmentManager, private val context: Context, private val options: FirebaseListOptions<Event>, private val  onFavoriteClickListener: OnFavoriteClickListener, private val dialogsOnClickListener: OnItemClickListener) :
     FirebaseListAdapter<Event>(options) {
 
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -90,7 +91,15 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
             //eventIcon.setImageResource(R.drawable.baseline_map_24)
             eventName.text = event.eventName
             eventLocation.text = event.eventLocation?.address
-            eventDate.text = event.startDate.toString()
+
+            // Set the startDate and endDate to TextView objects
+            val startDateText =
+                event.startDate?.let { DateFormatter.formatDate(it) } ?: "Start Date Unavailable"
+            val endDateText =
+                event.endDate?.let { DateFormatter.formatDate(it) } ?: "End Date Unavailable"
+            startDate.text = startDateText
+            endDate.text = " - $endDateText"
+
             eventType.text = event.eventType
             eventDescription.text = event.eventDescription
             loadImageToView(event, eventIcon)
@@ -116,9 +125,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
 
 
             }
-
         }
-
     }
 
 
@@ -128,13 +135,12 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
         val eventIcon= view.findViewById<ImageView>(R.id.event_icon)
         val eventName= view.findViewById<TextView>(R.id.event_name)
         val eventLocation= view.findViewById<TextView>(R.id.event_location)
-        val eventDate = view.findViewById<TextView>(R.id.event_date)
+        val startDate = view.findViewById<TextView>(R.id.start_date)
+        val endDate = view.findViewById<TextView>(R.id.end_date)
         val eventType = view.findViewById<TextView>(R.id.event_type)
         val eventDescription = view.findViewById<TextView>(R.id.event_description)
         val editButton = view.findViewById<Button>(R.id.edit_button)
         val deleteButton = view.findViewById<Button>(R.id.delete_button)
-
-
     }
 
     private fun loadImageToView(event: Event, eventImage: ImageView) {
@@ -150,9 +156,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
                         .into(eventImage)
                 }
         }
-
     }
-
     fun getId(position: Int): DatabaseReference{
         return getRef(position)
     }

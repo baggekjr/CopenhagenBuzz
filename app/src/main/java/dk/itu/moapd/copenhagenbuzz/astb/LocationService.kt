@@ -13,6 +13,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import dk.itu.moapd.copenhagenbuzz.astb.Utils.SharedPreferenceUtil
 
 /**
  * A service class with several methods to manage the location service of Geolocation application.

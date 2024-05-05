@@ -1,10 +1,9 @@
-package dk.itu.moapd.copenhagenbuzz.astb
+package dk.itu.moapd.copenhagenbuzz.astb.Utils
 
 
 import android.content.Context
 import androidx.core.content.edit
-import java.text.SimpleDateFormat
-import java.util.Locale
+import dk.itu.moapd.copenhagenbuzz.astb.R
 
 
 /**
@@ -34,15 +33,5 @@ internal object SharedPreferenceUtil {
             context.getString(R.string.preference_file_key), Context.MODE_PRIVATE).edit {
             putBoolean(KEY_FOREGROUND_ENABLED, requestingLocationUpdates)
         }
-
-    /**
-     * Return the timestamp as a date `String`.
-     *
-     * @return A formatted date range string in the format "E, MMM dd yyyy - E, MMM dd yyyy".
-     */
-    fun Long.toSimpleDateFormat(): String {
-        val dateFormat = SimpleDateFormat("E, MMM dd yyyy hh:mm:ss a", Locale.US)
-        return dateFormat.format(this)
-    }
 
 }

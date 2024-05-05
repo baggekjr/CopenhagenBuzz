@@ -20,8 +20,6 @@ import android.content.ContentValues.TAG
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.MarkerOptions
@@ -31,7 +29,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
-import dk.itu.moapd.copenhagenbuzz.astb.SharedPreferenceUtil
+import dk.itu.moapd.copenhagenbuzz.astb.Utils.SharedPreferenceUtil
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 

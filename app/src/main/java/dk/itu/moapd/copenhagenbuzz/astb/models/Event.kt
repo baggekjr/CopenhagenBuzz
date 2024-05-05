@@ -14,6 +14,7 @@ data class Event(
     val eventName: String? = null,
     val eventLocation: EventLocation? = null,
     val startDate: Long? = null,
+    val endDate: Long? = null,
     val eventType: String? = null,
     var eventDescription: String? = null,
     //val favoritedBy: MutableList<String>? = null
