@@ -21,6 +21,7 @@ import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnDialogsClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnFavoriteClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class EventAdapter(private val fragmentManager: FragmentManager, private val context: Context, private val options: FirebaseListOptions<Event>, private val  onFavoriteClickListener: OnFavoriteClickListener, private val dialogsOnClickListener: OnDialogsClickListener) :
@@ -93,8 +94,8 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
             //eventIcon.setImageResource(R.drawable.baseline_map_24)
             eventName.text = event.eventName
             eventLocation.text = event.eventLocation?.address
-            startDate.text = dateFormatter.format(event.startDate)
-            endDate.text = dateFormatter.format(event.endDate)
+            startDate.text = dateFormatter.format(Date(event.startDate!!))
+            endDate.text = dateFormatter.format(Date(event.endDate!!))
             eventType.text = event.eventType
             eventDescription.text = event.eventDescription
             loadImageToView(event, eventIcon)
@@ -118,9 +119,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
 
                 }
             }
-
         }
-
     }
 
 
@@ -136,8 +135,6 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
         val eventDescription = view.findViewById<TextView>(R.id.event_description)
         val editButton = view.findViewById<Button>(R.id.edit_button)
         val deleteButton = view.findViewById<Button>(R.id.delete_button)
-
-
     }
 
     private fun loadImageToView(event: Event, eventImage: ImageView) {
@@ -153,9 +150,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
                         .into(eventImage)
                 }
         }
-
     }
-
     fun getId(position: Int): DatabaseReference{
         return getRef(position)
     }
