@@ -41,11 +41,9 @@ import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.models.EventLocation
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 import java.io.File
-import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.Properties
 import java.util.UUID
 
 
@@ -76,6 +74,8 @@ class UpdateEventDialogFragment(private val event: Event,
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         super.onCreateDialog(savedInstanceState)
         _binding = FragmentUpdateEventBinding.inflate(layoutInflater)
+        //binding.editTextName.setText(dummy.name)
+        //auth = FirebaseAuth.getInstance()
         database = Firebase.database(DATABASE_URL).reference.child(BUZZ)
 
 
@@ -83,14 +83,22 @@ class UpdateEventDialogFragment(private val event: Event,
             handleEventButtonOnClick()
             dialog.dismiss()
         }
+        var dates = ""
+
+        // Check if event's start and end dates are not null
+        event.startDate?.let { startDate ->
+            event.endDate?.let { endDate ->
+                // If both start and end dates are not null, format the dates
+                dates = "${dateFormatter.format(startDate)} - ${dateFormatter.format(endDate)}"
+            }
+        }
 
         binding.apply {
             editTextEventName.setText(event.eventName)
             editTextEventLocation.setText(event.eventLocation?.address)
             editTextEventDescription.setText(event.eventDescription)
             editTextEventType.setText(event.eventType)
-
-            //Check if either start or end date is null:
+            //Check if eithre start or end date is null:
             val formattedStartDate = startDate?.let { dateFormatter.format(Date(it)) } ?: ""
             val formattedEndDate = endDate?.let { dateFormatter.format(Date(it)) } ?: ""
             val formattedDates = "$formattedStartDate - $formattedEndDate"
@@ -134,13 +142,6 @@ class UpdateEventDialogFragment(private val event: Event,
         }.create()
     }
 
-    private fun readApiKey(): String {
-        val properties = Properties()
-        val propertiesFile = File(requireContext().filesDir, "local.properties")
-        properties.load(FileInputStream(propertiesFile))
-        return properties.getProperty("geocode_api_key")
-    }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -158,18 +159,29 @@ class UpdateEventDialogFragment(private val event: Event,
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         photoName = "IMG_${UUID.randomUUID()}.JPG"
         val photoFile = File(requireContext().applicationContext.filesDir, photoName)
-        photoUri = FileProvider.getUriForFile(requireContext(), "dk.itu.moapd.copenhagenbuzz.astb.fileprovider", photoFile)
+        photoUri = FileProvider.getUriForFile(
+            requireContext(),
+            "dk.itu.moapd.copenhagenbuzz.astb.fileprovider",
+            photoFile
+        )
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
         takePhoto.launch(cameraIntent)
     }
 
 
-
     private val takePhoto = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult())
-    { result ->
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
+            // Update the photo name immediately
+            photoName = "IMG_${UUID.randomUUID()}.JPG"
+            // Update the event with the new photo name
+            updatedEvent = Event(
+                // Update other event properties here
+                eventIcon = photoName,
+                // Update other event properties here
+            )
         }
     }
 
@@ -177,38 +189,46 @@ class UpdateEventDialogFragment(private val event: Event,
         ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         if (uri != null) {
+            showMessage("Photo selected!")
             photoUri = uri
             photoName = "IMG_${UUID.randomUUID()}.JPG"
-
+            // Show the user a preview of the photo they just selected
             Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
+            // Update the event with the new photo name
+            updatedEvent = Event(
+                // Update other event properties here
+                eventIcon = photoName,
+                // Update other event properties here
+            )
         } else {
             showMessage("PhotoPicker: No media selected")
         }
     }
 
 
-
     private fun handlePhotoLibraryButtonOnClick() {
-            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+
+        pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+
     }
 
 
     private fun handleEventButtonOnClick() {
-        try{
+        try {
             val eventName = binding.editTextEventName.text.toString().trim()
-        val eventLocationStr = binding.editTextEventLocation.text.toString()
-            .replace(' ', '+')
-        val eventDate = binding.editTextEventDate.text.toString().trim()
+            val eventLocationStr = binding.editTextEventLocation.text.toString()
+                .replace(' ', '+')
+            val eventDate = binding.editTextEventDate.text.toString().trim()
             val eventType = binding.editTextEventType.text.toString().trim()
             val eventDescription = binding.editTextEventDescription.text.toString().trim()
 
             // Validate user inputs
             validateInputs(eventName, eventLocationStr, eventDate, eventType, eventDescription)
 
-            val apiKey  = readApiKey()
+            val key: String = "6630a5d972d20365148401gdsd0bcd5"
 
             val url =
-                "https://geocode.maps.co/search?q=${eventLocationStr}+Copenhagen&api_key=${apiKey}"
+                "https://geocode.maps.co/search?q=${eventLocationStr}+Copenhagen&api_key=${key}"
 
             val queue = Volley.newRequestQueue(activity?.applicationContext)
 
@@ -270,21 +290,18 @@ class UpdateEventDialogFragment(private val event: Event,
                         }
 
 
-
-                }catch(e: Exception){
-                    showMessage( "Address not valid. Try again with an address in Copenhagen.")
+                } catch (e: Exception) {
+                    showMessage("Address not valid. Try again updating your event again with an address in Copenhagen.")
                 }
-                }, { error ->
+            }, { error ->
                 handleFailureVolley(error)
             })
             queue.add(request)
 
         } catch (e: IllegalStateException) {
-            // Handle the IllegalStateException here
             Log.e(TAG, "IllegalStateException: ${e.message}")
-            // You can show an error message to the user or handle it in any other appropriate way
+            showMessage("Oops! Something unexpected happened while updating your event. Please try again.")
         } catch (e: Exception) {
-            // Handle other exceptions here if needed
             Log.e(TAG, "Exception: ${e.message}")
         }
 
@@ -312,13 +329,13 @@ class UpdateEventDialogFragment(private val event: Event,
     }
 
     private fun setupDatePicker() {
-                with(binding.editTextEventDate) {
-                    keyListener = null
-                    setOnFocusChangeListener { _, infocus ->
-                        if (infocus) handleDateOnClick()
-                    }
-                }
+        with(binding.editTextEventDate) {
+            keyListener = null
+            setOnFocusChangeListener { _, infocus ->
+                if (infocus) handleDateOnClick()
             }
+        }
+    }
 
     private fun handleDateOnClick() {
         val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker().setTitleText("Select dates").build()
