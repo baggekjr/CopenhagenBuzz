@@ -260,12 +260,12 @@ class UpdateEventDialogFragment(private val event: Event,
                         storageReference.child(photoName!!)
                             .putFile(photoUri!!)
                             .addOnSuccessListener {
-                                println("Photo uploaded successfully!")
+                                Log.d(TAG, "Photo uploaded successfully!")
                                 //Makes picture get updated without having to reload page
                                 adapter.notifyDataSetChanged()
 
                             }.addOnFailureListener {
-                                println("Photo upload failed with exception: $it")
+                                Log.e(TAG, "Photo upload with exception: $it")
                                 handleFailure(it)
                             }
 
@@ -355,7 +355,9 @@ class UpdateEventDialogFragment(private val event: Event,
     }
 
     private fun handleFailureVolley(error: VolleyError?) {
-        showMessage("VolleyError")
+        Log.e(TAG,"VolleyError: $error")
+        showMessage("Oops! Something went wrong with the network. Please try again later.")
+
     }
 
     private fun checkCameraPermission(): Boolean {
@@ -371,7 +373,7 @@ class UpdateEventDialogFragment(private val event: Event,
     }
 
     private fun handleFailure(exception: Exception) {
-        println("Database save failure with following exception: $exception")
+        Log.e(TAG, "Database save failure with following exception: $exception")
 
     }
 

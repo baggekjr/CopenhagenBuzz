@@ -181,7 +181,7 @@ class EventFragment : Fragment() {
             val userId = auth.currentUser?.uid
             userId?.let {
                 // Geocode the event location
-                val apiKey  = readApiKey()
+                val apiKey  = "6630a5d972d20365148401gdsd0bcd5"
                 val url =
                     "https://geocode.maps.co/search?q=$eventLocationStr+Copenhagen&api_key=$apiKey"
 
