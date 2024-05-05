@@ -154,7 +154,7 @@ class EventFragment : Fragment() {
             startDate = datePicked.first
             endDate = datePicked.second
 
-            //Make sure start and end dates are not null before setting text
+            //Check if either start or end date is null:
             if (startDate != null && endDate != null) {
                 val dates = "${DateFormatter.formatDate(startDate!!)} - ${DateFormatter.formatDate(endDate!!)}"
                 binding.editTextEventDate.setText(dates)

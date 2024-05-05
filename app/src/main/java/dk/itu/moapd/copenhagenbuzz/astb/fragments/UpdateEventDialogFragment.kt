@@ -33,9 +33,9 @@ import com.google.firebase.storage.ktx.storage
 import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.astb.BUCKET_URL
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
-import dk.itu.moapd.copenhagenbuzz.astb.Utils.DateFormatter
 import dk.itu.moapd.copenhagenbuzz.astb.GeocodingHelper
 import dk.itu.moapd.copenhagenbuzz.astb.R
+import dk.itu.moapd.copenhagenbuzz.astb.Utils.DateFormatter
 import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentUpdateEventBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
@@ -100,7 +100,8 @@ class UpdateEventDialogFragment(private val event: Event,
             editTextEventLocation.setText(event.eventLocation?.address)
             editTextEventDescription.setText(event.eventDescription)
             editTextEventType.setText(event.eventType)
-            //Check if eithre start or end date is null:
+
+            //Check if either start or end date is null:
             val formattedStartDate = startDate?.let { dateFormatter.format(Date(it)) } ?: ""
             val formattedEndDate = endDate?.let { dateFormatter.format(Date(it)) } ?: ""
             val formattedDates = "$formattedStartDate - $formattedEndDate"
