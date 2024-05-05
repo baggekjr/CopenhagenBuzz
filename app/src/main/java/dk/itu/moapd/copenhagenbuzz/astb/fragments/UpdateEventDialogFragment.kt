@@ -62,8 +62,8 @@ class UpdateEventDialogFragment(private val event: Event,
     private var photoName: String? = null
     private var photoUri: Uri? = null
     private val BUZZ = "CopenhagenBuzz"
-    private var startDate: Long? = null
-    private var endDate: Long? = null
+    private var startDate: Long? = event.startDate
+    private var endDate: Long? = event.endDate
     private val dateFormatter = SimpleDateFormat("EEE dd/MM/yyyy", Locale.ENGLISH)
 
 
