@@ -32,12 +32,11 @@ import com.google.firebase.storage.ktx.storage
 import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.astb.BUCKET_URL
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
+import dk.itu.moapd.copenhagenbuzz.astb.Utils.DateFormatter
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentEventBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.models.EventLocation
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Locale
 import java.util.UUID
 
 class EventFragment : Fragment() {
@@ -49,8 +48,6 @@ class EventFragment : Fragment() {
     private var photoUri: Uri? = null
     private var startDate: Long? = null
     private var endDate: Long? = null
-    private val dateFormatter = SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH)
-
 
     private val EVENTS = "events"
     private val BUZZ = "CopenhagenBuzz"
@@ -157,9 +154,11 @@ class EventFragment : Fragment() {
             startDate = datePicked.first
             endDate = datePicked.second
 
-            val dates =
-                "${dateFormatter.format(startDate)} - ${dateFormatter.format(endDate)}"
-            binding.editTextEventDate.setText(dates)
+            //Make sure start and end dates are not null before setting text
+            if (startDate != null && endDate != null) {
+                val dates = "${DateFormatter.formatDate(startDate!!)} - ${DateFormatter.formatDate(endDate!!)}"
+                binding.editTextEventDate.setText(dates)
+            }
 
         }
     }

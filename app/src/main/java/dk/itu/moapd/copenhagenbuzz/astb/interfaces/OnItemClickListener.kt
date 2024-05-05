@@ -1,18 +1,21 @@
-package dk.itu.moapd.copenhagenbuzz.astb
+package dk.itu.moapd.copenhagenbuzz.astb.interfaces
 
-import com.google.firebase.database.DatabaseReference
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 
 /**
  * An interface to implement listener methods for ListView items.
  */
+
 interface OnItemClickListener {
 
     /**
      * Implement this method to be executed when the user clicks an item in the ListView.
      *
-     * @param event An instance of `Dummy` class.
+     * @param event An instance of `Event` class.
      * @param position The selected position in the ListView.
      */
-    fun onItemClickListener(event: Event, position: Int, id: DatabaseReference)
+    fun onDeleteEvent(event: Event, position: Int)
+
+    fun onEditEvent(event: Event, position: Int)
 }
+

@@ -16,15 +16,13 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.storage.storage
 import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.astb.BUCKET_URL
+import dk.itu.moapd.copenhagenbuzz.astb.Utils.DateFormatter
 import dk.itu.moapd.copenhagenbuzz.astb.R
-import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnDialogsClickListener
+import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnItemClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnFavoriteClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
-class EventAdapter(private val fragmentManager: FragmentManager, private val context: Context, private val options: FirebaseListOptions<Event>, private val  onFavoriteClickListener: OnFavoriteClickListener, private val dialogsOnClickListener: OnDialogsClickListener) :
+class EventAdapter(private val fragmentManager: FragmentManager, private val context: Context, private val options: FirebaseListOptions<Event>, private val  onFavoriteClickListener: OnFavoriteClickListener, private val dialogsOnClickListener: OnItemClickListener) :
     FirebaseListAdapter<Event>(options) {
 
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -88,14 +86,19 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
         }
     }
     private fun bindEvent(viewHolder: ViewHolder, event: Event) {
-        val dateFormatter = SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH)
-
         with(viewHolder){
             //eventIcon.setImageResource(R.drawable.baseline_map_24)
             eventName.text = event.eventName
             eventLocation.text = event.eventLocation?.address
-            startDate.text = dateFormatter.format(Date(event.startDate!!))
-            endDate.text = dateFormatter.format(Date(event.endDate!!))
+
+            // Set the startDate and endDate to TextView objects
+            val startDateText =
+                event.startDate?.let { DateFormatter.formatDate(it) } ?: "Start Date Unavailable"
+            val endDateText =
+                event.endDate?.let { DateFormatter.formatDate(it) } ?: "End Date Unavailable"
+            startDate.text = startDateText
+            endDate.text = " - $endDateText"
+
             eventType.text = event.eventType
             eventDescription.text = event.eventDescription
             loadImageToView(event, eventIcon)

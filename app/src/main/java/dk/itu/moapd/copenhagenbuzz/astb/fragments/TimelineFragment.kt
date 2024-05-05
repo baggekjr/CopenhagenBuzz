@@ -22,7 +22,7 @@ import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentTimelineBinding
-import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnDialogsClickListener
+import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnItemClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnFavoriteClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
@@ -33,7 +33,7 @@ import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
  * Use the [TimelineFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class TimelineFragment : Fragment(), OnFavoriteClickListener, OnDialogsClickListener {
+class TimelineFragment : Fragment(), OnFavoriteClickListener, OnItemClickListener {
 
     private var _binding: FragmentTimelineBinding? = null
     private val dataViewModel: DataViewModel by activityViewModels()
