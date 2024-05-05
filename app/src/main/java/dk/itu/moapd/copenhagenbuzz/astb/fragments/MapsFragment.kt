@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
-import dk.itu.moapd.copenhagenbuzz.astb.LocationService
+import dk.itu.moapd.copenhagenbuzz.astb.Utils.LocationService
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentMapsBinding
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import android.Manifest.permission

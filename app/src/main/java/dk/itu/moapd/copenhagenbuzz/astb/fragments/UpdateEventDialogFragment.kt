@@ -33,7 +33,6 @@ import com.google.firebase.storage.ktx.storage
 import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.astb.BUCKET_URL
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
-import dk.itu.moapd.copenhagenbuzz.astb.GeocodingHelper
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.Utils.DateFormatter
 import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
@@ -57,7 +56,6 @@ class UpdateEventDialogFragment(private val event: Event,
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
     private lateinit var database: DatabaseReference
     private val dataViewModel: DataViewModel by viewModels()
-    private lateinit var geocodingHelper: GeocodingHelper
     private lateinit var updatedEvent: Event
     private var eventLocation: EventLocation? = event.eventLocation
     private val storageReference = Firebase.storage(BUCKET_URL).reference
