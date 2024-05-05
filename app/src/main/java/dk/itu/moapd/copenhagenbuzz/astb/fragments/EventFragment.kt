@@ -257,13 +257,6 @@ class EventFragment : Fragment() {
         eventType: String,
         eventDescription: String
     ) {
-        /*val eventDateLong = try {
-            eventDate.toLong()
-        } catch (e: NumberFormatException) {
-            Log.e(TAG, "Error parsing event date: ${e.message}")
-            showMessage("Error parsing event date")
-            return
-        }*/
                         storageReference.child(photoName!!)
                             .putFile(photoUri!!)
                             .addOnSuccessListener {
