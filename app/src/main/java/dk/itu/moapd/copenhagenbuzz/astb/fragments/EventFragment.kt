@@ -37,6 +37,8 @@ import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentEventBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.models.EventLocation
 import java.io.File
+import java.io.FileInputStream
+import java.util.Properties
 import java.util.UUID
 
 class EventFragment : Fragment() {
@@ -51,11 +53,11 @@ class EventFragment : Fragment() {
 
     private val EVENTS = "events"
     private val BUZZ = "CopenhagenBuzz"
-    companion object {
-        private const val CAMERA_REQUEST_CODE = 1888
-    }
 
-    private val binding get() = _binding!!
+    private val binding
+        get() = requireNotNull(_binding) {
+            "Cannot access binding because it is null. Is the view visible?"
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -68,6 +70,14 @@ class EventFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         init()
         setListeners()
+
+    }
+
+    private fun readApiKey(): String {
+        val properties = Properties()
+        val propertiesFile = File(requireContext().filesDir, "local.properties")
+        properties.load(FileInputStream(propertiesFile))
+        return properties.getProperty("geocode_api_key")
     }
 
     private fun init() {
@@ -119,14 +129,11 @@ class EventFragment : Fragment() {
 
     private val pickMedia = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
-    ) { uri -> // Callback is invoked after the user selects a media item or closes the photo picker.
+    ) { uri ->
         if (uri != null) {
-            showMessage("Photo selected!")
-
             photoUri = uri
             photoName = "IMG_${UUID.randomUUID()}.JPG"
 
-            // Show the user a preview of the photo they just selected
             Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
         } else {
             showMessage("PhotoPicker: No media selected")
@@ -174,9 +181,9 @@ class EventFragment : Fragment() {
             val userId = auth.currentUser?.uid
             userId?.let {
                 // Geocode the event location
-                val key: String = "6630a5d972d20365148401gdsd0bcd5"
+                val apiKey  = readApiKey()
                 val url =
-                    "https://geocode.maps.co/search?q=$eventLocationStr+Copenhagen&api_key=$key"
+                    "https://geocode.maps.co/search?q=$eventLocationStr+Copenhagen&api_key=$apiKey"
 
                 val queue = Volley.newRequestQueue(requireContext())
 

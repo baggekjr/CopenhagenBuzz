@@ -42,9 +42,11 @@ import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.models.EventLocation
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 import java.io.File
+import java.io.FileInputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.Properties
 import java.util.UUID
 
 
@@ -76,23 +78,12 @@ class UpdateEventDialogFragment(private val event: Event,
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         super.onCreateDialog(savedInstanceState)
         _binding = FragmentUpdateEventBinding.inflate(layoutInflater)
-        //binding.editTextName.setText(dummy.name)
-        //auth = FirebaseAuth.getInstance()
         database = Firebase.database(DATABASE_URL).reference.child(BUZZ)
 
 
         val onPositiveButtonClick: (DialogInterface, Int) -> Unit = { dialog, _ ->
             handleEventButtonOnClick()
             dialog.dismiss()
-        }
-        var dates = ""
-
-        // Check if event's start and end dates are not null
-        event.startDate?.let { startDate ->
-            event.endDate?.let { endDate ->
-                // If both start and end dates are not null, format the dates
-                dates = "${dateFormatter.format(startDate)} - ${dateFormatter.format(endDate)}"
-            }
         }
 
         binding.apply {
@@ -145,6 +136,13 @@ class UpdateEventDialogFragment(private val event: Event,
         }.create()
     }
 
+    private fun readApiKey(): String {
+        val properties = Properties()
+        val propertiesFile = File(requireContext().filesDir, "local.properties")
+        properties.load(FileInputStream(propertiesFile))
+        return properties.getProperty("geocode_api_key")
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -179,14 +177,11 @@ class UpdateEventDialogFragment(private val event: Event,
 
     private val pickMedia = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
-    ) { uri -> // Callback is invoked after the user selects a media item or closes the photo picker.
+    ) { uri ->
         if (uri != null) {
-            showMessage("Photo selected!")
-
             photoUri = uri
             photoName = "IMG_${UUID.randomUUID()}.JPG"
 
-            // Show the user a preview of the photo they just selected
             Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
         } else {
             showMessage("PhotoPicker: No media selected")
@@ -196,9 +191,7 @@ class UpdateEventDialogFragment(private val event: Event,
 
 
     private fun handlePhotoLibraryButtonOnClick() {
-
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-
     }
 
 
@@ -214,10 +207,10 @@ class UpdateEventDialogFragment(private val event: Event,
             // Validate user inputs
             validateInputs(eventName, eventLocationStr, eventDate, eventType, eventDescription)
 
-            val key: String = "6630a5d972d20365148401gdsd0bcd5"
+            val apiKey  = readApiKey()
 
             val url =
-                "https://geocode.maps.co/search?q=${eventLocationStr}+Copenhagen&api_key=${key}"
+                "https://geocode.maps.co/search?q=${eventLocationStr}+Copenhagen&api_key=${apiKey}"
 
             val queue = Volley.newRequestQueue(activity?.applicationContext)
 
