@@ -291,7 +291,7 @@ class UpdateEventDialogFragment(private val event: Event,
 
 
                 } catch (e: Exception) {
-                    showMessage("Address not valid. Try again updating your event again with an address in Copenhagen.")
+                    showMessage("Address not valid. Try updating your again event again with an address in Copenhagen.")
                 }
             }, { error ->
                 handleFailureVolley(error)
