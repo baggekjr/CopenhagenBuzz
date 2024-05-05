@@ -29,12 +29,11 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
-import dk.itu.moapd.copenhagenbuzz.astb.Utils.SharedPreferenceUtil
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 
 
-class MapsFragment : Fragment(),  SharedPreferences.OnSharedPreferenceChangeListener{
+class MapsFragment : Fragment(){
 
     private var isFirstMove = true
 
@@ -158,7 +157,7 @@ class MapsFragment : Fragment(),  SharedPreferences.OnSharedPreferenceChangeList
         )
 
         // Check if the service is a foreground service, and if not, subscribe to location updates
-        if (locationServiceBound && !SharedPreferenceUtil.getLocationTrackingPref(requireContext())) {
+        if (locationServiceBound) {
             if (checkPermission()) {
                 locationService?.subscribeToLocationUpdates()
             } else {
@@ -177,16 +176,13 @@ class MapsFragment : Fragment(),  SharedPreferences.OnSharedPreferenceChangeList
             LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(locationBroadcastReceiver)
 
             // Unsubscribe from location updates if the service is no longer a foreground service
-            if (!SharedPreferenceUtil.getLocationTrackingPref(requireContext())) {
-                locationService.unsubscribeToLocationUpdates()
-            }
+            locationService.unsubscribeToLocationUpdates()
         }
     }
 
 
     override fun onStart() {
         super.onStart()
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this)
         Intent(requireContext(), LocationService::class.java).let { serviceIntent ->
             requireActivity().bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
         }
@@ -194,10 +190,6 @@ class MapsFragment : Fragment(),  SharedPreferences.OnSharedPreferenceChangeList
             locationBroadcastReceiver,
             IntentFilter(LocationService.ACTION_FOREGROUND_ONLY_LOCATION_BROADCAST)
         )
-        sharedPreferences.getBoolean(SharedPreferenceUtil.KEY_FOREGROUND_ENABLED, false)
-
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this)
-
     }
 
     override fun onStop() {
@@ -205,7 +197,6 @@ class MapsFragment : Fragment(),  SharedPreferences.OnSharedPreferenceChangeList
             requireActivity().unbindService(serviceConnection)
             locationServiceBound = false
         }
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
         LocalBroadcastManager.getInstance(requireContext()).unregisterReceiver(locationBroadcastReceiver)
 
         super.onStop()
@@ -240,9 +231,6 @@ class MapsFragment : Fragment(),  SharedPreferences.OnSharedPreferenceChangeList
 
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
-        // No need for any action here since there is no start/stop button
-    }
 
     private fun checkPermission() =
         ActivityCompat.checkSelfPermission(
