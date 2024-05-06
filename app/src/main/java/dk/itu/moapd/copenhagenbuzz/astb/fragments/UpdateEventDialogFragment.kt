@@ -270,7 +270,7 @@ class UpdateEventDialogFragment(private val event: Event,
                         eventDescription = eventDescription
                     )
 
-                    //TODO: MAYBE ALSO MOVE IT TO THE DATAVIEWMODEL
+                    /*//TODO: MAYBE ALSO MOVE IT TO THE DATAVIEWMODEL
                     if (photoName != event.eventIcon) {
                         storageReference.child(photoName!!)
                             .putFile(photoUri!!)
@@ -292,10 +292,11 @@ class UpdateEventDialogFragment(private val event: Event,
                                 handleFailure(ex)
                             }
                     }
-
+*/
 
                     // Call the updateEvent method in DataViewModel
-                    dataViewModel.updateEvent(adapter.getId(position), updatedEvent)
+                    dataViewModel.updateEvent(adapter.getId(position), updatedEvent, photoUri, photoName, event.eventIcon, adapter)
+                    adapter.notifyDataSetChanged()
 
 
                 } catch (e: Exception) {

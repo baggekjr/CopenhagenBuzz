@@ -1,6 +1,7 @@
 package dk.itu.moapd.copenhagenbuzz.astb.viewmodels
 
 import android.content.ContentValues.TAG
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,7 +15,10 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
+import dk.itu.moapd.copenhagenbuzz.astb.BUCKET_URL
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
+import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import kotlinx.coroutines.launch
 
@@ -22,6 +26,7 @@ class DataViewModel : ViewModel() {
 
     private val databaseReference = FirebaseDatabase.getInstance().getReference("events")
     private val FAVORITES = "favorites"
+    private val storageReference = Firebase.storage(BUCKET_URL).reference
 
 
     private var auth = FirebaseAuth.getInstance()
@@ -208,24 +213,66 @@ class DataViewModel : ViewModel() {
 
     }
 
-    fun updateEvent(ref: DatabaseReference, updatedEvent: Event) {
+    /**
+     * Method to update the selected event.
+     *
+     * @param ref takes the reference to the event that is being updated
+     * @param updatedEvent The updated event. Picture is not handled here but directly in the fragment.
+     */
+
+    fun updateEvent(ref: DatabaseReference, updatedEvent: Event, updatedPhotoUri: Uri?, updatedPhotoName: String?, oldPhotoName: String?, adapter: EventAdapter) {
         viewModelScope.launch {
             auth.currentUser?.uid?.let { userId ->
                 ref.key?.let { eventKey ->
-                    database.child("events").child(eventKey).setValue(updatedEvent)
-                        .addOnSuccessListener {
-                            Log.d(TAG, "Event updated successfully")
+                    // Check if the photo has been updated
+                    Log.e(TAG, "$oldPhotoName = ${updatedEvent.eventIcon} er de det samme")
+                    if (updatedPhotoUri != null && updatedPhotoName != null && oldPhotoName != updatedEvent.eventIcon) {
+                        storageReference.child(updatedPhotoName)
+                            .putFile(updatedPhotoUri)
+                            .addOnSuccessListener {
+                                Log.d(TAG, "Photo uploaded successfully!")
+                                adapter.notifyDataSetChanged()
+                            }
+                            .addOnFailureListener { ex ->
+                                Log.e(TAG, "Photo upload with exception: $ex")
+                                // Handle failure
+                            }
+
+                        // Delete the old photo if it exists
+                        updatedEvent.eventIcon?.let {storageReference.child(oldPhotoName!!).delete()
+                                .addOnSuccessListener {
+                                    Log.d(TAG, "Successfully deleted old photo!")
+                                    // After photo deletion, update the event data
+                                    updateEventData(eventKey, updatedEvent, adapter)
+                                }
+                                .addOnFailureListener { ex ->
+                                    Log.e(TAG, "Failed to delete old photo: $ex")
+                                    // Handle failure
+                                    // Even if there's a failure, we should still attempt to update the event data
+                                    updateEventData(eventKey, updatedEvent, adapter)
+                                }
                         }
-                        .addOnFailureListener { exception ->
-                            Log.e(TAG, "Failed to update event", exception)
-                        }
+                    } else {
+                        // If the photo hasn't been updated, just update the event data
+                        updateEventData(eventKey, updatedEvent, adapter)
+                    }
                 }
             }
         }
     }
 
+    private fun updateEventData(eventKey: String, updatedEvent: Event, adapter: EventAdapter) {
+        // Update event data
+        database.child("events").child(eventKey).setValue(updatedEvent)
+            .addOnSuccessListener {
+                Log.d(TAG, "Event updated successfully")
+                adapter.notifyDataSetChanged() // Notify adapter
 
-
+            }
+            .addOnFailureListener { exception ->
+                Log.e(TAG, "Failed to update event", exception)
+            }
+    }
 
 }
 
