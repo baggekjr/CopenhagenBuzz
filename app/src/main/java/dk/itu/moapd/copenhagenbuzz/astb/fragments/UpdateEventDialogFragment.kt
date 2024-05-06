@@ -163,7 +163,7 @@ class UpdateEventDialogFragment(private val event: Event,
             "dk.itu.moapd.copenhagenbuzz.astb.fileprovider",
             photoFile
         )
-        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri!!)
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
         takePhoto.launch(cameraIntent)
     }
 
