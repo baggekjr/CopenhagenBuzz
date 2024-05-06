@@ -37,8 +37,6 @@ import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentEventBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.models.EventLocation
 import java.io.File
-import java.io.FileInputStream
-import java.util.Properties
 import java.util.UUID
 
 class EventFragment : Fragment() {
@@ -53,15 +51,11 @@ class EventFragment : Fragment() {
 
     private val EVENTS = "events"
     private val BUZZ = "CopenhagenBuzz"
-
-    private val binding
-        get() = requireNotNull(_binding) {
-            "Cannot access binding because it is null. Is the view visible?"
-        }
-
     companion object {
-        private const val PHOTO_URI_KEY = "photo_uri"
+        private const val CAMERA_REQUEST_CODE = 1888
     }
+
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -70,28 +64,10 @@ class EventFragment : Fragment() {
         _binding = this
     }.root
 
-    //Make it save picture even when phone is turned
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        photoUri?.let { outState.putString(PHOTO_URI_KEY, it.toString()) }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
         setListeners()
-        savedInstanceState?.getString(PHOTO_URI_KEY)?.let { uriString ->
-            photoUri = Uri.parse(uriString)
-            photoUri?.let { Picasso.get().load(it).into(binding.eventPhotoPreview) }
-        }
-
-    }
-
-    private fun readApiKey(): String {
-        val properties = Properties()
-        val propertiesFile = File(requireContext().filesDir, "local.properties")
-        properties.load(FileInputStream(propertiesFile))
-        return properties.getProperty("geocode_api_key")
     }
 
     private fun init() {
@@ -143,11 +119,14 @@ class EventFragment : Fragment() {
 
     private val pickMedia = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
-    ) { uri ->
+    ) { uri -> // Callback is invoked after the user selects a media item or closes the photo picker.
         if (uri != null) {
+            showMessage("Photo selected!")
+
             photoUri = uri
             photoName = "IMG_${UUID.randomUUID()}.JPG"
 
+            // Show the user a preview of the photo they just selected
             Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
         } else {
             showMessage("PhotoPicker: No media selected")
@@ -175,7 +154,7 @@ class EventFragment : Fragment() {
             startDate = datePicked.first
             endDate = datePicked.second
 
-            //Check if either start or end date is null:
+            //Make sure start and end dates are not null before setting text
             if (startDate != null && endDate != null) {
                 val dates = "${DateFormatter.formatDate(startDate!!)} - ${DateFormatter.formatDate(endDate!!)}"
                 binding.editTextEventDate.setText(dates)
@@ -195,9 +174,9 @@ class EventFragment : Fragment() {
             val userId = auth.currentUser?.uid
             userId?.let {
                 // Geocode the event location
-                val apiKey  = "6630a5d972d20365148401gdsd0bcd5"
+                val key: String = "6630a5d972d20365148401gdsd0bcd5"
                 val url =
-                    "https://geocode.maps.co/search?q=$eventLocationStr+Copenhagen&api_key=$apiKey"
+                    "https://geocode.maps.co/search?q=$eventLocationStr+Copenhagen&api_key=$key"
 
                 val queue = Volley.newRequestQueue(requireContext())
 
@@ -240,7 +219,7 @@ class EventFragment : Fragment() {
     }
     private fun handleFailureVolley(error: VolleyError?) {
         Log.e(TAG, "error {$error.message}")
-        showMessage("Oops! Something went wrong with the network. Please try again later.")
+        //TODO: WHAT KIND OF ERRORMESSAGE TO THE USER??
     }
 
     private fun formatAddress(address: String) : String{
@@ -278,48 +257,54 @@ class EventFragment : Fragment() {
         eventType: String,
         eventDescription: String
     ) {
-                        storageReference.child(photoName!!)
-                            .putFile(photoUri!!)
-                            .addOnSuccessListener {
-                                Log.d(TAG, "Photo uploaded successfully!")
+        /*val eventDateLong = try {
+            eventDate.toLong()
+        } catch (e: NumberFormatException) {
+            Log.e(TAG, "Error parsing event date: ${e.message}")
+            showMessage("Error parsing event date")
+            return
+        }*/
+        storageReference.child(photoName!!)
+            .putFile(photoUri!!)
+            .addOnSuccessListener {
+                println("Photo uploaded successfully!")
 
-                    val newEvent = Event(
-                        userId,
-                        eventIcon,
-                        eventName,
-                        eventLocation,
-                        startDate,
-                        endDate,
-                        eventType,
-                        eventDescription
-                    )
+                val newEvent = Event(
+                    userId,
+                    eventIcon,
+                    eventName,
+                    eventLocation,
+                    startDate,
+                    endDate,
+                    eventType,
+                    eventDescription
+                )
 
-                    // Save the event to Firebase Realtime Database
-                    userId.let { uid ->
-                        database.child(EVENTS)
-                            .child(uid)
-                            .push()
-                            .key?.let { eventKey ->
-                                database.child(EVENTS)
-                                    .child(eventKey)
-                                    .setValue(newEvent)
-                                    .addOnSuccessListener {
-                                        showMessage("Saved event successfully")
-                                        clearInputFields()
-                                    }
-                                    .addOnFailureListener { exception ->
-                                        Log.e(TAG, "Error saving event: ${exception.message}")
-                                        showMessage("Failed to save event. Please try again later.")
-                                    }
-                            }
-                    }
+                // Save the event to Firebase Realtime Database
+                userId.let { uid ->
+                    database.child(EVENTS)
+                        .child(uid)
+                        .push()
+                        .key?.let { eventKey ->
+                            database.child(EVENTS)
+                                .child(eventKey)
+                                .setValue(newEvent)
+                                .addOnSuccessListener {
+                                    showMessage("Saved event successfully")
+                                    clearInputFields()
+                                }
+                                .addOnFailureListener { exception ->
+                                    Log.e(TAG, "Error saving event: ${exception.message}")
+                                    showMessage("Failed to save event: ${exception.message}")
+                                }
+                        }
                 }
-                            .addOnFailureListener { exception ->
-                    Log.e(TAG, "Error uploading image: ${exception.message}")
-                    showMessage("Failed to upload image. Please try again later.")
-                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e(TAG, "Error uploading image: ${exception.message}")
+                showMessage("Failed to upload image: ${exception.message}")
+            }
     }
-
     private fun clearInputFields() {
         binding.apply {
             editTextEventName.text?.clear()
