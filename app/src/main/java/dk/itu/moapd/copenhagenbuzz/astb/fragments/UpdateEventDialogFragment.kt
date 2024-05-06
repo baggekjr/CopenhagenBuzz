@@ -141,13 +141,15 @@ class UpdateEventDialogFragment(private val event: Event,
 
         }.create()
     }
-
+    
+    override fun onPause() {
+        super.onPause()
+        dismiss()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         auth = FirebaseAuth.getInstance()
-
-
     }
 
     override fun onDestroyView() {

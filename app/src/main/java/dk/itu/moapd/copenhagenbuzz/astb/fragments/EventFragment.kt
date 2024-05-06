@@ -70,6 +70,7 @@ class EventFragment : Fragment() {
         _binding = this
     }.root
 
+    //Make it save picture even when phone is turned
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         photoUri?.let { outState.putString(PHOTO_URI_KEY, it.toString()) }
