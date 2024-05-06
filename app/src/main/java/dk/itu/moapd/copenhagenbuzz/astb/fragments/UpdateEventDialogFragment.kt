@@ -91,15 +91,6 @@ class UpdateEventDialogFragment(private val event: Event,
             handleEventButtonOnClick()
             dialog.dismiss()
         }
-        var dates = ""
-
-        // Check if event's start and end dates are not null
-        event.startDate?.let { startDate ->
-            event.endDate?.let { endDate ->
-                // If both start and end dates are not null, format the dates
-                dates = "${dateFormatter.format(startDate)} - ${dateFormatter.format(endDate)}"
-            }
-        }
 
         binding.apply {
             editTextEventName.setText(event.eventName)
