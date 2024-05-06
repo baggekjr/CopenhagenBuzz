@@ -224,5 +224,18 @@ class DataViewModel : ViewModel() {
             }
     }
 
-}
+
+    fun deleteEvent(adapter: EventAdapter, event: Event, position: Int) {
+        val ref = adapter.getRef(position)
+            ref
+                .removeValue()
+                .addOnSuccessListener { //TODO: HANDLE FAILURE AND SUCCESS
+                    println(storageReference.child(event.eventIcon!!).toString())
+                    storageReference.child(event.eventIcon!!).delete()
+                }
+            ref.key?.let { removeEventFromFavorites(it) }
+        }
+
+
+    }
 
