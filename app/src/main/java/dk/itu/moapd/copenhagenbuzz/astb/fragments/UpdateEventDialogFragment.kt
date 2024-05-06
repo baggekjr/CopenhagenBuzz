@@ -17,7 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import com.android.volley.Request
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonArrayRequest
@@ -53,7 +53,6 @@ class UpdateEventDialogFragment(private val event: Event,
     private var _binding: FragmentUpdateEventBinding? = null
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
     private lateinit var database: DatabaseReference
-    private val dataViewModel: DataViewModel by viewModels()
     private lateinit var updatedEvent: Event
     private var eventLocation: EventLocation? = event.eventLocation
     private val storageReference = Firebase.storage(BUCKET_URL).reference
@@ -63,7 +62,9 @@ class UpdateEventDialogFragment(private val event: Event,
     private var startDate: Long? = event.startDate
     private var endDate: Long? = event.endDate
     private val dateFormatter = SimpleDateFormat("EEE dd/MM/yyyy", Locale.ENGLISH)
-
+    private lateinit var dataViewModel: DataViewModel
+    //Boolean to make sure it does not dismiss dialog when taking picture
+    private var cameraActive = false
 
     private val binding
         get() = requireNotNull(_binding) {
@@ -78,6 +79,13 @@ class UpdateEventDialogFragment(private val event: Event,
         //auth = FirebaseAuth.getInstance()
         database = Firebase.database(DATABASE_URL).reference.child(BUZZ)
 
+        try {
+            // Initialize dataViewModel using the activity context
+            dataViewModel = ViewModelProvider(requireActivity()).get(DataViewModel::class.java)
+            Log.e(TAG, "DataViewModel initialized: $dataViewModel")
+        } catch (e: Exception) {
+            Log.e(TAG, "DataViewModel initialization error: ${e.message}")
+        }
 
         val onPositiveButtonClick: (DialogInterface, Int) -> Unit = { dialog, _ ->
             handleEventButtonOnClick()
@@ -117,6 +125,7 @@ class UpdateEventDialogFragment(private val event: Event,
                 }
             }
             eventPhotoLibrary.setOnClickListener {
+                cameraActive = true
                 handlePhotoLibraryButtonOnClick()
             }
 
@@ -141,16 +150,14 @@ class UpdateEventDialogFragment(private val event: Event,
 
         }.create()
     }
-    
+
     override fun onPause() {
         super.onPause()
-        dismiss()
+        if (!cameraActive) {
+            dismiss()
+        }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        auth = FirebaseAuth.getInstance()
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -158,6 +165,7 @@ class UpdateEventDialogFragment(private val event: Event,
     }
 
     private fun launchCamera() {
+        cameraActive=true
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         photoName = "IMG_${UUID.randomUUID()}.JPG"
         val photoFile = File(requireContext().applicationContext.filesDir, photoName)
@@ -184,7 +192,9 @@ class UpdateEventDialogFragment(private val event: Event,
                 eventIcon = photoName,
                 // Update other event properties here
             )
+
         }
+        cameraActive = false
     }
 
     private val pickMedia = registerForActivityResult(
@@ -205,6 +215,7 @@ class UpdateEventDialogFragment(private val event: Event,
         } else {
             showMessage("PhotoPicker: No media selected")
         }
+        cameraActive=false
     }
 
 
@@ -258,6 +269,8 @@ class UpdateEventDialogFragment(private val event: Event,
                         eventType = eventType,
                         eventDescription = eventDescription
                     )
+
+                    //TODO: MAYBE ALSO MOVE IT TO THE DATAVIEWMODEL
                     if (photoName != event.eventIcon) {
                         storageReference.child(photoName!!)
                             .putFile(photoUri!!)
@@ -279,21 +292,15 @@ class UpdateEventDialogFragment(private val event: Event,
                                 handleFailure(ex)
                             }
                     }
-                    adapter.getRef(position).setValue(updatedEvent)
-                        .addOnSuccessListener {
-                            // Event updated successfully
-                            Log.d(TAG, "Event updated successfully!")
 
-                        }
-                        .addOnFailureListener {
-                            // Error updating event
-                            Log.e(TAG, "Error updating event: $it")
-                            handleFailure(it)
-                        }
+
+                    // Call the updateEvent method in DataViewModel
+                    dataViewModel.updateEvent(adapter.getId(position), updatedEvent)
 
 
                 } catch (e: Exception) {
-                    showMessage("Address not valid. Try updating your again event again with an address in Copenhagen.")
+                    showMessage("Address not valid. Try updating your again event again with an address in Copenhagen.${e.message}")
+                    Log.e(TAG, "${e.message}")
                 }
             }, { error ->
                 handleFailureVolley(error)

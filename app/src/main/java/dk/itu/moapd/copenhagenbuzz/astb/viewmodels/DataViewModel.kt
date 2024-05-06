@@ -208,6 +208,23 @@ class DataViewModel : ViewModel() {
 
     }
 
+    fun updateEvent(ref: DatabaseReference, updatedEvent: Event) {
+        viewModelScope.launch {
+            auth.currentUser?.uid?.let { userId ->
+                ref.key?.let { eventKey ->
+                    database.child("events").child(eventKey).setValue(updatedEvent)
+                        .addOnSuccessListener {
+                            Log.d(TAG, "Event updated successfully")
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.e(TAG, "Failed to update event", exception)
+                        }
+                }
+            }
+        }
+    }
+
+
 
 
 }
