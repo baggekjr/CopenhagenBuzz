@@ -14,11 +14,14 @@ inline fun <reified T> T.TAG(): String = T::class.java.simpleName
 val DATABASE_URL: String = dotenv {
     directory = "/assets"
     filename = "env"
-}["DATABASE_URL"]
+}["DATABASE_URL"] ?: throw IllegalArgumentException("DATABASE_URL not found in env file")
 
 
-//TODO: save like database in the assets
-val BUCKET_URL: String="gs://copenhagenbuzz-b8a16.appspot.com"
+val BUCKET_URL: String = dotenv {
+        directory = "/assets"
+        filename = "env"
+    }["BUCKET_URL"] ?: throw IllegalArgumentException("BUCKET_URL not found in env file")
+
 
 class MyApplication: Application() {
     override fun onCreate() {
