@@ -119,6 +119,13 @@ class DataViewModel : ViewModel() {
     }
 
 
+    /**
+     * Method to make sure if an event is deleted from the database, that the event is also deleted from
+     * the list of favorites under all the users that have that event favorited
+     *
+     * @param deletedEvent is a String that represents a reference key, which is the eventId for the
+     * deleted event.
+     */
     fun removeEventFromFavorites(deletedEvent: String) {
         val favoritesReference = database.child(FAVORITES)
 
@@ -150,8 +157,14 @@ class DataViewModel : ViewModel() {
     }
 
 
-
-
+    /**
+     * Method to determine if the user is removing or adding an event to their favorites depending on
+     * if the checkBox heart is already checked or not.
+     *
+     * @param ref takes the reference to the event that is favorited or not
+     * @param isChecked Boolean to give information; if it's already checked, when pressed it need to uncheck and remove
+     * from favorites. If not checked it need to add
+     */
 
     fun updateFavorite(ref: DatabaseReference, isChecked: Boolean) {
         if (isChecked) {

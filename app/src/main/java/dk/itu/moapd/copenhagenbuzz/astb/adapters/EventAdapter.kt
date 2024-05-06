@@ -40,9 +40,6 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
 
         view.tag = viewHolder
 
-
-        // Set OnClickListener for the edit button
-
         return view
     }
 
@@ -64,7 +61,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
 
             if (currentUser != null) {
                 favoriteCheckbox.visibility = View.VISIBLE
-                bindFavorites(viewHolder, event, position)
+                bindFavorites(viewHolder, position)
             } else {
                 favoriteCheckbox.visibility = View.GONE
             }
@@ -106,7 +103,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
         }
     }
 
-    private fun bindFavorites(viewHolder: ViewHolder, event: Event, position: Int){
+    private fun bindFavorites(viewHolder: ViewHolder, position: Int){
 
         auth.currentUser?.uid?.let { userId ->
             with(viewHolder) {
@@ -119,7 +116,7 @@ class EventAdapter(private val fragmentManager: FragmentManager, private val con
 
                 favoriteCheckbox.setOnCheckedChangeListener { _, isChecked ->
 
-                    onFavoriteClickListener.onFavoriteClick(ref, event ,isChecked)
+                    onFavoriteClickListener.onFavoriteClick(ref ,isChecked)
 
                 }
 

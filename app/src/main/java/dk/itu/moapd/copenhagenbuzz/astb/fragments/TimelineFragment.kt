@@ -71,7 +71,7 @@ class TimelineFragment : Fragment(), OnFavoriteClickListener, OnItemClickListene
     }
 
     /**
-     * Loading standard timeline with all events
+     * Loading standard timeline with all events sorted by startdate
      */
     private fun loadEvents() {
         val query = Firebase.database(DATABASE_URL).reference
@@ -93,7 +93,9 @@ class TimelineFragment : Fragment(), OnFavoriteClickListener, OnItemClickListene
 
 
     /**
-     * Ability to search for event via name is added in following methods.
+     * Creates searchview where user is able search for event via name. Has to be searched with
+     * correct capital letters in order of appearance. The search query is then sent to performSearch()
+     * if it is not null or blank. Otherwise it will load all events.
      */
     private fun setupSearch() {
         val menuHost: MenuHost = requireActivity()
@@ -140,6 +142,11 @@ class TimelineFragment : Fragment(), OnFavoriteClickListener, OnItemClickListene
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
+    /**
+     * Function that performs the search and creates a new listView with the results of the search.
+     *
+     * @param query is the String that the user has put in as the search query aka the eventName.
+     */
 
     private fun performSearch(query: String) {
         val db = Firebase.database(DATABASE_URL).reference.child(BUZZ)
@@ -171,7 +178,13 @@ class TimelineFragment : Fragment(), OnFavoriteClickListener, OnItemClickListene
         _binding = null
     }
 
-    override fun onFavoriteClick(ref: DatabaseReference, event: Event, isChecked: Boolean) {
+    /**
+     * Implements the interface methods
+     *
+     * @param ref is the reference to the event that is either added to favorites or removed from favorites
+     * @param isChecked Boolean to inform if the favoriteCheckbox is already checked or not
+     */
+    override fun onFavoriteClick(ref: DatabaseReference, isChecked: Boolean) {
         dataViewModel.updateFavorite(ref, isChecked)
     }
 

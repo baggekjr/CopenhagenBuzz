@@ -17,7 +17,6 @@ data class Event(
     val endDate: Long? = null,
     val eventType: String? = null,
     var eventDescription: String? = null,
-    //val favoritedBy: MutableList<String>? = null
 
 )
 
