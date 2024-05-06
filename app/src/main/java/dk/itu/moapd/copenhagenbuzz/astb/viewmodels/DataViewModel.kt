@@ -217,17 +217,21 @@ class DataViewModel : ViewModel() {
      * Method to update the selected event.
      *
      * @param ref takes the reference to the event that is being updated
-     * @param updatedEvent The updated event. Picture is not handled here but directly in the fragment.
+     * @param updatedEvent The updated event.
+     * @param updatedPhotoUri the uri used to update the picture of the event if needed
+     * @param oldPhotoName the name for the photo from the not yet updated event
+     * @param adapter passing the adapter as to notify the adapter about dataset changes
+     * to make the picture, and the rest of the event info, update without reload
      */
 
-    fun updateEvent(ref: DatabaseReference, updatedEvent: Event, updatedPhotoUri: Uri?, updatedPhotoName: String?, oldPhotoName: String?, adapter: EventAdapter) {
+    fun updateEvent(ref: DatabaseReference, updatedEvent: Event, updatedPhotoUri: Uri?, oldPhotoName: String?, adapter: EventAdapter) {
         viewModelScope.launch {
             auth.currentUser?.uid?.let { userId ->
                 ref.key?.let { eventKey ->
                     // Check if the photo has been updated
                     Log.e(TAG, "$oldPhotoName = ${updatedEvent.eventIcon} er de det samme")
-                    if (updatedPhotoUri != null && updatedPhotoName != null && oldPhotoName != updatedEvent.eventIcon) {
-                        storageReference.child(updatedPhotoName)
+                    if (updatedPhotoUri != null && updatedEvent.eventIcon != null && oldPhotoName != updatedEvent.eventIcon) {
+                        storageReference.child(updatedEvent.eventIcon)
                             .putFile(updatedPhotoUri)
                             .addOnSuccessListener {
                                 Log.d(TAG, "Photo uploaded successfully!")

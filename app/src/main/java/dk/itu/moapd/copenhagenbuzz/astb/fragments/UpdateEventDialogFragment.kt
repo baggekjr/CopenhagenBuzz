@@ -295,7 +295,7 @@ class UpdateEventDialogFragment(private val event: Event,
 */
 
                     // Call the updateEvent method in DataViewModel
-                    dataViewModel.updateEvent(adapter.getId(position), updatedEvent, photoUri, photoName, event.eventIcon, adapter)
+                    dataViewModel.updateEvent(adapter.getId(position), updatedEvent, photoUri, event.eventIcon, adapter)
                     adapter.notifyDataSetChanged()
 
 
