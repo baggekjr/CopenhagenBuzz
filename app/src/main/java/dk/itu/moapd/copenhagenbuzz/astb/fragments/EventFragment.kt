@@ -59,6 +59,10 @@ class EventFragment : Fragment() {
             "Cannot access binding because it is null. Is the view visible?"
         }
 
+    companion object {
+        private const val PHOTO_URI_KEY = "photo_uri"
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -66,10 +70,19 @@ class EventFragment : Fragment() {
         _binding = this
     }.root
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        photoUri?.let { outState.putString(PHOTO_URI_KEY, it.toString()) }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
         setListeners()
+        savedInstanceState?.getString(PHOTO_URI_KEY)?.let { uriString ->
+            photoUri = Uri.parse(uriString)
+            photoUri?.let { Picasso.get().load(it).into(binding.eventPhotoPreview) }
+        }
 
     }
 
