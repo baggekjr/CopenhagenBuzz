@@ -226,7 +226,7 @@ class EventFragment : Fragment() {
     }
     private fun handleFailureVolley(error: VolleyError?) {
         Log.e(TAG, "error {$error.message}")
-       //TODO: WHAT KIND OF ERRORMESSAGE TO THE USER??
+        showMessage("Oops! Something went wrong with the network. Please try again later.")
     }
 
     private fun formatAddress(address: String) : String{
@@ -267,7 +267,7 @@ class EventFragment : Fragment() {
                         storageReference.child(photoName!!)
                             .putFile(photoUri!!)
                             .addOnSuccessListener {
-                                println("Photo uploaded successfully!")
+                                Log.d(TAG, "Photo uploaded successfully!")
 
                     val newEvent = Event(
                         userId,
@@ -295,16 +295,17 @@ class EventFragment : Fragment() {
                                     }
                                     .addOnFailureListener { exception ->
                                         Log.e(TAG, "Error saving event: ${exception.message}")
-                                        showMessage("Failed to save event: ${exception.message}")
+                                        showMessage("Failed to save event. Please try again later.")
                                     }
                             }
                     }
                 }
                             .addOnFailureListener { exception ->
                     Log.e(TAG, "Error uploading image: ${exception.message}")
-                    showMessage("Failed to upload image: ${exception.message}")
+                    showMessage("Failed to upload image. Please try again later.")
                 }
     }
+
     private fun clearInputFields() {
         binding.apply {
             editTextEventName.text?.clear()
