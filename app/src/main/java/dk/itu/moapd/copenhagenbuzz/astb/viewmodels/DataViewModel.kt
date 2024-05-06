@@ -48,59 +48,6 @@ class DataViewModel : ViewModel() {
 
 
 
-
-    fun editEvent(id: DatabaseReference, event: Event) {
-        viewModelScope.launch {
-            id.setValue(event)
-        }
-    }
-
-
-    fun getEvents(): LiveData<List<Event>> {
-        val mutableLiveData = MutableLiveData<List<Event>>()
-
-        databaseReference.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                Log.d(TAG, "DataSnapshot: $snapshot")
-
-                val events = mutableListOf<Event>()
-                for (eventSnapshot in snapshot.children) {
-                    Log.e(TAG, "$eventSnapshot: EVENT!!!!")
-                    val event = eventSnapshot.getValue(Event::class.java)
-                    event?.let {
-                        events.add(it)
-                    }
-                }
-                mutableLiveData.value = events
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                // Handle error
-            }
-        })
-
-        return mutableLiveData
-    }
-
-    fun fetchEvents() {
-        databaseReference.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val events = mutableListOf<Event>()
-                for (eventSnapshot in snapshot.children) {
-                    val event = eventSnapshot.getValue(Event::class.java)
-                    event?.let {
-                        events.add(it)
-                    }
-                }
-                _events.value = events
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                // Handle error
-            }
-        })
-    }
-
     fun isFavorite(eventId: String, onResult: (isFavorite: Boolean) -> Unit) {
 
         viewModelScope.launch {
@@ -222,6 +169,7 @@ class DataViewModel : ViewModel() {
      * @param oldPhotoName the name for the photo from the not yet updated event
      * @param adapter passing the adapter as to notify the adapter about dataset changes
      * to make the picture, and the rest of the event info, update without reload
+     * Location updates are handled directly in the fragment
      */
 
     fun updateEvent(ref: DatabaseReference, updatedEvent: Event, updatedPhotoUri: Uri?, oldPhotoName: String?, adapter: EventAdapter) {
@@ -251,8 +199,7 @@ class DataViewModel : ViewModel() {
                                 }
                                 .addOnFailureListener { ex ->
                                     Log.e(TAG, "Failed to delete old photo: $ex")
-                                    // Handle failure
-                                    // Even if there's a failure, we should still attempt to update the event data
+                                    // Even if there's a failure, we still attempt to update the event data
                                     updateEventData(eventKey, updatedEvent, adapter)
                                 }
                         }
@@ -271,7 +218,6 @@ class DataViewModel : ViewModel() {
             .addOnSuccessListener {
                 Log.d(TAG, "Event updated successfully")
                 adapter.notifyDataSetChanged() // Notify adapter
-
             }
             .addOnFailureListener { exception ->
                 Log.e(TAG, "Failed to update event", exception)
