@@ -260,7 +260,7 @@ class EventFragment : Fragment() {
         }
     }
     private fun handleFailureVolley(error: VolleyError?) {
-        Log.e(TAG, "error {$error.message}")
+        Log.e(TAG, "Volleyerror {$error.message}")
         showMessage("Oops! Something went wrong with the network. Please try again later.")
     }
 

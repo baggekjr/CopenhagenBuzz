@@ -33,9 +33,7 @@ class EventAdapter(private val context: Context, private val options: FirebaseLi
 
         val viewHolder = (view.tag as? ViewHolder) ?: ViewHolder(view)
 
-        getItem(position)?.let { event ->
-            populateViewHolder(viewHolder, event, position)
-        }
+        populateViewHolder(viewHolder, getItem(position), position)
 
         view.tag = viewHolder
 
