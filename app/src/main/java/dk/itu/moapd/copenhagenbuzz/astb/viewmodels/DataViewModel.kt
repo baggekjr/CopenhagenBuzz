@@ -260,7 +260,7 @@ class DataViewModel : ViewModel() {
                                 }
                         }
                     } else {
-                        // If the photo hasn't been updated, just update the event data
+                        // If the photo hasn't been updated the event data is updated without
                         updateEventData(eventKey, updatedEvent, adapter)
                     }
                 }
@@ -269,14 +269,13 @@ class DataViewModel : ViewModel() {
     }
 
     private fun updateEventData(eventKey: String, updatedEvent: Event, adapter: EventAdapter) {
-        // Update event data
         database.child("events").child(eventKey).setValue(updatedEvent)
             .addOnSuccessListener {
                 Log.d(TAG, "Event updated successfully")
-                adapter.notifyDataSetChanged() // Notify adapter
+                adapter.notifyDataSetChanged()
             }
-            .addOnFailureListener { exception ->
-                Log.e(TAG, "Failed to update event", exception)
+            .addOnFailureListener {
+                Log.e(TAG, "Failed to update event", it)
             }
     }
 
@@ -285,15 +284,27 @@ class DataViewModel : ViewModel() {
         val ref = adapter.getRef(position)
         ref
             .removeValue()
-            .addOnSuccessListener { //TODO: HANDLE FAILURE AND SUCCESS
-                println(storageReference.child(event.eventIcon!!).toString())
+            .addOnSuccessListener {
+                Log.d(TAG, "Event removed successfully from database")
+                // Delete event image from storage
                 storageReference.child(event.eventIcon!!).delete()
+                    .addOnSuccessListener {
+                        Log.d(TAG, "Event image deleted successfully")
+                    }
+                    .addOnFailureListener { imageDeletionException ->
+                        Log.e(TAG, "Failed to delete event image", imageDeletionException)
+                    }
+                // Remove event from favorites
+                ref.key?.let { eventId ->
+                    removeEventFromFavorites(eventId)
+                }
             }
-            ref.key?.let { removeEventFromFavorites(it) }
-        }
-
-
+            .addOnFailureListener { databaseException ->
+                Log.e(TAG, "Failed to remove event from database", databaseException)
+            }
     }
+}
+
 
 
 
