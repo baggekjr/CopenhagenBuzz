@@ -21,6 +21,10 @@ import dk.itu.moapd.copenhagenbuzz.astb.Utils.DateFormatter
 import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnFavoriteClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnItemClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
+/**
+ * An adapter class responsible for populating a list of events into a ListView.
+ * This adapter extends FirebaseListAdapter to customize the view of each item in the list.
+ */
 
 class EventAdapter(private val context: Context, options: FirebaseListOptions<Event>, private val  onFavoriteClickListener: OnFavoriteClickListener, private val dialogsOnClickListener: OnItemClickListener) :
     FirebaseListAdapter<Event>(options) {

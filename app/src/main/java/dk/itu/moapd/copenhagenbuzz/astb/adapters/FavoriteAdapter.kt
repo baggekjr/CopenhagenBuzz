@@ -15,7 +15,10 @@ import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FavoritesRowItemBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 
-
+/**
+ * An adapter class responsible for populating a list of favorite events into a RecyclerView.
+ * This adapter extends FirebaseRecyclerAdapter to customize the view of each item in the list.
+ */
 class FavoriteAdapter(options: FirebaseRecyclerOptions<Event>) : FirebaseRecyclerAdapter<Event, FavoriteAdapter.ViewHolder>(options) {
 
     inner class ViewHolder(private val binding: FavoritesRowItemBinding) : RecyclerView.ViewHolder(binding.root)
