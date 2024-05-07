@@ -61,6 +61,7 @@ class UpdateEventDialogFragment(private val event: Event,
     private var endDate: Long? = event.endDate
     private val dateFormatter = SimpleDateFormat("EEE dd/MM/yyyy", Locale.ENGLISH)
     private lateinit var dataViewModel: DataViewModel
+
     //Boolean to make sure it does not dismiss dialog when taking picture
     private var cameraActive = false
 
@@ -73,8 +74,6 @@ class UpdateEventDialogFragment(private val event: Event,
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         super.onCreateDialog(savedInstanceState)
         _binding = FragmentUpdateEventBinding.inflate(layoutInflater)
-        //binding.editTextName.setText(dummy.name)
-        //auth = FirebaseAuth.getInstance()
         database = Firebase.database(DATABASE_URL).reference.child(BUZZ)
 
         try {
@@ -175,13 +174,6 @@ class UpdateEventDialogFragment(private val event: Event,
             Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
             // Update the photo name immediately
             photoName = "IMG_${UUID.randomUUID()}.JPG"
-            // Update the event with the new photo name
-            updatedEvent = Event(
-                // Update other event properties here
-                eventIcon = photoName,
-                // Update other event properties here
-            )
-
         }
         cameraActive = false
     }
@@ -195,12 +187,7 @@ class UpdateEventDialogFragment(private val event: Event,
             photoName = "IMG_${UUID.randomUUID()}.JPG"
             // Show the user a preview of the photo they just selected
             Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
-            // Update the event with the new photo name
-            updatedEvent = Event(
-                // Update other event properties here
-                eventIcon = photoName,
-                // Update other event properties here
-            )
+
         } else {
             showMessage("PhotoPicker: No media selected")
         }
@@ -209,9 +196,7 @@ class UpdateEventDialogFragment(private val event: Event,
 
 
     private fun handlePhotoLibraryButtonOnClick() {
-
         pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-
     }
 
 
@@ -259,34 +244,9 @@ class UpdateEventDialogFragment(private val event: Event,
                         eventDescription = eventDescription
                     )
 
-                    /*//TODO: MAYBE ALSO MOVE IT TO THE DATAVIEWMODEL
-                    if (photoName != event.eventIcon) {
-                        storageReference.child(photoName!!)
-                            .putFile(photoUri!!)
-                            .addOnSuccessListener {
-                                Log.d(TAG, "Photo uploaded successfully!")
-                                //Makes picture get updated without having to reload page
-                                adapter.notifyDataSetChanged()
-
-                            }.addOnFailureListener {
-                                Log.e(TAG, "Photo upload with exception: $it")
-                                handleFailure(it)
-                            }
-
-                        storageReference.child(event.eventIcon!!).delete()
-                            .addOnSuccessListener { ex ->
-                                println("Successfully deleted old photo!")
-                            }
-                            .addOnFailureListener { ex ->
-                                handleFailure(ex)
-                            }
-                    }
-*/
-
                     // Call the updateEvent method in DataViewModel
                     dataViewModel.updateEvent(adapter.getId(position), updatedEvent, photoUri, event.eventIcon, adapter)
                     adapter.notifyDataSetChanged()
-
 
                 } catch (e: Exception) {
                     showMessage("Address not valid. Try updating your again event again with an address in Copenhagen.${e.message}")

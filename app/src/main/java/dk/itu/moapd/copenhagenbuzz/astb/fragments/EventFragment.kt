@@ -239,7 +239,7 @@ class EventFragment : Fragment() {
     }
     private fun handleFailureVolley(error: VolleyError?) {
         Log.e(TAG, "error {$error.message}")
-        //TODO: WHAT KIND OF ERRORMESSAGE TO THE USER??
+        showMessage("Oops! Something went wrong with the network. Please try again later.")
     }
 
     private fun formatAddress(address: String) : String{
