@@ -26,8 +26,6 @@ class DeleteEventDialogFragment(
                     dialog.dismiss()
                 }
 
-
-
         // Create and return a new instance of MaterialAlertDialogBuilder.
         return MaterialAlertDialogBuilder(requireContext()).apply {
             setTitle(getString(R.string.dialog_delete_title))
