@@ -1,5 +1,6 @@
 package dk.itu.moapd.copenhagenbuzz.astb.adapters
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -21,7 +22,7 @@ import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnFavoriteClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.interfaces.OnItemClickListener
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 
-class EventAdapter(private val context: Context, private val options: FirebaseListOptions<Event>, private val  onFavoriteClickListener: OnFavoriteClickListener, private val dialogsOnClickListener: OnItemClickListener) :
+class EventAdapter(private val context: Context, options: FirebaseListOptions<Event>, private val  onFavoriteClickListener: OnFavoriteClickListener, private val dialogsOnClickListener: OnItemClickListener) :
     FirebaseListAdapter<Event>(options) {
 
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -80,6 +81,7 @@ class EventAdapter(private val context: Context, private val options: FirebaseLi
             }
         }
     }
+    @SuppressLint("SetTextI18n")
     private fun bindEvent(viewHolder: ViewHolder, event: Event) {
         with(viewHolder){
             eventName.text = event.eventName
@@ -91,7 +93,8 @@ class EventAdapter(private val context: Context, private val options: FirebaseLi
             val endDateText =
                 event.endDate?.let { DateFormatter.formatDate(it) } ?: "End Date Unavailable"
             startDate.text = startDateText
-            endDate.text = " - $endDateText"
+            endDate.text = context.getString(R.string.end_date_format, endDateText)
+                    // " - $endDateText"
 
             eventType.text = event.eventType
             eventDescription.text = event.eventDescription

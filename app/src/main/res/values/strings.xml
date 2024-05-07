@@ -43,6 +43,8 @@
     <string name="logout">logout</string>
     <string name="image">image</string>
     <string name="search">Search event</string>
+    <string name="end_date_format"> - %s</string>
+
 
 
 
