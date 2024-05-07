@@ -348,6 +348,9 @@ class UpdateEventDialogFragment(
                 val dates =
                     "${DateFormatter.formatDate(startDate!!)} - ${DateFormatter.formatDate(endDate!!)}"
                 binding.editTextEventDate.setText(dates)
+            }else {
+                binding.editTextEventDate.setText(getString(R.string.no_dates))
+
             }
 
         }

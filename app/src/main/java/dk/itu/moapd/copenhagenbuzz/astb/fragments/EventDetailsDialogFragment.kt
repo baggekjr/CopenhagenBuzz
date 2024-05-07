@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dk.itu.moapd.copenhagenbuzz.astb.R
+import dk.itu.moapd.copenhagenbuzz.astb.Utils.DateFormatter
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentEventDetailsDialogBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 
@@ -29,8 +30,16 @@ class EventDetailsDialogFragment(private val event: Event) : DialogFragment() {
             editTextEventName.setText(event.eventName)
             editTextEventLocation.setText(event.eventLocation?.address)
             editTextEventDescription.setText(event.eventDescription)
+            //Check if dates are not null before setting text
+            if (event.startDate != null && event.endDate != null) {
+                val dates =
+                    "${DateFormatter.formatDate(event.startDate)} - ${DateFormatter.formatDate(event.endDate)}"
+                binding.editTextEventDate.setText(dates)
+            } else {
+                binding.editTextEventDate.setText(getString(R.string.no_dates))
+
+            }
             editTextEventType.setText(event.eventType)
-            editTextEventDate.setText(event.startDate.toString())
 
             return MaterialAlertDialogBuilder(requireContext()).apply {
                 setView(binding.root)

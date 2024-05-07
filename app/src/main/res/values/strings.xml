@@ -55,6 +55,7 @@
     <string name="cam_permission_denied">Camera permission denied</string>
     <string name="no_start_date">Start Date Unavailable</string>
     <string name="no_end_date">End Date Unavailable</string>
+    <string name="no_dates">Dates Unavailable</string>
 
 
 
