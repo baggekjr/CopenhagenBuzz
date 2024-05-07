@@ -104,7 +104,7 @@ class TimelineFragment : Fragment(), OnFavoriteClickListener, OnItemClickListene
                 val searchItem = menu.findItem(R.id.search_bar)
                 val searchView = searchItem?.actionView as SearchView
 
-                searchView.queryHint = "Search event"
+                searchView.queryHint = getString(R.string.search)
                 searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                     override fun onQueryTextSubmit(query: String): Boolean {
                         if (!query.isNullOrBlank()) {

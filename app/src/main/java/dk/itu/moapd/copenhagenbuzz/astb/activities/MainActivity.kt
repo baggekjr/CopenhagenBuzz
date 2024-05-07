@@ -56,13 +56,10 @@ class MainActivity : AppCompatActivity() {
      */
     private lateinit var binding: ActivityMainBinding
     private lateinit var appBarConfiguration: AppBarConfiguration
-    //private var isLoggedIn: Boolean = false
+
 
     override fun onStart() {
         super.onStart()
-        // Redirect the user to the LoginActivity
-        // if they are not logged in.
-        //auth.currentUser ?: startLoginActivity()
 
         // Check if user is authenticated
         val currentUser = auth.currentUser
@@ -97,17 +94,16 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Calls method to create the correct icon determining if you are logged in or not
-        //onPrepareOptionsMenu(binding.contentMain.childAppBar.menu)
 
         /* Initializing navHosFragment which is responsible for displaying destinations
         via Navigation Graph
-         */
+        */
         val navHostFragment = supportFragmentManager.findFragmentById(
             R.id.fragment_container_view ) as NavHostFragment
 
         /* Initializing navController, which manages the current position and facilitates
         swapping between destinations as users use CopenhagenBuzz
-         */
+        */
         val navController = navHostFragment.navController
 
 
@@ -122,15 +118,7 @@ class MainActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
 
 
-
-       /* // Listener for user interaction with top app bar to either login or out
-        binding.contentMain.childAppBar.setOnMenuItemClickListener{
-            onStart()
-            true
-        }*/
-
     }
-
 
 
     private fun startLoginActivity() {
@@ -146,7 +134,7 @@ class MainActivity : AppCompatActivity() {
         return true
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        //isLoggedIn = intent.getBooleanExtra("IsLoggedIn", false)
+
             when (item.itemId) {
                 R.id.action_logout -> {
                     Log.d("MainActivity", "Logout menu item clicked") // Add this log statement
@@ -158,11 +146,6 @@ class MainActivity : AppCompatActivity() {
             return true
 
     }
-
-
-
-
-
 
      /** Changes the icon depending on if you're logged in or are using CopenhagenBuzz as a guest
      * @param menu The top app bar
@@ -184,22 +167,4 @@ class MainActivity : AppCompatActivity() {
         return true
 
     }
-
-
-
-
-
-     //* Handles the top menu button to go to the login-page
-
-    /*private fun handleGoToLogin() {
-        val intent = Intent(this, LoginActivity::class.java).putExtra("IsLoggedIn",isLoggedIn)
-        startActivity(intent)
-        finish()
-    }
-
-     */
-
-
-
-
 }
