@@ -171,6 +171,8 @@ class EventFragment : Fragment() {
         val eventDescription = binding.editTextEventDescription.text.toString().trim()
 
         if (eventName.isNotEmpty() && eventLocationStr.isNotEmpty() && eventDate.isNotEmpty() && eventType.isNotEmpty() && eventDescription.isNotEmpty()) {
+            if(photoName != null || photoUri != null) {
+
             val userId = auth.currentUser?.uid
             userId?.let {
                 // Geocode the event location
@@ -211,6 +213,9 @@ class EventFragment : Fragment() {
                 queue.add(request)
             } ?: run {//TODO: this should not be able to happen so do we event need it?
                 showMessage("User is not logged in")
+            }
+            } else {
+                showMessage("Please select a photo")
             }
         } else {
             showMessage("Please fill out all fields")
