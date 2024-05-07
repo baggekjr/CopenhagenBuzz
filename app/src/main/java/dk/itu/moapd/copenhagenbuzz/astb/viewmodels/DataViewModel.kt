@@ -247,17 +247,17 @@ class DataViewModel : ViewModel() {
                             }
 
                         // Delete the old photo if it exists
-                        updatedEvent.eventIcon?.let {storageReference.child(oldPhotoName!!).delete()
-                                .addOnSuccessListener {
-                                    Log.d(TAG, "Successfully deleted old photo!")
-                                    // After photo deletion, update the event data
-                                    updateEventData(eventKey, updatedEvent, adapter)
-                                }
-                                .addOnFailureListener { ex ->
-                                    Log.e(TAG, "Failed to delete old photo: $ex")
-                                    // Even if there's a failure, we still attempt to update the event data
-                                    updateEventData(eventKey, updatedEvent, adapter)
-                                }
+                        updatedEvent.eventIcon.let {storageReference.child(oldPhotoName!!).delete()
+                            .addOnSuccessListener {
+                                Log.d(TAG, "Successfully deleted old photo!")
+                                // After photo deletion, update the event data
+                                updateEventData(eventKey, updatedEvent, adapter)
+                            }
+                            .addOnFailureListener { ex ->
+                                Log.e(TAG, "Failed to delete old photo: $ex")
+                                // Even if there's a failure, we still attempt to update the event data
+                                updateEventData(eventKey, updatedEvent, adapter)
+                            }
                         }
                     } else {
                         // If the photo hasn't been updated the event data is updated without

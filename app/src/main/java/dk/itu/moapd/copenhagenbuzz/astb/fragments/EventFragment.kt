@@ -53,11 +53,7 @@ class EventFragment : Fragment() {
     private lateinit var dataViewModel: DataViewModel
 
 
-    private val EVENTS = "events"
     private val BUZZ = "CopenhagenBuzz"
-    companion object {
-        private const val CAMERA_REQUEST_CODE = 1888
-    }
 
     private val binding get() = _binding!!
 
@@ -107,8 +103,12 @@ class EventFragment : Fragment() {
     private fun launchCamera() {
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         photoName = "IMG_${UUID.randomUUID()}.JPG"
-        val photoFile = File(requireContext().applicationContext.filesDir, photoName)
-        photoUri = FileProvider.getUriForFile(requireContext(), "dk.itu.moapd.copenhagenbuzz.astb.fileprovider", photoFile)
+        val photoFile = photoName?.let { File(requireContext().applicationContext.filesDir, it) }
+        photoUri = photoFile?.let {
+            FileProvider.getUriForFile(requireContext(), "dk.itu.moapd.copenhagenbuzz.astb.fileprovider",
+                it
+            )
+        }
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
         takePhoto.launch(cameraIntent)
     }
@@ -182,7 +182,7 @@ class EventFragment : Fragment() {
             val userId = auth.currentUser?.uid
             userId?.let {
                 // Geocode the event location
-                val key: String = "6630a5d972d20365148401gdsd0bcd5"
+                val key = "6630a5d972d20365148401gdsd0bcd5"
                 val url =
                     "https://geocode.maps.co/search?q=$eventLocationStr+Copenhagen&api_key=$key"
 

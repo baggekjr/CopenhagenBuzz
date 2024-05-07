@@ -164,11 +164,11 @@ class MainActivity : AppCompatActivity() {
 
 
 
-     /* Changes the icon depending on if you're logged in or are using CopenhagenBuzz as a guest
+     /** Changes the icon depending on if you're logged in or are using CopenhagenBuzz as a guest
      * @param menu The top app bar
      *
      * @return return if the user is logged in or not
-    */
+     */
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val currentUser = auth.currentUser

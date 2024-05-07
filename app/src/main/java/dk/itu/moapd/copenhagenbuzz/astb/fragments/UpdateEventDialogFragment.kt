@@ -62,6 +62,7 @@ class UpdateEventDialogFragment(private val event: Event,
     private val dateFormatter = SimpleDateFormat("EEE dd/MM/yyyy", Locale.ENGLISH)
     private lateinit var dataViewModel: DataViewModel
 
+
     //Boolean to make sure it does not dismiss dialog when taking picture
     private var cameraActive = false
 
@@ -75,14 +76,8 @@ class UpdateEventDialogFragment(private val event: Event,
         super.onCreateDialog(savedInstanceState)
         _binding = FragmentUpdateEventBinding.inflate(layoutInflater)
         database = Firebase.database(DATABASE_URL).reference.child(BUZZ)
+        dataViewModel = ViewModelProvider(requireActivity()).get(DataViewModel::class.java)
 
-        try {
-            // Initialize dataViewModel using the activity context
-            dataViewModel = ViewModelProvider(requireActivity()).get(DataViewModel::class.java)
-            Log.e(TAG, "DataViewModel initialized: $dataViewModel")
-        } catch (e: Exception) {
-            Log.e(TAG, "DataViewModel initialization error: ${e.message}")
-        }
 
         val onPositiveButtonClick: (DialogInterface, Int) -> Unit = { dialog, _ ->
             handleEventButtonOnClick()
@@ -94,7 +89,7 @@ class UpdateEventDialogFragment(private val event: Event,
             editTextEventLocation.setText(event.eventLocation?.address)
             editTextEventDescription.setText(event.eventDescription)
             editTextEventType.setText(event.eventType)
-            //Check if eithre start or end date is null:
+            //Check if either start or end date is null:
             val formattedStartDate = startDate?.let { dateFormatter.format(Date(it)) } ?: ""
             val formattedEndDate = endDate?.let { dateFormatter.format(Date(it)) } ?: ""
             val formattedDates = "$formattedStartDate - $formattedEndDate"
@@ -156,12 +151,14 @@ class UpdateEventDialogFragment(private val event: Event,
         cameraActive=true
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         photoName = "IMG_${UUID.randomUUID()}.JPG"
-        val photoFile = File(requireContext().applicationContext.filesDir, photoName)
-        photoUri = FileProvider.getUriForFile(
-            requireContext(),
-            "dk.itu.moapd.copenhagenbuzz.astb.fileprovider",
-            photoFile
-        )
+        val photoFile = photoName?.let { File(requireContext().applicationContext.filesDir, it) }
+        photoUri = photoFile?.let {
+            FileProvider.getUriForFile(
+                requireContext(),
+                "dk.itu.moapd.copenhagenbuzz.astb.fileprovider",
+                it
+            )
+        }
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
         takePhoto.launch(cameraIntent)
     }
@@ -212,7 +209,7 @@ class UpdateEventDialogFragment(private val event: Event,
             // Validate user inputs
             validateInputs(eventName, eventLocationStr, eventDate, eventType, eventDescription)
 
-            val key: String = "6630a5d972d20365148401gdsd0bcd5"
+            val key = "6630a5d972d20365148401gdsd0bcd5"
 
             val url =
                 "https://geocode.maps.co/search?q=${eventLocationStr}+Copenhagen&api_key=${key}"

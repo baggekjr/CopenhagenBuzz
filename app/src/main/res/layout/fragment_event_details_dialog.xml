@@ -24,7 +24,7 @@
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edit_text_event_name"
-                android:text="Chuck Norris"
+                android:text="@string/event_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
@@ -37,7 +37,7 @@
             >
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edit_text_event_location"
-                android:text="Copenhagen"
+                android:text="@string/event_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
