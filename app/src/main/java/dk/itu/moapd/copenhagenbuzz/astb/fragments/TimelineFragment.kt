@@ -192,7 +192,7 @@ class TimelineFragment : Fragment(), OnFavoriteClickListener, OnItemClickListene
         binding.listView.adapter.let {
             DeleteEventDialogFragment(event, position, it as EventAdapter).apply {
                 isCancelable = false
-            }.show(requireFragmentManager(), "DeleteEventDialogFragment")
+            }.show(parentFragmentManager, "DeleteEventDialogFragment")
         }
 
 
@@ -202,7 +202,7 @@ class TimelineFragment : Fragment(), OnFavoriteClickListener, OnItemClickListene
         binding.listView.adapter.let {
             UpdateEventDialogFragment(event, position, it as EventAdapter, requireView()).apply {
                 isCancelable = false
-            }.show(requireFragmentManager(), "UpdateEventFragment")
+            }.show(parentFragmentManager, "UpdateEventFragment")
         }    }
 }
 
