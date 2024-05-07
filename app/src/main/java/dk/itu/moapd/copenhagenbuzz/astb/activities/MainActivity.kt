@@ -35,8 +35,6 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.firebase.auth.FirebaseAuth
 import dk.itu.moapd.copenhagenbuzz.astb.R
@@ -55,7 +53,6 @@ class MainActivity : AppCompatActivity() {
      * View binding that creates a direct reference to make coding easier
      */
     private lateinit var binding: ActivityMainBinding
-    private lateinit var appBarConfiguration: AppBarConfiguration
 
 
     override fun onStart() {
@@ -108,14 +105,13 @@ class MainActivity : AppCompatActivity() {
 
 
         setSupportActionBar(binding.contentMain.childAppBar)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-        setupActionBarWithNavController(navController, appBarConfiguration)
 
         // Adds the bottomNavigation to easily navigate through the application
         binding.contentMain.bottomNavigation.setupWithNavController(navController)
 
 
         auth = FirebaseAuth.getInstance()
+
 
 
     }
