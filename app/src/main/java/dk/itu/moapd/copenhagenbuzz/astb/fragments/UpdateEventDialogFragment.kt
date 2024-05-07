@@ -39,12 +39,18 @@ import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentUpdateEventBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.models.EventLocation
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
+import io.github.cdimascio.dotenv.dotenv
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
 
+/**
+ * A dialogFragment subclass for updating an event. It allows users to edit event details such as name,
+ * location, date, type, and description,and update them in the database by using an instance of the DataViewModel.
+ * Users can also change event images by capturing a new photo or selecting from the device's gallery.
+ */
 
 class UpdateEventDialogFragment(
     private val event: Event,
@@ -235,7 +241,10 @@ class UpdateEventDialogFragment(
             // Validate user inputs
             validateInputs(eventName, eventLocationStr, eventDate, eventType, eventDescription)
 
-            val key = "6630a5d972d20365148401gdsd0bcd5"
+            val key: String = dotenv {
+                directory = "/assets"
+                filename = "env"
+            }["GEOCODE_API_KEY"] ?: throw IllegalArgumentException("GEOCODE_API_KEY not found in env file")
 
             val url =
                 "https://geocode.maps.co/search?q=${eventLocationStr}+Copenhagen&api_key=${key}"

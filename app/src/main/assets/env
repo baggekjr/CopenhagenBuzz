@@ -1,2 +1,3 @@
 DATABASE_URL=https://copenhagenbuzz-b8a16-default-rtdb.europe-west1.firebasedatabase.app/
 BUCKET_URL=gs://copenhagenbuzz-b8a16.appspot.com
+GEOCODE_API_KEY=6630a5d972d20365148401gdsd0bcd5

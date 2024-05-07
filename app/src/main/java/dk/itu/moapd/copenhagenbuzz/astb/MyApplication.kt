@@ -8,6 +8,16 @@ import dk.itu.moapd.copenhagenbuzz.astb.Utils.SharedPreferenceUtil
 import io.github.cdimascio.dotenv.dotenv
 
 
+/**
+ * Application class for the CopenhagenBuzz app. This class initializes necessary components
+ * and configurations when the application starts.
+ * It sets up DynamicColors for activities, saves default location tracking preference using SharedPreferenceUtil,
+ * and configures Firebase Realtime Database with disk persistence and synchronization.
+ *
+ * @property DATABASE_URL The URL to the Firebase Realtime Database retrieved from the environment configuration file.
+ * @property BUCKET_URL The URL to the Firebase Storage bucket retrieved from the environment configuration file.
+ */
+
 inline fun <reified T> T.TAG(): String = T::class.java.simpleName
 
 

@@ -38,9 +38,15 @@ import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentEventBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.models.EventLocation
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
+import io.github.cdimascio.dotenv.dotenv
 import java.io.File
 import java.util.UUID
 
+/**
+ * A Fragment subclass responsible for adding new events.
+ * This fragment provides functionality to add new events, including capturing photos, selecting dates,
+ * and saving event details to the database.
+ */
 class EventFragment : Fragment() {
     private var _binding: FragmentEventBinding? = null
     private lateinit var auth: FirebaseAuth
@@ -204,7 +210,10 @@ class EventFragment : Fragment() {
             val userId = auth.currentUser?.uid
             userId?.let {
                 // Geocode the event location
-                val key = "6630a5d972d20365148401gdsd0bcd5"
+                val key: String = dotenv {
+                directory = "/assets"
+                filename = "env"
+            }["GEOCODE_API_KEY"] ?: throw IllegalArgumentException("GEOCODE_API_KEY not found in env file")
                 val url =
                     "https://geocode.maps.co/search?q=$eventLocationStr+Copenhagen&api_key=$key"
 

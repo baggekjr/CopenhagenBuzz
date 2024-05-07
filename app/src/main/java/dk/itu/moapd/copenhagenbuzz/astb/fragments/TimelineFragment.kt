@@ -29,9 +29,8 @@ import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 
 
 /**
- * A simple [Fragment] subclass.
- * Use the [TimelineFragment.newInstance] factory method to
- * create an instance of this fragment.
+ * A simple fragment subclass.
+ * This fragment displays a timeline of events and provides functionality for searching events by name.
  */
 class TimelineFragment : Fragment(), OnFavoriteClickListener, OnItemClickListener {
 

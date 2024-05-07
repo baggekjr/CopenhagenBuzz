@@ -3,7 +3,6 @@ package dk.itu.moapd.copenhagenbuzz.astb.fragments
 import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentEventDetailsDialogBinding
@@ -11,10 +10,9 @@ import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 
 
 /**
- * A simple [Fragment] subclass.
- * Use the [EventInfoDialogFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+* A DialogFragment subclass responsible for displaying details of an event.
+* This fragment displays details such as event name, location, description, type, and date.
+*/
 class EventDetailsDialogFragment(private val event: Event) : DialogFragment() {
 
     private var _binding: FragmentEventDetailsDialogBinding? = null

@@ -10,6 +10,11 @@ import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 
+/**
+ * A DialogFragment subclass responsible for deleting an event.
+ * This fragment displays a dialog box asking the user to confirm the deletion of the event.
+ * Upon confirmation, it triggers the deletion of the event through the DataViewModel.
+ */
 class DeleteEventDialogFragment(
     private val event: Event,
     private val position: Int,

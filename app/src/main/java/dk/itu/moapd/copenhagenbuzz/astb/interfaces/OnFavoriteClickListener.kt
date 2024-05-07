@@ -1,9 +1,10 @@
 package dk.itu.moapd.copenhagenbuzz.astb.interfaces
 
-import com.github.javafaker.Bool
 import com.google.firebase.database.DatabaseReference
-import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 
+/**
+ * An interface to implement listener methods for onFavorite.
+ */
 interface OnFavoriteClickListener {
     fun onFavoriteClick(ref: DatabaseReference, isChecked: Boolean)
 

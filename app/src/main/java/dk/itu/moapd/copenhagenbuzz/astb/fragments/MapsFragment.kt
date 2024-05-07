@@ -1,27 +1,33 @@
 package dk.itu.moapd.copenhagenbuzz.astb.fragments;
 
-import android.content.*
+import android.Manifest.permission
+import android.content.BroadcastReceiver
+import android.content.ComponentName
+import android.content.ContentValues.TAG
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.ServiceConnection
+import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.LatLng
-import dk.itu.moapd.copenhagenbuzz.astb.Utils.LocationService
-import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentMapsBinding
-import dk.itu.moapd.copenhagenbuzz.astb.R
-import android.Manifest.permission
-import android.content.ContentValues.TAG
-import android.content.pm.PackageManager
-import android.os.Build
-import android.util.Log
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot
@@ -29,10 +35,16 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
+import dk.itu.moapd.copenhagenbuzz.astb.R
+import dk.itu.moapd.copenhagenbuzz.astb.Utils.LocationService
+import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentMapsBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 
-
+/**
+ * A Fragment subclass responsible for displaying a map with event markers and the user's location.
+ * It also handles location updates and displays event details when a marker is clicked.
+ */
 class MapsFragment : Fragment(){
 
     private var isFirstMove = true
@@ -122,7 +134,7 @@ class MapsFragment : Fragment(){
                     }}}
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+               Log.e(TAG, "Database error: ${error.message}")
             }
         }
         database.child("events").addValueEventListener(eventListener)

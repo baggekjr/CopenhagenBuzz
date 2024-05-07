@@ -21,6 +21,11 @@ import dk.itu.moapd.copenhagenbuzz.astb.adapters.EventAdapter
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel class responsible for managing data related to events and favorites in the CopenhagenBuzz app.
+ * This class interacts with Firebase Realtime Database and Firebase Storage to perform CRUD operations on events
+ * and manage user favorites.
+ */
 class DataViewModel : ViewModel() {
 
     private val FAVORITES = "favorites"
