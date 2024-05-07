@@ -278,8 +278,7 @@ class DataViewModel : ViewModel() {
     }
 
 
-    fun deleteEvent(adapter: EventAdapter, event: Event, position: Int) {
-        val ref = adapter.getRef(position)
+    fun deleteEvent(ref: DatabaseReference, event: Event) {
         ref
             .removeValue()
             .addOnSuccessListener {

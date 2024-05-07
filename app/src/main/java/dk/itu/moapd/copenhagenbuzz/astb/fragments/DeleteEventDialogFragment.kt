@@ -26,8 +26,9 @@ class DeleteEventDialogFragment(
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         super.onCreateDialog(savedInstanceState)
+        val ref = adapter.getRef(position)
         val onPositiveButtonClick: (DialogInterface, Int) -> Unit = { dialog, _ ->
-            dataViewModel.deleteEvent(adapter, event, position)
+            dataViewModel.deleteEvent(ref, event)
                     dialog.dismiss()
                 }
 
