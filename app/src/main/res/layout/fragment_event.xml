@@ -99,13 +99,13 @@
                     style="@style/image_button_style"
                     android:id="@+id/event_camera"
                     android:src="@drawable/baseline_add_a_photo_24"
-                    android:contentDescription="TODO"
+                    android:contentDescription="@string/image"
                     />
                 <ImageButton
                     android:id="@+id/event_photo_library"
                     style="@style/image_button_style"
                     android:src="@drawable/baseline_add_to_photos_24"
-                    android:contentDescription="image" />
+                    android:contentDescription="@string/image" />
                 
             </LinearLayout>
         
@@ -116,7 +116,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/event_camera"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:contentDescription="image" />
+                android:contentDescription="@string/image" />
         </LinearLayout>
 
     </ScrollView>
