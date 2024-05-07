@@ -199,17 +199,6 @@ class EventFragment : Fragment() {
 
                         val eventLocation = EventLocation(lat, lon, prettyAddress)
 
-                        /*// Save the event
-                        saveEvent(
-                            userId,
-                            photoName,
-                            eventName,
-                            eventLocation,
-                            startDate,
-                            endDate,
-                            eventType,
-                            eventDescription
-                        )*/
                         dataViewModel.saveEvent(
                             Event(
                                 auth.currentUser?.uid,
@@ -278,57 +267,6 @@ class EventFragment : Fragment() {
         _binding = null
     }
 
-   /* private fun saveEvent(
-        userId: String,
-        eventIcon: String?, // Image URI to upload
-        eventName: String,
-        eventLocation: EventLocation,
-        startDate: Long?,
-        endDate: Long?,
-        eventType: String,
-        eventDescription: String
-    ) {
-        storageReference.child(photoName!!)
-            .putFile(photoUri!!)
-            .addOnSuccessListener {
-                println("Photo uploaded successfully!")
-
-                val newEvent = Event(
-                    userId,
-                    eventIcon,
-                    eventName,
-                    eventLocation,
-                    startDate,
-                    endDate,
-                    eventType,
-                    eventDescription
-                )
-
-                // Save the event to Firebase Realtime Database
-                userId.let { uid ->
-                    database.child(EVENTS)
-                        .child(uid)
-                        .push()
-                        .key?.let { eventKey ->
-                            database.child(EVENTS)
-                                .child(eventKey)
-                                .setValue(newEvent)
-                                .addOnSuccessListener {
-                                    showMessage("Saved event successfully")
-                                    clearInputFields()
-                                }
-                                .addOnFailureListener { exception ->
-                                    Log.e(TAG, "Error saving event: ${exception.message}")
-                                    showMessage("Failed to save event: ${exception.message}")
-                                }
-                        }
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.e(TAG, "Error uploading image: ${exception.message}")
-                showMessage("Failed to upload image: ${exception.message}")
-            }
-    }*/
     private fun clearInputFields() {
         binding.apply {
             editTextEventName.text?.clear()
