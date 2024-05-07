@@ -33,6 +33,7 @@ import com.google.firebase.storage.ktx.storage
 import com.squareup.picasso.Picasso
 import dk.itu.moapd.copenhagenbuzz.astb.BUCKET_URL
 import dk.itu.moapd.copenhagenbuzz.astb.DATABASE_URL
+import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.Utils.DateFormatter
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentEventBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
@@ -146,7 +147,7 @@ class EventFragment : Fragment() {
         ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         if (uri != null) {
-            showMessage("Photo selected!")
+            showMessage(getString(R.string.photo_select))
 
             photoUri = uri
             photoName = "IMG_${UUID.randomUUID()}.JPG"
@@ -154,7 +155,7 @@ class EventFragment : Fragment() {
             // Show the user a preview of the photo they just selected
             Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
         } else {
-            showMessage("PhotoPicker: No media selected")
+            showMessage(getString(R.string.no_media))
         }
     }
 
@@ -175,7 +176,7 @@ class EventFragment : Fragment() {
         }
     }
     private fun handleDateOnClick() {
-        val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker().setTitleText("Select dates").build()
+        val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker().setTitleText(getString(R.string.select_dates)).build()
         dateRangePicker.show(parentFragmentManager, "DatePicker")
         dateRangePicker.addOnPositiveButtonClickListener { datePicked ->
 
@@ -243,7 +244,7 @@ class EventFragment : Fragment() {
                             ),
                             photoUri,
                             {
-                                showMessage("Saved event successfully")
+                                showMessage(getString(R.string.saved_event))
                                 clearInputFields()
                             },
                             { errorMessage ->
@@ -251,26 +252,26 @@ class EventFragment : Fragment() {
                             }
                         )
                     } catch (e: Exception){
-                        showMessage("Address not valid. Try again with an address in Copenhagen")
+                        showMessage(getString(R.string.only_copenhagen))
                     }
                 }, { error ->
                     handleFailureVolley(error)
                 })
                 queue.add(request)
-            } ?: run {//TODO: this should not be able to happen so do we event need it?
-                showMessage("User is not logged in")
+            } ?: run {
+                showMessage(getString(R.string.user_not_logged_in))
             }
             } else {
-                showMessage("Please select a photo")
+                showMessage(getString(R.string.please_select))
             }
         } else {
-            showMessage("Please fill out all fields")
+            showMessage(getString(R.string.fill_out_all))
 
         }
     }
     private fun handleFailureVolley(error: VolleyError?) {
         Log.e(TAG, "Volleyerror {$error.message}")
-        showMessage("Oops! Something went wrong with the network. Please try again later.")
+        showMessage(getString(R.string.network_error_message))
     }
 
     private fun formatAddress(address: String) : String{
@@ -289,7 +290,7 @@ class EventFragment : Fragment() {
         if (isGranted) {
             launchCamera()
         } else {
-            showMessage("Camera permission denied")
+            showMessage(getString(R.string.cam_permission_denied))
         }
     }
 

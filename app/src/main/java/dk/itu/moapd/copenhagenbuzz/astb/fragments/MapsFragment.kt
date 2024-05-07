@@ -50,6 +50,7 @@ class MapsFragment : Fragment(){
     private var isFirstMove = true
 
     private val BUZZ = "CopenhagenBuzz"
+    private val EVENT = "events"
     private inner class LocationBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val location = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
@@ -137,7 +138,7 @@ class MapsFragment : Fragment(){
                Log.e(TAG, "Database error: ${error.message}")
             }
         }
-        database.child("events").addValueEventListener(eventListener)
+        database.child(EVENT).addValueEventListener(eventListener)
         googleMap.setOnMarkerClickListener {
             val event = it.tag as Event
 

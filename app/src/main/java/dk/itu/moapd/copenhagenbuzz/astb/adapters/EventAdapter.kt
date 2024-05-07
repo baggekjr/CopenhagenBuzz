@@ -89,12 +89,11 @@ class EventAdapter(private val context: Context, options: FirebaseListOptions<Ev
 
             // Set the startDate and endDate to TextView objects
             val startDateText =
-                event.startDate?.let { DateFormatter.formatDate(it) } ?: "Start Date Unavailable"
+                event.startDate?.let { DateFormatter.formatDate(it) } ?: context.getString(R.string.no_start_date)
             val endDateText =
-                event.endDate?.let { DateFormatter.formatDate(it) } ?: "End Date Unavailable"
+                event.endDate?.let { DateFormatter.formatDate(it) } ?: context.getString(R.string.no_start_date)
             startDate.text = startDateText
             endDate.text = context.getString(R.string.end_date_format, endDateText)
-                    // " - $endDateText"
 
             eventType.text = event.eventType
             eventDescription.text = event.eventDescription
