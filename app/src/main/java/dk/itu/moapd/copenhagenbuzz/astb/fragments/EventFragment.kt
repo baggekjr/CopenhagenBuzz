@@ -100,6 +100,12 @@ class EventFragment : Fragment() {
         }
     }
 
+    /**
+     * Method to launch the camera to capture a photo.
+     * It generates a unique photo name using UUID and creates a file to store the captured photo.
+     * It also configures an intent to capture an image and save it to the specified UR and launches
+     * the camera activity with the configured intent.
+     */
     private fun launchCamera() {
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         photoName = "IMG_${UUID.randomUUID()}.JPG"
@@ -114,7 +120,10 @@ class EventFragment : Fragment() {
     }
 
 
-
+    /**
+     * Activity result launcher for capturing a photo.
+     * Handles the result of the camera activity.
+     */
     private val takePhoto = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult())
     { result ->
@@ -123,6 +132,10 @@ class EventFragment : Fragment() {
         }
     }
 
+    /**
+     * Activity result launcher for picking media from the device's gallery.
+     * Handles the result of the media selection activity.
+     */
     private val pickMedia = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { uri -> // Callback is invoked after the user selects a media item or closes the photo picker.
@@ -139,8 +152,11 @@ class EventFragment : Fragment() {
         }
     }
 
+    /**
+     * Handles the button click event to open the device's gallery for selecting a photo.
+     * Launches the activity to pick visual media, specifically images.
+     */
     private fun handlePhotoLibraryButtonOnClick() {
-
         pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
 
@@ -169,6 +185,12 @@ class EventFragment : Fragment() {
         }
     }
 
+    /**
+     * Method to handle event being added. This method uses the DataViewModel method saveEvent() to add
+     * add the event to the database and the image to the storage bucket. It sets the
+     * eventLocation by using forward geocoding from:
+     * https://geocode.maps.co/
+     */
     private fun handleEventButtonOnClick() {
         val eventName = binding.editTextEventName.text.toString().trim()
         val eventLocationStr = binding.editTextEventLocation.text.toString().replace(' ', '+')

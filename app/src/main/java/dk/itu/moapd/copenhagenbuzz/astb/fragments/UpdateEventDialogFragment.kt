@@ -46,9 +46,11 @@ import java.util.Locale
 import java.util.UUID
 
 
-class UpdateEventDialogFragment(private val event: Event,
-                                private val position: Int,
-                                private val adapter: EventAdapter, private val parentView: View) : DialogFragment() {
+class UpdateEventDialogFragment(
+    private val event: Event,
+    private val position: Int,
+    private val adapter: EventAdapter, private val parentView: View
+) : DialogFragment() {
     private var _binding: FragmentUpdateEventBinding? = null
     private lateinit var database: DatabaseReference
     private lateinit var updatedEvent: Event
@@ -147,8 +149,14 @@ class UpdateEventDialogFragment(private val event: Event,
         _binding = null
     }
 
+    /**
+     * Method to launch the camera to capture a photo.
+     * It generates a unique photo name using UUID and creates a file to store the captured photo.
+     * It also configures an intent to capture an image and save it to the specified UR and launches
+     * the camera activity with the configured intent.
+     */
     private fun launchCamera() {
-        cameraActive=true
+        cameraActive = true
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         photoName = "IMG_${UUID.randomUUID()}.JPG"
         val photoFile = photoName?.let { File(requireContext().applicationContext.filesDir, it) }
@@ -163,7 +171,10 @@ class UpdateEventDialogFragment(private val event: Event,
         takePhoto.launch(cameraIntent)
     }
 
-
+    /**
+     * Activity result launcher for capturing a photo.
+     * Handles the result of the camera activity.
+     */
     private val takePhoto = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -175,6 +186,10 @@ class UpdateEventDialogFragment(private val event: Event,
         cameraActive = false
     }
 
+    /**
+     * Activity result launcher for picking media from the device's gallery.
+     * Handles the result of the media selection activity.
+     */
     private val pickMedia = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { uri ->
@@ -188,15 +203,25 @@ class UpdateEventDialogFragment(private val event: Event,
         } else {
             showMessage("PhotoPicker: No media selected")
         }
-        cameraActive=false
+        cameraActive = false
     }
 
 
+    /**
+     * Handles the button click event to open the device's gallery for selecting a photo.
+     * Launches the activity to pick visual media, specifically images.
+     */
     private fun handlePhotoLibraryButtonOnClick() {
         pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
 
 
+    /**
+     * Method to handle event being added. This method uses the DataViewModel method saveEvent() to add
+     * add the event to the database and the image to the storage bucket. It sets the
+     * eventLocation by using forward geocoding from:
+     * https://geocode.maps.co/
+     */
     private fun handleEventButtonOnClick() {
         try {
             val eventName = binding.editTextEventName.text.toString().trim()
@@ -242,7 +267,13 @@ class UpdateEventDialogFragment(private val event: Event,
                     )
 
                     // Call the updateEvent method in DataViewModel
-                    dataViewModel.updateEvent(adapter.getId(position), updatedEvent, photoUri, event.eventIcon, adapter)
+                    dataViewModel.updateEvent(
+                        adapter.getId(position),
+                        updatedEvent,
+                        photoUri,
+                        event.eventIcon,
+                        adapter
+                    )
                     adapter.notifyDataSetChanged()
 
                 } catch (e: Exception) {
@@ -263,7 +294,7 @@ class UpdateEventDialogFragment(private val event: Event,
 
     }
 
-    private fun formatAddress(address: String) : String{
+    private fun formatAddress(address: String): String {
         val list = address
             .split(", ")
 
@@ -294,7 +325,8 @@ class UpdateEventDialogFragment(private val event: Event,
     }
 
     private fun handleDateOnClick() {
-        val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker().setTitleText("Select dates").build()
+        val dateRangePicker =
+            MaterialDatePicker.Builder.dateRangePicker().setTitleText("Select dates").build()
         dateRangePicker.show(parentFragmentManager, "DatePicker")
         dateRangePicker.addOnPositiveButtonClickListener { datePicked ->
 
@@ -303,7 +335,8 @@ class UpdateEventDialogFragment(private val event: Event,
 
             //Check if dates are not null before setting text
             if (startDate != null && endDate != null) {
-                val dates = "${DateFormatter.formatDate(startDate!!)} - ${DateFormatter.formatDate(endDate!!)}"
+                val dates =
+                    "${DateFormatter.formatDate(startDate!!)} - ${DateFormatter.formatDate(endDate!!)}"
                 binding.editTextEventDate.setText(dates)
             }
 
@@ -311,29 +344,33 @@ class UpdateEventDialogFragment(private val event: Event,
     }
 
     private fun handleFailureVolley(error: VolleyError?) {
-        Log.e(TAG,"VolleyError: $error")
+        Log.e(TAG, "VolleyError: $error")
         showMessage("Oops! Something went wrong with the network. Please try again later.")
 
     }
 
     private fun checkCameraPermission(): Boolean {
-        return ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+        return ActivityCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
-    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if (isGranted) {
-            launchCamera()
-        } else {
-            showMessage("Camera permission denied")
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                launchCamera()
+            } else {
+                showMessage("Camera permission denied")
+            }
         }
-    }
 
     private fun handleFailure(exception: Exception) {
         Log.e(TAG, "Database save failure with following exception: $exception")
 
     }
 
-    private fun showMessage( s: String){
+    private fun showMessage(s: String) {
         Snackbar.make(parentView, s, Snackbar.LENGTH_SHORT).show()
     }
 
