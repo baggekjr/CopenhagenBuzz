@@ -47,6 +47,7 @@ import dk.itu.moapd.copenhagenbuzz.astb.databinding.ActivityMainBinding
  * Activity class to manage the main activity of CopenhagenBuzz
  */
 
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
