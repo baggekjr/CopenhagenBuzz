@@ -26,6 +26,8 @@ class DataViewModel : ViewModel() {
 
     private val databaseReference = FirebaseDatabase.getInstance().getReference("events")
     private val FAVORITES = "favorites"
+    private val EVENTS = "events"
+
     private val storageReference = Firebase.storage(BUCKET_URL).reference
 
 
@@ -46,6 +48,60 @@ class DataViewModel : ViewModel() {
     val favorites: LiveData<List<Event>>
         get() = _favorites
 
+
+    fun saveEvent(event: Event, photoUri: Uri?, onSuccess: ()->Unit,
+                  onFailure: (String)->Unit){
+        val photoName = event.eventIcon
+        val eventName = event.eventName
+        val eventLocation = event.eventLocation
+        val startDate = event.startDate
+        val endDate = event.endDate
+        val eventType = event.eventType
+        val eventDescription = event.eventDescription
+
+        storageReference.child(photoName!!)
+            .putFile(photoUri!!)
+            .addOnSuccessListener {
+                println("Photo uploaded successfully!")
+
+                val newEvent = Event(
+                    auth.currentUser?.uid,
+                    photoName,
+                    eventName,
+                    eventLocation,
+                    startDate,
+                    endDate,
+                    eventType,
+                    eventDescription
+                )
+
+                auth.currentUser?.uid.let { uid ->
+                    if (uid != null) {
+                        database.child(EVENTS)
+                            .child(uid)
+                            .push()
+                            .key?.let { eventKey ->
+                                database.child(EVENTS)
+                                    .child(eventKey)
+                                    .setValue(newEvent)
+                                    .addOnSuccessListener {
+                                        Log.d(TAG, "success saving event:")
+                                        onSuccess()
+
+
+                                    }
+                                    .addOnFailureListener { exception ->
+                                        Log.e(TAG, "Error saving event: ${exception.message}")
+                                        onFailure("Error saving event: ${exception.message}")
+                                    }
+                            }
+                    }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e(TAG, "Error uploading image: ${exception.message}")
+            }
+    }
 
 
     fun isFavorite(eventId: String, onResult: (isFavorite: Boolean) -> Unit) {
@@ -238,4 +294,8 @@ class DataViewModel : ViewModel() {
 
 
     }
+
+
+
+
 

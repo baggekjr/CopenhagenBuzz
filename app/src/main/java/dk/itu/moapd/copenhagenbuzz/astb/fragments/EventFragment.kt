@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.android.volley.Request
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonArrayRequest
@@ -36,6 +37,7 @@ import dk.itu.moapd.copenhagenbuzz.astb.Utils.DateFormatter
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentEventBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
 import dk.itu.moapd.copenhagenbuzz.astb.models.EventLocation
+import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 import java.io.File
 import java.util.UUID
 
@@ -48,6 +50,8 @@ class EventFragment : Fragment() {
     private var photoUri: Uri? = null
     private var startDate: Long? = null
     private var endDate: Long? = null
+    private lateinit var dataViewModel: DataViewModel
+
 
     private val EVENTS = "events"
     private val BUZZ = "CopenhagenBuzz"
@@ -66,6 +70,8 @@ class EventFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dataViewModel = ViewModelProvider(this).get(DataViewModel::class.java)
+
         init()
         setListeners()
     }
@@ -193,7 +199,7 @@ class EventFragment : Fragment() {
 
                         val eventLocation = EventLocation(lat, lon, prettyAddress)
 
-                        // Save the event
+                        /*// Save the event
                         saveEvent(
                             userId,
                             photoName,
@@ -203,6 +209,26 @@ class EventFragment : Fragment() {
                             endDate,
                             eventType,
                             eventDescription
+                        )*/
+                        dataViewModel.saveEvent(
+                            Event(
+                                auth.currentUser?.uid,
+                                photoName,
+                                eventName,
+                                eventLocation,
+                                startDate,
+                                endDate,
+                                eventType,
+                                eventDescription
+                            ),
+                            photoUri,
+                            {
+                                showMessage("Saved event successfully")
+                                clearInputFields()
+                            },
+                            { errorMessage ->
+                                showMessage(errorMessage)
+                            }
                         )
                     } catch (e: Exception){
                         showMessage("Address not valid. Try again with an address in Copenhagen")
@@ -252,7 +278,7 @@ class EventFragment : Fragment() {
         _binding = null
     }
 
-    private fun saveEvent(
+   /* private fun saveEvent(
         userId: String,
         eventIcon: String?, // Image URI to upload
         eventName: String,
@@ -262,13 +288,6 @@ class EventFragment : Fragment() {
         eventType: String,
         eventDescription: String
     ) {
-        /*val eventDateLong = try {
-            eventDate.toLong()
-        } catch (e: NumberFormatException) {
-            Log.e(TAG, "Error parsing event date: ${e.message}")
-            showMessage("Error parsing event date")
-            return
-        }*/
         storageReference.child(photoName!!)
             .putFile(photoUri!!)
             .addOnSuccessListener {
@@ -309,7 +328,7 @@ class EventFragment : Fragment() {
                 Log.e(TAG, "Error uploading image: ${exception.message}")
                 showMessage("Failed to upload image: ${exception.message}")
             }
-    }
+    }*/
     private fun clearInputFields() {
         binding.apply {
             editTextEventName.text?.clear()
