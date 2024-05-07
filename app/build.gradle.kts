@@ -70,21 +70,24 @@ dependencies {
     implementation("com.firebaseui:firebase-ui-database:8.0.0")
     implementation("com.google.firebase:firebase-database-ktx")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
-    implementation ("com.google.firebase:firebase-storage-ktx:20.0.0")
+    implementation("com.google.firebase:firebase-storage-ktx:20.0.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.gms:play-services-location:21.2.0")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0")
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
     implementation("com.firebaseui:firebase-ui-storage:8.0.0")
     implementation("com.google.firebase:firebase-storage-ktx")
     implementation("com.squareup.picasso:picasso:2.71828")
-    implementation ("androidx.camera:camera-lifecycle:1.1.0-alpha08")
-    implementation ("androidx.camera:camera-camera2:1.1.0-alpha08")
-    implementation ("androidx.camera:camera-lifecycle:1.1.0-alpha08")
-    implementation ("androidx.camera:camera-camera2:1.1.0")
-
-
-
-
+    implementation("androidx.camera:camera-lifecycle:1.1.0-alpha08")
+    implementation("androidx.camera:camera-camera2:1.1.0-alpha08")
+    implementation("androidx.camera:camera-lifecycle:1.1.0-alpha08")
+    implementation("androidx.camera:camera-camera2:1.1.0")
 }
+    buildscript {
+        dependencies {
+            classpath("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:2.0.1")
+        }
+
+
+    }
