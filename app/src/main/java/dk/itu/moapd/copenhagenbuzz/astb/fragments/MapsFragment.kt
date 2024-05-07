@@ -1,4 +1,4 @@
-package dk.itu.moapd.copenhagenbuzz.astb.fragments;
+package dk.itu.moapd.copenhagenbuzz.astb.fragments
 
 import android.Manifest.permission
 import android.content.BroadcastReceiver
@@ -65,15 +65,12 @@ class MapsFragment : Fragment(){
     }
 
     private var _binding: FragmentMapsBinding? = null
-    private lateinit var dataViewModel: DataViewModel
-
 
     private val binding get() = requireNotNull(_binding) { "Binding is null" }
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var locationBroadcastReceiver: LocationBroadcastReceiver
     private lateinit var locationService: LocationService
     private var locationServiceBound = false
-    private lateinit var mapFragment: SupportMapFragment
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private var googleMap: GoogleMap? = null
     private val serviceConnection = object : ServiceConnection {
@@ -172,7 +169,7 @@ class MapsFragment : Fragment(){
         // Check if the service is a foreground service, and if not, subscribe to location updates
         if (locationServiceBound) {
             if (checkPermission()) {
-                locationService?.subscribeToLocationUpdates()
+                locationService.subscribeToLocationUpdates()
             } else {
                 requestUserPermissions()
             }
