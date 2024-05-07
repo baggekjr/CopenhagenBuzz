@@ -39,7 +39,6 @@ import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.Utils.LocationService
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.FragmentMapsBinding
 import dk.itu.moapd.copenhagenbuzz.astb.models.Event
-import dk.itu.moapd.copenhagenbuzz.astb.viewmodels.DataViewModel
 
 /**
  * A Fragment subclass responsible for displaying a map with event markers and the user's location.
