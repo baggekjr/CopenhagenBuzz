@@ -11,7 +11,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -24,7 +23,6 @@ import kotlinx.coroutines.launch
 
 class DataViewModel : ViewModel() {
 
-    private val databaseReference = FirebaseDatabase.getInstance().getReference("events")
     private val FAVORITES = "favorites"
     private val EVENTS = "events"
 
@@ -33,12 +31,6 @@ class DataViewModel : ViewModel() {
 
     private var auth = FirebaseAuth.getInstance()
     private var database = Firebase.database(DATABASE_URL).reference.child("CopenhagenBuzz")
-
-
-    private val _events: MutableLiveData<List<Event>> by lazy {
-        MutableLiveData<List<Event>>()
-
-    }
 
 
     private val _favorites: MutableLiveData<List<Event>> by lazy {
@@ -58,14 +50,16 @@ class DataViewModel : ViewModel() {
         val endDate = event.endDate
         val eventType = event.eventType
         val eventDescription = event.eventDescription
+        val userId = auth.currentUser?.uid
+
 
         storageReference.child(photoName!!)
             .putFile(photoUri!!)
             .addOnSuccessListener {
-                println("Photo uploaded successfully!")
+               Log.d(TAG, "Photo uploaded successfully!")
 
                 val newEvent = Event(
-                    auth.currentUser?.uid,
+                    userId,
                     photoName,
                     eventName,
                     eventLocation,
@@ -75,7 +69,7 @@ class DataViewModel : ViewModel() {
                     eventDescription
                 )
 
-                auth.currentUser?.uid.let { uid ->
+                userId.let { uid ->
                     if (uid != null) {
                         database.child(EVENTS)
                             .child(uid)
@@ -85,9 +79,8 @@ class DataViewModel : ViewModel() {
                                     .child(eventKey)
                                     .setValue(newEvent)
                                     .addOnSuccessListener {
-                                        Log.d(TAG, "success saving event:")
+                                        Log.d(TAG, "Success saving event")
                                         onSuccess()
-
 
                                     }
                                     .addOnFailureListener { exception ->
@@ -302,8 +295,11 @@ class DataViewModel : ViewModel() {
             .addOnFailureListener { databaseException ->
                 Log.e(TAG, "Failed to remove event from database", databaseException)
             }
+        }
+
     }
-}
+
+
 
 
 
