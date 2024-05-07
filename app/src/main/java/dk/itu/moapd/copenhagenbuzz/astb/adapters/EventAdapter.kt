@@ -136,6 +136,13 @@ class EventAdapter(private val context: Context, private val options: FirebaseLi
         val deleteButton = view.findViewById<Button>(R.id.delete_button)
     }
 
+    /**
+     * Loads the image from the provided image path using Firebase Storage. Once the image is
+     * successfully loaded, it is displayed in the ImageView using Picasso library.
+     *
+     * @param event The event where the image is supposed to be displayed
+     * @param eventImage The ImageView where the image will be displayed
+     */
     private fun loadImageToView(event: Event, eventImage: ImageView) {
         val placeholderImage = R.drawable.baseline_find_replace_24
 
