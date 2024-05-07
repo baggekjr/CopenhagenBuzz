@@ -1,9 +1,8 @@
 package dk.itu.moapd.copenhagenbuzz.astb.activities
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
@@ -11,8 +10,12 @@ import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.android.material.snackbar.Snackbar
 import dk.itu.moapd.copenhagenbuzz.astb.R
 import dk.itu.moapd.copenhagenbuzz.astb.databinding.ActivityLoginBinding
-import dk.itu.moapd.copenhagenbuzz.astb.databinding.ActivityMainBinding
 
+
+/**
+ * Activity class to manage the login activity of CopenhagenBuzz. The implemented ways of authentication
+ * is email and gmail.
+ */
 class LoginActivity : AppCompatActivity() {
     private var isLoggedIn: Boolean = false
     private val signInLauncher = registerForActivityResult(
@@ -21,11 +24,8 @@ class LoginActivity : AppCompatActivity() {
         onSignInResult(result)
     }
 
-
-
     private lateinit var binding: ActivityLoginBinding
     override fun onCreate(savedInstanceState: Bundle?) {
-        //TODO: kan windowCompat.... slettes??
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
 
@@ -47,7 +47,6 @@ class LoginActivity : AppCompatActivity() {
         // Choose authentication providers.
         val providers = arrayListOf(
             AuthUI.IdpConfig.EmailBuilder().build(),
-            //AuthUI.IdpConfig.PhoneBuilder().build(),
             AuthUI.IdpConfig.GoogleBuilder().build())
 
         // Create and launch sign-in intent.
@@ -73,9 +72,7 @@ class LoginActivity : AppCompatActivity() {
                 isLoggedIn
                 // Successfully signed in.
                 showSnackBar("User logged in the app.")
-                //isLoggedIn = true
                 startMainActivity()
-
             }
             else -> {
                 // Sign in failed.
@@ -83,8 +80,6 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
-
-
 
 
     private fun startMainActivity() {
