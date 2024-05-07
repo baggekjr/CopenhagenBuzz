@@ -125,43 +125,6 @@ class DataViewModel : ViewModel() {
     }
 
 
-    /**
-     * Method to make sure if an event is deleted from the database, that the event is also deleted from
-     * the list of favorites under all the users that have that event favorited
-     *
-     * @param deletedEvent is a String that represents a reference key, which is the eventId for the
-     * deleted event.
-     */
-    fun removeEventFromFavorites(deletedEvent: String) {
-        val favoritesReference = database.child(FAVORITES)
-
-
-        favoritesReference.addListenerForSingleValueEvent(object : ValueEventListener {
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-                for (userSnapshot in snapshot.children) {
-
-                    userSnapshot.child(deletedEvent).ref.removeValue()
-                        .addOnSuccessListener {
-                            // Event successfully removed from user's favorites
-                            Log.d(TAG, "Event $deletedEvent removed from user ${userSnapshot.key}'s favorites")
-                        }
-                        .addOnFailureListener { error ->
-                            // Handle failure to remove event from user's favorites
-                            Log.e(TAG, "Failed to remove event $deletedEvent from user ${userSnapshot.key}'s favorites", error)
-                        }
-
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                // Handle error
-                Log.e(TAG, "Database operation cancelled", error.toException())
-            }
-        })
-
-    }
-
 
     /**
      * Method to determine if the user is removing or adding an event to their favorites depending on
@@ -187,7 +150,7 @@ class DataViewModel : ViewModel() {
 
                 ref.key?.let {
                     database.child(FAVORITES).child(userId).child(it).setValue(true).addOnSuccessListener {
-                        Log.d(TAG, "Favorited event succesfully")
+                        Log.d(TAG, "Favorited event successfully")
                     }.addOnFailureListener {
                         Log.d(TAG, "An error occurred: $it")
                     }
@@ -203,7 +166,7 @@ class DataViewModel : ViewModel() {
                 ref.key?.let {
                     database.child(FAVORITES).child(userId).child(it).removeValue()
                         .addOnSuccessListener {
-                            Log.d(TAG, "Unfavorited event succesfully")
+                            Log.d(TAG, "Unfavorited event successfully")
                         }.addOnFailureListener {
                         Log.d(TAG, "An error occurred: $it")
                     }
@@ -231,7 +194,7 @@ class DataViewModel : ViewModel() {
             auth.currentUser?.uid?.let { userId ->
                 ref.key?.let { eventKey ->
                     // Check if the photo has been updated
-                    Log.e(TAG, "$oldPhotoName = ${updatedEvent.eventIcon} er de det samme")
+                    Log.e(TAG, "$oldPhotoName = ${updatedEvent.eventIcon} is the same")
                     if (updatedPhotoUri != null && updatedEvent.eventIcon != null && oldPhotoName != updatedEvent.eventIcon) {
                         storageReference.child(updatedEvent.eventIcon)
                             .putFile(updatedPhotoUri)
@@ -267,7 +230,7 @@ class DataViewModel : ViewModel() {
     }
 
     private fun updateEventData(eventKey: String, updatedEvent: Event, adapter: EventAdapter) {
-        database.child("events").child(eventKey).setValue(updatedEvent)
+        database.child(EVENTS).child(eventKey).setValue(updatedEvent)
             .addOnSuccessListener {
                 Log.d(TAG, "Event updated successfully")
                 adapter.notifyDataSetChanged()
@@ -301,7 +264,45 @@ class DataViewModel : ViewModel() {
             }
         }
 
+    /**
+     * Method to make sure if an event is deleted from the database, that the event is also deleted from
+     * the list of favorites under all the users that have that event favorited
+     *
+     * @param deletedEvent is a String that represents a reference key, which is the eventId for the
+     * deleted event.
+     */
+    private fun removeEventFromFavorites(deletedEvent: String) {
+        val favoritesReference = database.child(FAVORITES)
+
+
+        favoritesReference.addListenerForSingleValueEvent(object : ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (userSnapshot in snapshot.children) {
+
+                    userSnapshot.child(deletedEvent).ref.removeValue()
+                        .addOnSuccessListener {
+                            // Event successfully removed from user's favorites
+                            Log.d(TAG, "Event $deletedEvent removed from user ${userSnapshot.key}'s favorites")
+                        }
+                        .addOnFailureListener { error ->
+                            // Handle failure to remove event from user's favorites
+                            Log.e(TAG, "Failed to remove event $deletedEvent from user ${userSnapshot.key}'s favorites", error)
+                        }
+
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Handle error
+                Log.e(TAG, "Database operation cancelled", error.toException())
+            }
+        })
+
     }
+
+
+}
 
 
 

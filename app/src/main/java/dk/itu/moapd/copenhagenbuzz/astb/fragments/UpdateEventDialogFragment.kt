@@ -200,7 +200,7 @@ class UpdateEventDialogFragment(
         ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         if (uri != null) {
-            showMessage("Photo selected!")
+            showMessage(getString(R.string.photo_select))
             photoUri = uri
             photoName = "IMG_${UUID.randomUUID()}.JPG"
 
@@ -208,7 +208,7 @@ class UpdateEventDialogFragment(
             Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
 
         } else {
-            showMessage("PhotoPicker: No media selected")
+            showMessage(getString(R.string.no_media))
         }
         cameraActive = false
     }
@@ -287,7 +287,7 @@ class UpdateEventDialogFragment(
                     adapter.notifyDataSetChanged()
 
                 } catch (e: Exception) {
-                    showMessage("Address not valid. Try updating your again event again with an address in Copenhagen.${e.message}")
+                    showMessage(getString(R.string.only_copenhagen))
                     Log.e(TAG, "${e.message}")
                 }
             }, { error ->
@@ -297,7 +297,7 @@ class UpdateEventDialogFragment(
 
         } catch (e: IllegalStateException) {
             Log.e(TAG, "IllegalStateException: ${e.message}")
-            showMessage("Oops! Something unexpected happened while updating your event. Please try again.")
+            showMessage(getString(R.string.generic_error_message))
         } catch (e: Exception) {
             Log.e(TAG, "Exception: ${e.message}")
         }
@@ -321,7 +321,7 @@ class UpdateEventDialogFragment(
         eventDescription: String
     ) {
         if (eventName.isEmpty() || eventLocation.isEmpty() || eventDate.isEmpty() || eventType.isEmpty() || eventDescription.isEmpty()) {
-            throw IllegalArgumentException("Please fill out all fields")
+            throw IllegalArgumentException(getString(R.string.fill_out_all))
         }
     }
 
@@ -336,7 +336,7 @@ class UpdateEventDialogFragment(
 
     private fun handleDateOnClick() {
         val dateRangePicker =
-            MaterialDatePicker.Builder.dateRangePicker().setTitleText("Select dates").build()
+            MaterialDatePicker.Builder.dateRangePicker().setTitleText(getString(R.string.select_dates)).build()
         dateRangePicker.show(parentFragmentManager, "DatePicker")
         dateRangePicker.addOnPositiveButtonClickListener { datePicked ->
 
@@ -355,7 +355,7 @@ class UpdateEventDialogFragment(
 
     private fun handleFailureVolley(error: VolleyError?) {
         Log.e(TAG, "VolleyError: $error")
-        showMessage("Oops! Something went wrong with the network. Please try again later.")
+        showMessage(getString(R.string.network_error_message))
 
     }
 
@@ -371,7 +371,7 @@ class UpdateEventDialogFragment(
             if (isGranted) {
                 launchCamera()
             } else {
-                showMessage("Camera permission denied")
+                showMessage(getString(R.string.cam_permission_denied))
             }
         }
 
