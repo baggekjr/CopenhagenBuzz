@@ -138,7 +138,7 @@ class EventFragment : Fragment() {
      */
     private val pickMedia = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
-    ) { uri -> // Callback is invoked after the user selects a media item or closes the photo picker.
+    ) { uri ->
         if (uri != null) {
             showMessage("Photo selected!")
 

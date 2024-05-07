@@ -197,6 +197,7 @@ class UpdateEventDialogFragment(
             showMessage("Photo selected!")
             photoUri = uri
             photoName = "IMG_${UUID.randomUUID()}.JPG"
+
             // Show the user a preview of the photo they just selected
             Picasso.get().load(photoUri).into(binding.eventPhotoPreview)
 
